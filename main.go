@@ -27,8 +27,11 @@ func init() {
 	router = mux.NewRouter()
 
 	router.HandleFunc("/", getDocs)
-	router.HandleFunc("/drivers", getAllDrivers)
-	router.HandleFunc(`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`, getDriver)
+	router.HandleFunc("/drivers", getAllDrivers).Methods("GET")
+	router.HandleFunc(
+		`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`,
+		getDriver,
+	).Methods("GET")
 }
 
 func main() {
