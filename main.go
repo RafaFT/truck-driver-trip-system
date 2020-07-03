@@ -28,6 +28,7 @@ func init() {
 
 	router.HandleFunc("/", getDocs)
 	router.HandleFunc("/drivers", getAllDrivers)
+	router.HandleFunc(`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`, getDriver)
 }
 
 func main() {
