@@ -33,6 +33,7 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 	// get CPF (doc ID)
 	rawCPF := mux.Vars(r)["cpf"]
 	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
+	driver.CPF = &cpf
 
 	collection := client.Collection("drivers")
 	doc := collection.Doc(cpf)

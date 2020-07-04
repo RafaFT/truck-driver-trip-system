@@ -14,7 +14,7 @@ const (
 
 // Driver type for Firestore Drivers collection
 type Driver struct {
-	CPF        *string    `firestore:"-" json:"cpf,omitempty"`
+	CPF        *string    `firestore:"cpf" json:"cpf,omitempty"`
 	Name       *string    `firestore:"name" json:"name"`
 	BirthDate  *time.Time `firestore:"birth_date" json:"birth_date"`
 	Age        *int       `firestore:"-" json:"age"`
