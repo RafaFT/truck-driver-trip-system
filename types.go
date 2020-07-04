@@ -15,12 +15,12 @@ const (
 // Driver type for Firestore Drivers collection
 type Driver struct {
 	CPF        *string    `firestore:"cpf" json:"cpf,omitempty"`
-	Name       *string    `firestore:"name" json:"name"`
-	BirthDate  *time.Time `firestore:"birth_date" json:"birth_date"`
-	Age        *int       `firestore:"-" json:"age"`
-	Gender     *string    `firestore:"gender" json:"gender"`
-	HasVehicle *bool      `firestore:"has_vehicle" json:"has_vehicle"`
-	CNHType    *string    `firestore:"cnh_type" json:"cnh_type"`
+	Name       *string    `firestore:"name" json:"name,omitempty"`
+	BirthDate  *time.Time `firestore:"birth_date" json:"birth_date,omitempty"`
+	Age        *int       `firestore:"-" json:"age,omitempty"`
+	Gender     *string    `firestore:"gender" json:"gender,omitempty"`
+	HasVehicle *bool      `firestore:"has_vehicle" json:"has_vehicle,omitempty"`
+	CNHType    *string    `firestore:"cnh_type" json:"cnh_type,omitempty"`
 }
 
 // Trip type for Firestore Trips collection

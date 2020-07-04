@@ -10,6 +10,7 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/gorilla/mux"
+	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -47,34 +48,41 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllDrivers(w http.ResponseWriter, r *http.Request) {
-	collection := client.Collection("drivers")
-	docs, err := collection.DocumentRefs(ctx).GetAll()
+	r.ParseForm()
+
+	returnAge := true
+	if fields := r.Form.Get("fields"); len(fields) > 0 {
+		returnAge = strings.Contains(fields, "age")
+	}
+
+	q := createQuery(client.Collection("drivers"), r)
+	docs, err := q.Documents(ctx).GetAll()
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	result := make([]*Driver, len(docs))
-	for i, doc := range docs {
-		docSnapShot, err := doc.Get(ctx)
-		if err != nil {
-			panic(err)
-		}
-
+	for i, docSnapShot := range docs {
 		var driver Driver
 		err = docSnapShot.DataTo(&driver)
 		if err != nil {
-			panic(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 
-		age := 30
-		driver.Age = &age // TODO: add age logic
+		if returnAge {
+			age := 30
+			driver.Age = &age // TODO: add age logic
+		}
 
 		result[i] = &driver
 	}
 
 	b, err := json.Marshal(result)
 	if err != nil {
-		panic(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -86,12 +94,17 @@ func getDocs(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDriver(w http.ResponseWriter, r *http.Request) {
-	inputCPF := mux.Vars(r)["cpf"]
-	cpf := strings.ReplaceAll(strings.ReplaceAll(inputCPF, "-", ""), ".", "")
+	r.ParseForm()
 
-	docSnapShot, err := client.Doc(fmt.Sprintf("drivers/%s", cpf)).Get(ctx)
+	returnAge := true
+	if fields := r.Form.Get("fields"); len(fields) > 0 {
+		returnAge = strings.Contains(fields, "age")
+	}
+
+	q := createQuery(client.Collection("drivers"), r)
+	docSnapshot, err := q.Documents(ctx).Next()
 	if err != nil {
-		if status.Code(err) == codes.NotFound {
+		if err == iterator.Done {
 			w.WriteHeader(http.StatusNotFound)
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -100,15 +113,16 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var driver Driver
-
-	err = docSnapShot.DataTo(&driver)
+	err = docSnapshot.DataTo(&driver)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	age := 30
-	driver.Age = &age // TODO: add age logic
+	if returnAge {
+		age := 30
+		driver.Age = &age // TODO: add age logic
+	}
 
 	b, err := json.Marshal(&driver)
 	if err != nil {
@@ -131,7 +145,7 @@ func updateDriver(w http.ResponseWriter, r *http.Request) {
 	// load content into Driver instance
 	var driver Driver
 	err = json.Unmarshal(content, &driver)
-	if err != nil || driver.CPF != nil {  // cannot update CPF
+	if err != nil || driver.CPF != nil { // cannot update CPF
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
