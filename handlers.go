@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -10,6 +11,37 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+func addDriver(w http.ResponseWriter, r *http.Request) {
+	// get body's content
+	content, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// load content into Driver instance
+	var driver Driver
+	err = json.Unmarshal(content, &driver)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// get CPF (doc ID)
+	rawCPF := mux.Vars(r)["cpf"]
+	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
+
+	collection := client.Collection("drivers")
+	doc := collection.Doc(cpf)
+	_, err = doc.Create(ctx, &driver)
+	if err != nil {
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
 
 func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 	collection := client.Collection("drivers")

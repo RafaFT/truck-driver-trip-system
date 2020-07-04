@@ -28,10 +28,10 @@ func init() {
 
 	router.HandleFunc("/", getDocs)
 	router.HandleFunc("/drivers", getAllDrivers).Methods("GET")
-	router.HandleFunc(
-		`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`,
-		getDriver,
-	).Methods("GET")
+	router.HandleFunc(`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`,
+		getDriver).Methods("GET")
+	router.HandleFunc(`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`,
+		addDriver).Methods("POST")
 }
 
 func main() {
