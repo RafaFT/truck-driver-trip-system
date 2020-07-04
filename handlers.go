@@ -53,16 +53,14 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	result := make(map[string]*Driver)
-	for _, doc := range docs {
-		cpf := doc.ID
-		var driver Driver
-
+	result := make([]*Driver, len(docs))
+	for i, doc := range docs {
 		docSnapShot, err := doc.Get(ctx)
 		if err != nil {
 			panic(err)
 		}
 
+		var driver Driver
 		err = docSnapShot.DataTo(&driver)
 		if err != nil {
 			panic(err)
@@ -70,7 +68,8 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 
 		age := 30
 		driver.Age = &age // TODO: add age logic
-		result[cpf] = &driver
+
+		result[i] = &driver
 	}
 
 	b, err := json.Marshal(result)
@@ -110,7 +109,6 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 
 	age := 30
 	driver.Age = &age // TODO: add age logic
-	driver.CPF = &cpf
 
 	b, err := json.Marshal(&driver)
 	if err != nil {
@@ -133,7 +131,7 @@ func updateDriver(w http.ResponseWriter, r *http.Request) {
 	// load content into Driver instance
 	var driver Driver
 	err = json.Unmarshal(content, &driver)
-	if err != nil {
+	if err != nil || driver.CPF != nil {  // cannot update CPF
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
