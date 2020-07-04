@@ -32,6 +32,8 @@ func init() {
 		getDriver).Methods("GET")
 	router.HandleFunc(`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`,
 		addDriver).Methods("POST")
+	router.HandleFunc(`/drivers/{cpf:(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})}`,
+		updateDriver).Methods("PATCH")
 }
 
 func main() {

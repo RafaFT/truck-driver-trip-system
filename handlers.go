@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 
+	"cloud.google.com/go/firestore"
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -117,4 +119,61 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(b)
+}
+
+func updateDriver(w http.ResponseWriter, r *http.Request) {
+	// get body's content
+	content, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// load content into Driver instance
+	var driver Driver
+	err = json.Unmarshal(content, &driver)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// explicitly convert Driver to map, because it's easier to iterate it
+	mapDriver := map[string]interface{}{
+		"name":        driver.Name,
+		"birth_date":  driver.BirthDate,
+		"gender":      driver.Gender,
+		"has_vehicle": driver.HasVehicle,
+		"cnh_type":    driver.CNHType,
+	}
+
+	// create slice of updates
+	updates := make([]firestore.Update, 0)
+	for fieldName, fieldValue := range mapDriver {
+		if !reflect.ValueOf(fieldValue).IsNil() {
+			update := firestore.Update{
+				Path:  fieldName,
+				Value: fieldValue,
+			}
+			updates = append(updates, update)
+		}
+	}
+
+	// get CPF (doc ID)
+	rawCPF := mux.Vars(r)["cpf"]
+	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
+
+	doc := client.Doc(fmt.Sprintf("drivers/%s", cpf))
+	_, err = doc.Update(ctx, updates)
+	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			w.WriteHeader(http.StatusNotFound)
+		} else if err.Error() == "firestore: no paths to update" {
+			w.WriteHeader(http.StatusBadRequest)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
