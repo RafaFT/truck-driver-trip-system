@@ -1,8 +1,14 @@
 package main
 
-import "time"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+	"time"
+)
 
 type VehicleType uint8
+type CNHType string
 
 const (
 	TRUCK_34         VehicleType = 1
@@ -20,7 +26,7 @@ type Driver struct {
 	Age        *int       `firestore:"-" json:"age,omitempty"`
 	Gender     *string    `firestore:"gender" json:"gender,omitempty"`
 	HasVehicle *bool      `firestore:"has_vehicle" json:"has_vehicle,omitempty"`
-	CNHType    *string    `firestore:"cnh_type" json:"cnh_type,omitempty"`
+	CNHType    *CNHType   `firestore:"cnh_type" json:"cnh_type,omitempty"`
 }
 
 func (d *Driver) IsComplete() bool {
@@ -34,6 +40,20 @@ func (d *Driver) IsComplete() bool {
 	}
 
 	return true
+}
+
+func (cnh *CNHType) UnmarshalJSON(b []byte) error {
+	var sCNH string
+	json.Unmarshal(b, &sCNH)
+
+	sCNH = strings.ToUpper(sCNH)
+	validCNHTypes := "ABCDE"
+	if len(sCNH) != 1 || !strings.Contains(validCNHTypes, sCNH) {
+		return fmt.Errorf("'cnh_type' must be 'A', 'B', 'C', 'D' or 'E'")
+	}
+
+	*cnh = CNHType(sCNH)
+	return nil
 }
 
 // Trip type for Firestore Trips collection
