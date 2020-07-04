@@ -23,6 +23,19 @@ type Driver struct {
 	CNHType    *string    `firestore:"cnh_type" json:"cnh_type,omitempty"`
 }
 
+func (d *Driver) IsComplete() bool {
+	if d.CPF == nil ||
+		d.Name == nil ||
+		d.BirthDate == nil ||
+		d.Gender == nil ||
+		d.HasVehicle == nil ||
+		d.CNHType == nil {
+		return false
+	}
+
+	return true
+}
+
 // Trip type for Firestore Trips collection
 type Trip struct {
 	HasLoad     *bool        `firestore:"has_load" json:"has_load"`

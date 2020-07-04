@@ -36,6 +36,11 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
 	driver.CPF = &cpf
 
+	if !driver.IsComplete() {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	collection := client.Collection("drivers")
 	doc := collection.Doc(cpf)
 	_, err = doc.Create(ctx, &driver)
