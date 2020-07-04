@@ -9,6 +9,7 @@ import (
 
 type VehicleType uint8
 type CNHType string
+type Gender string
 
 const (
 	TRUCK_34         VehicleType = 1
@@ -24,7 +25,7 @@ type Driver struct {
 	Name       *string    `firestore:"name" json:"name,omitempty"`
 	BirthDate  *time.Time `firestore:"birth_date" json:"birth_date,omitempty"`
 	Age        *int       `firestore:"-" json:"age,omitempty"`
-	Gender     *string    `firestore:"gender" json:"gender,omitempty"`
+	Gender     *Gender    `firestore:"gender" json:"gender,omitempty"`
 	HasVehicle *bool      `firestore:"has_vehicle" json:"has_vehicle,omitempty"`
 	CNHType    *CNHType   `firestore:"cnh_type" json:"cnh_type,omitempty"`
 }
@@ -53,6 +54,20 @@ func (cnh *CNHType) UnmarshalJSON(b []byte) error {
 	}
 
 	*cnh = CNHType(sCNH)
+	return nil
+}
+
+func (gender *Gender) UnmarshalJSON(b []byte) error {
+	var sGender string
+	json.Unmarshal(b, &sGender)
+
+	sGender = strings.ToUpper(sGender)
+	validGenders := "FMO" // "O" stands for other
+	if len(sGender) != 1 || !strings.Contains(validGenders, sGender) {
+		return fmt.Errorf("'gender' must be 'F', 'M' or 'O'")
+	}
+
+	*gender = Gender(sGender)
 	return nil
 }
 
