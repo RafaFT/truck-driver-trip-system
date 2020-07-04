@@ -65,7 +65,8 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		driver.Age = 30 // TODO: add age logic
+		age := 30
+		driver.Age = &age // TODO: add age logic
 		result[cpf] = &driver
 	}
 
@@ -104,8 +105,9 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	driver.Age = 30 // TODO: add age logic
-	driver.CPF = cpf
+	age := 30
+	driver.Age = &age // TODO: add age logic
+	driver.CPF = &cpf
 
 	b, err := json.Marshal(&driver)
 	if err != nil {
