@@ -83,3 +83,7 @@ type Location struct {
 	Latitute  *int
 	Longitude *int
 }
+
+type errorJSON struct {
+	Error string `json:"error"`
+}

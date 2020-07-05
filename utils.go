@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -44,4 +45,13 @@ func createQuery(collection *firestore.CollectionRef, r *http.Request) firestore
 	}
 
 	return q
+}
+
+func createErrorJSON(e error) []byte {
+	output := errorJSON{
+		Error: e.Error(),
+	}
+
+	content, _ := json.Marshal(&output)
+	return content
 }
