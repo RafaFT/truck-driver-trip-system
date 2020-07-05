@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 
@@ -37,5 +38,12 @@ func init() {
 }
 
 func main() {
-	http.ListenAndServe(":3000", router)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	if err := http.ListenAndServe(":"+port, router); err != nil {
+		log.Fatal(err)
+	}
 }
