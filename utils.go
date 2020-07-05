@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/gorilla/mux"
@@ -34,7 +36,11 @@ func createQuery(collection *firestore.CollectionRef, r *http.Request) firestore
 	// get only requested fields
 	if rawFields := r.Form.Get("fields"); len(rawFields) > 0 {
 		splitFields := strings.Split(rawFields, ",")
-		fields := make([]string, 0)
+		// always get birth_date, because it's necessary for calculating
+		// the age, remove it later if necessary
+		fields := []string{
+			"birth_date",
+		}
 		for _, field := range splitFields {
 			if len(field) > 0 {
 				fields = append(fields, field)
@@ -65,4 +71,20 @@ func getCPF(r *http.Request) (string, bool) {
 	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
 
 	return cpf, true
+}
+
+func calculateAge(birthDate, now time.Time) int {
+	years := now.Year() - birthDate.Year()
+	if years < 0 {
+		return 0
+	}
+
+	birthMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(birthDate.Month()), birthDate.Day()))
+	nowMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(now.Month()), now.Day()))
+
+	if birthMonthNDay > nowMonthNDay {
+		years--
+	}
+
+	return years
 }

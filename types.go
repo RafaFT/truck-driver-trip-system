@@ -24,7 +24,7 @@ type Driver struct {
 	CPF        *string    `firestore:"cpf" json:"cpf,omitempty"`
 	Name       *string    `firestore:"name" json:"name,omitempty"`
 	BirthDate  *time.Time `firestore:"birth_date" json:"birth_date,omitempty"`
-	Age        *int       `firestore:"-" json:"age,omitempty"`
+	Age        int        `firestore:"-" json:"age,omitempty"`
 	Gender     *Gender    `firestore:"gender" json:"gender,omitempty"`
 	HasVehicle *bool      `firestore:"has_vehicle" json:"has_vehicle,omitempty"`
 	CNHType    *CNHType   `firestore:"cnh_type" json:"cnh_type,omitempty"`

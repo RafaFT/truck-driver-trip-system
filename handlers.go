@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/iterator"
@@ -62,9 +63,11 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	returnAge := true
+	returnAge := true       // age doesnt come from DB, it's calculated
+	returnBirthDate := true // birth date is necessary to calculate age
 	if fields := r.Form.Get("fields"); len(fields) > 0 {
 		returnAge = strings.Contains(fields, "age")
+		returnBirthDate = strings.Contains(fields, "birth_date")
 	}
 
 	q := createQuery(client.Collection("drivers"), r)
@@ -88,8 +91,10 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if returnAge {
-			age := 30
-			driver.Age = &age // TODO: add age logic
+			driver.Age = calculateAge(*driver.BirthDate, time.Now())
+		}
+		if !returnBirthDate {
+			driver.BirthDate = nil
 		}
 
 		result[i] = &driver
@@ -116,9 +121,11 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	returnAge := true
+	returnAge := true       // age doesnt come from DB, it's calculated
+	returnBirthDate := true // birth date is necessary to calculate age
 	if fields := r.Form.Get("fields"); len(fields) > 0 {
 		returnAge = strings.Contains(fields, "age")
+		returnBirthDate = strings.Contains(fields, "birth_date")
 	}
 
 	q := createQuery(client.Collection("drivers"), r)
@@ -146,8 +153,10 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if returnAge {
-		age := 30
-		driver.Age = &age // TODO: add age logic
+		driver.Age = calculateAge(*driver.BirthDate, time.Now())
+	}
+	if !returnBirthDate {
+		driver.BirthDate = nil
 	}
 
 	b, err := json.Marshal(&driver)
