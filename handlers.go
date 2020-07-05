@@ -67,7 +67,7 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 		returnBirthDate = strings.Contains(fields, "birth_date")
 	}
 
-	q := createQuery(client.Collection("drivers"), r)
+	q := createDriversQuery(r)
 	docs, err := q.Documents(ctx).GetAll()
 	if err != nil {
 		fmt.Println(err)
@@ -125,7 +125,7 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 		returnBirthDate = strings.Contains(fields, "birth_date")
 	}
 
-	q := createQuery(client.Collection("drivers"), r)
+	q := createDriversQuery(r)
 	docSnapshot, err := q.Documents(ctx).Next()
 	if err != nil {
 		if err == iterator.Done {

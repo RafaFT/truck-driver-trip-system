@@ -12,8 +12,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func createQuery(collection *firestore.CollectionRef, r *http.Request) firestore.Query {
-	q := collection.Query
+func createDriversQuery(r *http.Request) firestore.Query {
+	q := client.Collection("drivers").Query
 
 	// cpf will only exists if it's the getDriver`s route
 	if rawCPF, exist := mux.Vars(r)["cpf"]; exist {
