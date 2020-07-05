@@ -62,17 +62,6 @@ func createErrorJSON(e error) []byte {
 	return content
 }
 
-func getCPF(r *http.Request) (string, bool) {
-	rawCPF, exists := mux.Vars(r)["cpf"]
-	if !exists {
-		return "", false
-	}
-
-	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
-
-	return cpf, true
-}
-
 func calculateAge(birthDate, now time.Time) int {
 	years := now.Year() - birthDate.Year()
 	if years < 0 {

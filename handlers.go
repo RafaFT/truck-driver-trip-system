@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	"github.com/gorilla/mux"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -35,10 +36,6 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get CPF (doc ID)
-	cpf, _ := getCPF(r)
-	driver.CPF = &cpf
-
 	err = driver.ValidateDriver()
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -47,11 +44,11 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	collection := client.Collection("drivers")
-	doc := collection.Doc(cpf)
+	doc := collection.Doc(string(*driver.CPF))
 	_, err = doc.Create(ctx, &driver)
 	if err != nil {
 		w.WriteHeader(http.StatusConflict)
-		w.Write(createErrorJSON(fmt.Errorf("CPF=%s already exists", cpf)))
+		w.Write(createErrorJSON(fmt.Errorf("CPF=%s already registered", *driver.CPF)))
 		return
 	}
 
@@ -132,7 +129,7 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 	docSnapshot, err := q.Documents(ctx).Next()
 	if err != nil {
 		if err == iterator.Done {
-			cpf, _ := getCPF(r)
+			cpf := mux.Vars(r)["cpf"]
 			w.WriteHeader(http.StatusNotFound)
 			w.Write(createErrorJSON(fmt.Errorf("cpf=%s not found", cpf)))
 		} else {
@@ -213,7 +210,7 @@ func updateDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get CPF (doc ID)
-	cpf, _ := getCPF(r)
+	cpf := mux.Vars(r)["cpf"]
 
 	doc := client.Doc(fmt.Sprintf("drivers/%s", cpf))
 	_, err = doc.Update(ctx, updates)

@@ -3,13 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 )
 
-type VehicleType uint8
+// custom types for field validation
 type CNHType string
+type CPF string
 type Gender string
+type VehicleType uint8
 
 const (
 	TRUCK_34         VehicleType = 1
@@ -21,7 +24,7 @@ const (
 
 // Driver type for Firestore Drivers collection
 type Driver struct {
-	CPF        *string    `firestore:"cpf" json:"cpf,omitempty"`
+	CPF        *CPF       `firestore:"cpf" json:"cpf,omitempty"`
 	Name       *string    `firestore:"name" json:"name,omitempty"`
 	BirthDate  *time.Time `firestore:"birth_date" json:"birth_date,omitempty"`
 	Age        int        `firestore:"-" json:"age,omitempty"`
@@ -37,7 +40,7 @@ func (d *Driver) ValidateDriver() error {
 		d.Gender == nil ||
 		d.HasVehicle == nil ||
 		d.CNHType == nil {
-		fields := "['name', 'birth_date', 'gender', 'has_vehicle', 'cnh_type']"
+		fields := "['cpf', 'name', 'birth_date', 'gender', 'has_vehicle', 'cnh_type']"
 		return fmt.Errorf("Driver must have all fields: %s", fields)
 	}
 
@@ -55,6 +58,25 @@ func (cnh *CNHType) UnmarshalJSON(b []byte) error {
 	}
 
 	*cnh = CNHType(sCNH)
+	return nil
+}
+
+func (cpf *CPF) UnmarshalJSON(b []byte) error {
+	var sCPF string
+	err := json.Unmarshal(b, &sCPF)
+	if err != nil {
+		return err
+	}
+
+	matched, err := regexp.MatchString(`^\d{11}$`, sCPF)
+	if err != nil {
+		return err
+	}
+	if !matched {
+		return fmt.Errorf("invalid value for 'CPF'")
+	}
+
+	*cpf = CPF(sCPF)
 	return nil
 }
 
