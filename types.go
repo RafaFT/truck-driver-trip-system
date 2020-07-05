@@ -12,15 +12,9 @@ import (
 type CNHType string
 type CPF string
 type Gender string
-type VehicleType uint8
-
-const (
-	TRUCK_34         VehicleType = 1
-	TRUCK_TOCO       VehicleType = 2
-	TRUCK            VehicleType = 3
-	SIMPLE_TRUCK     VehicleType = 4
-	EXTENDED_TRAILER VehicleType = 5
-)
+type VehicleType int
+type Latitute int
+type Longitude int
 
 // Driver type for Firestore Drivers collection
 type Driver struct {
@@ -96,15 +90,71 @@ func (gender *Gender) UnmarshalJSON(b []byte) error {
 
 // Trip type for Firestore Trips collection
 type Trip struct {
-	HasLoad     *bool        `firestore:"has_load" json:"has_load"`
-	VehicleType *VehicleType `firestore:"vehicle_type" json:"vehicle_type"`
-	Origin      *Location    `firestore:"origin" json:"origin"`
-	Destination *Location    `firestore:"destination" json:"destination"`
+	CPF         *CPF         `firestore:"cpf" json:"cpf,omitempty"`
+	HasLoad     *bool        `firestore:"has_load" json:"has_load,omitempty"`
+	VehicleType *VehicleType `firestore:"vehicle_type" json:"vehicle_type,omitempty"`
+	Time        *time.Time   `firestore:"time" json:"time,omitempty"`
+	Origin      *Location    `firestore:"origin" json:"origin,omitempty"`
+	Destination *Location    `firestore:"destination" json:"destination,omitempty"`
+}
+
+func (vt *VehicleType) UnmarshalJSON(b []byte) error {
+	vehicleTypes := map[int]string{
+		1: "TRUCK_34",
+		2: "TRUCK_TOCO",
+		3: "TRUCK",
+		4: "SIMPLE_TRUCK",
+		5: "EXTENDED_TRAILER",
+	}
+
+	var vehicleType int
+	err := json.Unmarshal(b, &vehicleType)
+	if err != nil {
+		return err
+	}
+
+	_, exist := vehicleTypes[vehicleType]
+	if !exist {
+		return fmt.Errorf("invalid vehicle_type")
+	}
+
+	*vt = VehicleType(vehicleType)
+	return nil
 }
 
 type Location struct {
-	Latitute  *int
-	Longitude *int
+	Latitute  *Latitute  `firestore:"latitude" json:"latitude"`
+	Longitude *Longitude `firestore:"longitude" json:"longitude"`
+}
+
+func (lat *Latitute) UnmarshalJSON(b []byte) error {
+	var latitude int
+	err := json.Unmarshal(b, &latitude)
+	if err != nil {
+		return err
+	}
+
+	if latitude < -90 || latitude > 90 {
+		return fmt.Errorf("latitude must be between -90 to 90")
+	}
+
+	*lat = Latitute(latitude)
+	return nil
+}
+
+func (long *Longitude) UnmarshalJSON(b []byte) error {
+	var longitude int
+	err := json.Unmarshal(b, &longitude)
+	if err != nil {
+		return err
+	}
+
+	if longitude < -180 || longitude > 180 {
+		return fmt.Errorf("longitude must be between -180 to 180")
+	}
+
+	*long = Longitude(longitude)
+	return nil
 }
 
 type errorJSON struct {
