@@ -55,3 +55,14 @@ func createErrorJSON(e error) []byte {
 	content, _ := json.Marshal(&output)
 	return content
 }
+
+func getCPF(r *http.Request) (string, bool) {
+	rawCPF, exists := mux.Vars(r)["cpf"]
+	if !exists {
+		return "", false
+	}
+
+	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
+
+	return cpf, true
+}
