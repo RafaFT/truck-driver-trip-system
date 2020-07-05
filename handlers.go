@@ -9,17 +9,19 @@ import (
 	"strings"
 
 	"cloud.google.com/go/firestore"
-	"github.com/gorilla/mux"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func addDriver(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	// get body's content
 	content, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(createErrorJSON(err))
 		return
 	}
 
@@ -28,16 +30,18 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(content, &driver)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(createErrorJSON(err))
 		return
 	}
 
 	// get CPF (doc ID)
-	rawCPF := mux.Vars(r)["cpf"]
-	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
+	cpf, _ := getCPF(r)
 	driver.CPF = &cpf
 
-	if !driver.IsComplete() {
+	err = driver.ValidateDriver()
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(createErrorJSON(err))
 		return
 	}
 
@@ -46,6 +50,7 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 	_, err = doc.Create(ctx, &driver)
 	if err != nil {
 		w.WriteHeader(http.StatusConflict)
+		w.Write(createErrorJSON(fmt.Errorf("CPF=%s already exists", cpf)))
 		return
 	}
 
@@ -53,6 +58,8 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllDrivers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	r.ParseForm()
 
 	returnAge := true
@@ -63,7 +70,9 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 	q := createQuery(client.Collection("drivers"), r)
 	docs, err := q.Documents(ctx).GetAll()
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
 		return
 	}
 
@@ -72,7 +81,9 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 		var driver Driver
 		err = docSnapShot.DataTo(&driver)
 		if err != nil {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
 			return
 		}
 
@@ -86,7 +97,9 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 
 	b, err := json.Marshal(result)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
 		return
 	}
 
@@ -99,6 +112,8 @@ func getDocs(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDriver(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	r.ParseForm()
 
 	returnAge := true
@@ -110,9 +125,13 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 	docSnapshot, err := q.Documents(ctx).Next()
 	if err != nil {
 		if err == iterator.Done {
+			cpf, _ := getCPF(r)
 			w.WriteHeader(http.StatusNotFound)
+			w.Write(createErrorJSON(fmt.Errorf("cpf=%s not found", cpf)))
 		} else {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
 		}
 		return
 	}
@@ -120,7 +139,9 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 	var driver Driver
 	err = docSnapshot.DataTo(&driver)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
 		return
 	}
 
@@ -131,7 +152,9 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 
 	b, err := json.Marshal(&driver)
 	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
 		return
 	}
 
@@ -140,10 +163,13 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateDriver(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	// get body's content
 	content, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(createErrorJSON(err))
 		return
 	}
 
@@ -152,6 +178,7 @@ func updateDriver(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(content, &driver)
 	if err != nil || driver.CPF != nil { // cannot update CPF
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write(createErrorJSON(err))
 		return
 	}
 
@@ -177,18 +204,21 @@ func updateDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get CPF (doc ID)
-	rawCPF := mux.Vars(r)["cpf"]
-	cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
+	cpf, _ := getCPF(r)
 
 	doc := client.Doc(fmt.Sprintf("drivers/%s", cpf))
 	_, err = doc.Update(ctx, updates)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			w.WriteHeader(http.StatusNotFound)
+			w.Write(createErrorJSON(fmt.Errorf("cpf=%s not found", cpf)))
 		} else if err.Error() == "firestore: no paths to update" {
 			w.WriteHeader(http.StatusBadRequest)
+			w.Write(createErrorJSON(fmt.Errorf("empty update request")))
 		} else {
+			fmt.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
 		}
 		return
 	}

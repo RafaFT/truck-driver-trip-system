@@ -30,17 +30,18 @@ type Driver struct {
 	CNHType    *CNHType   `firestore:"cnh_type" json:"cnh_type,omitempty"`
 }
 
-func (d *Driver) IsComplete() bool {
+func (d *Driver) ValidateDriver() error {
 	if d.CPF == nil ||
 		d.Name == nil ||
 		d.BirthDate == nil ||
 		d.Gender == nil ||
 		d.HasVehicle == nil ||
 		d.CNHType == nil {
-		return false
+		fields := "['name', 'birth_date', 'gender', 'has_vehicle', 'cnh_type']"
+		return fmt.Errorf("Driver must have all fields: %s", fields)
 	}
 
-	return true
+	return nil
 }
 
 func (cnh *CNHType) UnmarshalJSON(b []byte) error {
