@@ -34,13 +34,13 @@ func init() {
 	})
 
 	// route for drivers
-	router.HandleFunc("/drivers", handlers.getAllDrivers).Methods("GET")
-	router.HandleFunc("/drivers", handlers.addDriver).Methods("POST")
-	router.HandleFunc(`/drivers/{cpf:\d{11}}`, handlers.getDriver).Methods("GET")
-	router.HandleFunc(`/drivers/{cpf:\d{11}}`, handlers.updateDriver).Methods("PATCH")
+	router.HandleFunc("/drivers", handlers.GetAllDrivers(client)).Methods("GET")
+	router.HandleFunc("/drivers", handlers.AddDriver(client)).Methods("POST")
+	router.HandleFunc(`/drivers/{cpf:\d{11}}`, handlers.GetDriver(client)).Methods("GET")
+	router.HandleFunc(`/drivers/{cpf:\d{11}}`, handlers.UpdateDriver(client)).Methods("PATCH")
 
 	// route for trips
-	router.HandleFunc("/trips", handlers.getAllTrips).Methods("GET")
+	router.HandleFunc("/trips", handlers.GetAllTrips(client)).Methods("GET")
 }
 
 func main() {

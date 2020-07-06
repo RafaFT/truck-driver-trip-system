@@ -16,7 +16,7 @@ import (
 
 const ISO8601 = "2006-01-02"
 
-func createDriversQuery(r *http.Request) firestore.Query {
+func createDriversQuery(client *firestore.Client, r *http.Request) firestore.Query {
 	q := client.Collection("drivers").Query
 
 	// cpf will only exists if it's the getDriver`s route
@@ -57,7 +57,7 @@ func createDriversQuery(r *http.Request) firestore.Query {
 	return q
 }
 
-func createTripsQuery(r *http.Request) firestore.Query {
+func createTripsQuery(client *firestore.Client, r *http.Request) firestore.Query {
 	q := client.CollectionGroup("trips").Query
 
 	// add filters
