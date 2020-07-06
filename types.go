@@ -6,6 +6,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
 // custom types for field validation
@@ -90,12 +92,12 @@ func (gender *Gender) UnmarshalJSON(b []byte) error {
 
 // Trip type for Firestore Trips collection
 type Trip struct {
-	CPF         *CPF         `firestore:"cpf" json:"cpf,omitempty"`
-	HasLoad     *bool        `firestore:"has_load" json:"has_load,omitempty"`
-	VehicleType *VehicleType `firestore:"vehicle_type" json:"vehicle_type,omitempty"`
-	Time        *time.Time   `firestore:"time" json:"time,omitempty"`
-	Origin      *Location    `firestore:"origin" json:"origin,omitempty"`
-	Destination *Location    `firestore:"destination" json:"destination,omitempty"`
+	CPF         *CPF           `firestore:"cpf" json:"cpf,omitempty"`
+	HasLoad     *bool          `firestore:"has_load" json:"has_load,omitempty"`
+	VehicleType *VehicleType   `firestore:"vehicle_type" json:"vehicle_type,omitempty"`
+	Time        *time.Time     `firestore:"time" json:"time,omitempty"`
+	Origin      *latlng.LatLng `firestore:"origin" json:"origin,omitempty"`
+	Destination *latlng.LatLng `firestore:"destination" json:"destination,omitempty"`
 }
 
 func (vt *VehicleType) UnmarshalJSON(b []byte) error {
@@ -120,11 +122,6 @@ func (vt *VehicleType) UnmarshalJSON(b []byte) error {
 
 	*vt = VehicleType(vehicleType)
 	return nil
-}
-
-type Location struct {
-	Latitute  *Latitute  `firestore:"latitude" json:"latitude"`
-	Longitude *Longitude `firestore:"longitude" json:"longitude"`
 }
 
 func (lat *Latitute) UnmarshalJSON(b []byte) error {
