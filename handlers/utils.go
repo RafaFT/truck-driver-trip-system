@@ -137,3 +137,7 @@ func calculateAge(birthDate, now time.Time) int {
 
 	return years
 }
+
+func padFourZeros(value int) string {
+	return fmt.Sprintf("%04d", value)
+}

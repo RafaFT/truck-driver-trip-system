@@ -41,6 +41,7 @@ func init() {
 
 	// route for trips
 	router.HandleFunc("/trips", handlers.GetAllTrips(client)).Methods("GET")
+	router.HandleFunc(`/trips/{year:\d{4}}`, handlers.GetTripsByYear(client)).Methods("GET")
 }
 
 func main() {
