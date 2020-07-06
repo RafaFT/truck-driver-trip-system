@@ -8,6 +8,8 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/gorilla/mux"
+
+	"github.com/rafaft/truck-pad/handlers"
 )
 
 var ctx context.Context
@@ -27,22 +29,24 @@ func init() {
 
 	router = mux.NewRouter()
 
-	router.HandleFunc("/", getDocs)
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Docs..."))
+	})
 
 	// route for drivers
-	router.HandleFunc("/drivers", getAllDrivers).Methods("GET")
-	router.HandleFunc("/drivers", addDriver).Methods("POST")
-	router.HandleFunc(`/drivers/{cpf:\d{11}}`, getDriver).Methods("GET")
-	router.HandleFunc(`/drivers/{cpf:\d{11}}`, updateDriver).Methods("PATCH")
+	router.HandleFunc("/drivers", handlers.getAllDrivers).Methods("GET")
+	router.HandleFunc("/drivers", handlers.addDriver).Methods("POST")
+	router.HandleFunc(`/drivers/{cpf:\d{11}}`, handlers.getDriver).Methods("GET")
+	router.HandleFunc(`/drivers/{cpf:\d{11}}`, handlers.updateDriver).Methods("PATCH")
 
 	// route for trips
-	router.HandleFunc("/trips", getAllTrips).Methods("GET")
+	router.HandleFunc("/trips", handlers.getAllTrips).Methods("GET")
 }
 
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "3000"
 	}
 
 	if err := http.ListenAndServe(":"+port, router); err != nil {

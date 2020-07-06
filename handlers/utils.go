@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -10,6 +10,8 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/gorilla/mux"
+
+	"github.com/rafaft/truck-pad/models"
 )
 
 const ISO8601 = "2006-01-02"
@@ -112,7 +114,7 @@ func createTripsQuery(r *http.Request) firestore.Query {
 }
 
 func createErrorJSON(e error) []byte {
-	output := errorJSON{
+	output := models.ErrorJSON{
 		Error: e.Error(),
 	}
 

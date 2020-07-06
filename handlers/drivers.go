@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -14,6 +14,8 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/rafaft/truck-pad/models"
 )
 
 func addDriver(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +30,7 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// load content into Driver instance
-	var driver Driver
+	var driver models.Driver
 	err = json.Unmarshal(content, &driver)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -45,7 +47,7 @@ func addDriver(w http.ResponseWriter, r *http.Request) {
 
 	collection := client.Collection("drivers")
 	doc := collection.Doc(string(*driver.CPF))
-	_, err = doc.Create(ctx, &driver)
+	_, err = doc.Create(r.Context(), &driver)
 	if err != nil {
 		w.WriteHeader(http.StatusConflict)
 		w.Write(createErrorJSON(fmt.Errorf("CPF=%s already registered", *driver.CPF)))
@@ -68,7 +70,7 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := createDriversQuery(r)
-	docs, err := q.Documents(ctx).GetAll()
+	docs, err := q.Documents(r.Context()).GetAll()
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -76,9 +78,9 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := make([]*Driver, len(docs))
+	result := make([]*models.Driver, len(docs))
 	for i, docSnapShot := range docs {
-		var driver Driver
+		var driver models.Driver
 		err = docSnapShot.DataTo(&driver)
 		if err != nil {
 			fmt.Println(err)
@@ -109,50 +111,6 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
-func getAllTrips(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	r.ParseForm()
-
-	q := createTripsQuery(r)
-	docs, err := q.Documents(ctx).GetAll()
-	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
-		return
-	}
-
-	result := make([]*Trip, len(docs))
-	for i, docSnapShot := range docs {
-		var trip Trip
-		err = docSnapShot.DataTo(&trip)
-		if err != nil {
-			fmt.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
-			return
-		}
-
-		result[i] = &trip
-	}
-
-	b, err := json.Marshal(result)
-	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(b)
-}
-
-func getDocs(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Docs..."))
-}
-
 func getDriver(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -166,7 +124,7 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	q := createDriversQuery(r)
-	docSnapshot, err := q.Documents(ctx).Next()
+	docSnapshot, err := q.Documents(r.Context()).Next()
 	if err != nil {
 		if err == iterator.Done {
 			cpf := mux.Vars(r)["cpf"]
@@ -180,7 +138,7 @@ func getDriver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var driver Driver
+	var driver models.Driver
 	err = docSnapshot.DataTo(&driver)
 	if err != nil {
 		fmt.Println(err)
@@ -220,7 +178,7 @@ func updateDriver(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// load content into Driver instance
-	var driver Driver
+	var driver models.Driver
 	err = json.Unmarshal(content, &driver)
 	if err != nil || driver.CPF != nil { // cannot update CPF
 		w.WriteHeader(http.StatusBadRequest)
@@ -253,7 +211,7 @@ func updateDriver(w http.ResponseWriter, r *http.Request) {
 	cpf := mux.Vars(r)["cpf"]
 
 	doc := client.Doc(fmt.Sprintf("drivers/%s", cpf))
-	_, err = doc.Update(ctx, updates)
+	_, err = doc.Update(r.Context(), updates)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			w.WriteHeader(http.StatusNotFound)
