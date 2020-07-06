@@ -28,10 +28,15 @@ func init() {
 	router = mux.NewRouter()
 
 	router.HandleFunc("/", getDocs)
+
+	// route for drivers
 	router.HandleFunc("/drivers", getAllDrivers).Methods("GET")
 	router.HandleFunc("/drivers", addDriver).Methods("POST")
 	router.HandleFunc(`/drivers/{cpf:\d{11}}`, getDriver).Methods("GET")
 	router.HandleFunc(`/drivers/{cpf:\d{11}}`, updateDriver).Methods("PATCH")
+
+	// route for trips
+	router.HandleFunc("/trips", getAllTrips).Methods("GET")
 }
 
 func main() {

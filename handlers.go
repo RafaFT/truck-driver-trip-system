@@ -109,6 +109,46 @@ func getAllDrivers(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
+func getAllTrips(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	r.ParseForm()
+
+	q := createTripsQuery(r)
+	docs, err := q.Documents(ctx).GetAll()
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+		return
+	}
+
+	result := make([]*Trip, len(docs))
+	for i, docSnapShot := range docs {
+		var trip Trip
+		err = docSnapShot.DataTo(&trip)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+			return
+		}
+
+		result[i] = &trip
+	}
+
+	b, err := json.Marshal(result)
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
+}
+
 func getDocs(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Docs..."))
 }
