@@ -63,6 +63,9 @@ func createTripsQuery(client *firestore.Client, r *http.Request) firestore.Query
 	if cpf := r.Form.Get("cpf"); len(cpf) > 0 {
 		q = q.Where("cpf", "==", cpf)
 	}
+	if id := r.Form.Get("id"); len(id) > 0 {
+		q = q.Where("id", "==", id)
+	}
 	if str_has_load := r.Form.Get("has_load"); len(str_has_load) > 0 {
 		has_load, err := strconv.ParseBool(str_has_load)
 		if err == nil {

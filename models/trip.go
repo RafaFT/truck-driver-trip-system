@@ -8,12 +8,9 @@ import (
 	"google.golang.org/genproto/googleapis/type/latlng"
 )
 
-// custom types for field validation
-type Latitute int
-type Longitude int
-
 // Trip type for Firestore Trips collection
 type Trip struct {
+	ID          string         `firestore:"id" json:"id,omitempty"`
 	CPF         *CPF           `firestore:"cpf" json:"cpf,omitempty"`
 	HasLoad     *bool          `firestore:"has_load" json:"has_load,omitempty"`
 	VehicleType *VehicleType   `firestore:"vehicle_type" json:"vehicle_type,omitempty"`
@@ -22,32 +19,25 @@ type Trip struct {
 	Destination *latlng.LatLng `firestore:"destination" json:"destination,omitempty"`
 }
 
-func (lat *Latitute) UnmarshalJSON(b []byte) error {
-	var latitude int
-	err := json.Unmarshal(b, &latitude)
+func NewTrip(b []byte) (*Trip, error) {
+	var trip Trip
+	err := json.Unmarshal(b, &trip)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if latitude < -90 || latitude > 90 {
-		return fmt.Errorf("latitude must be between -90 to 90")
+	if trip.CPF == nil ||
+		trip.HasLoad == nil ||
+		trip.VehicleType == nil ||
+		trip.Time == nil ||
+		trip.Origin == nil ||
+		trip.Destination == nil {
+		fields := "['cpf', 'has_load', 'vehicle_type', 'time', 'origin', 'destination']"
+		return nil, fmt.Errorf("Trip must have all fields: %s", fields)
 	}
 
-	*lat = Latitute(latitude)
-	return nil
-}
+	// a trip's ID is it's timestamp on string format
+	trip.ID = trip.Time.Format("20060102150405")
 
-func (long *Longitude) UnmarshalJSON(b []byte) error {
-	var longitude int
-	err := json.Unmarshal(b, &longitude)
-	if err != nil {
-		return err
-	}
-
-	if longitude < -180 || longitude > 180 {
-		return fmt.Errorf("longitude must be between -180 to 180")
-	}
-
-	*long = Longitude(longitude)
-	return nil
+	return &trip, nil
 }
