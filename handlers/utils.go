@@ -70,8 +70,11 @@ func createTripsQuery(client *firestore.Client, r *http.Request) firestore.Query
 			q = q.Where("has_load", "==", has_load)
 		}
 	}
-	if vehicle_type := r.Form.Get("vehicle_type"); len(vehicle_type) > 0 {
-		q = q.Where("vehicle_type", "==", vehicle_type)
+	if str_vehicle_type := r.Form.Get("vehicle_type"); len(str_vehicle_type) > 0 {
+		vehicle_type, err := strconv.Atoi(str_vehicle_type)
+		if err == nil {
+			q = q.Where("vehicle_type", "==", vehicle_type)
+		}
 	}
 	if str_start_date := r.Form.Get("start_date"); len(str_start_date) > 0 {
 		start_date, err := time.Parse(ISO8601, str_start_date)
