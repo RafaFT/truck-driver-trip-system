@@ -20,8 +20,7 @@ func createDriversQuery(client *firestore.Client, r *http.Request) firestore.Que
 	q := client.Collection("drivers").Query
 
 	// cpf will only exists if it's the getDriver`s route
-	if rawCPF, exist := mux.Vars(r)["cpf"]; exist {
-		cpf := strings.ReplaceAll(strings.ReplaceAll(rawCPF, ".", ""), "-", "")
+	if cpf, exist := mux.Vars(r)["cpf"]; exist {
 		q = q.Where("cpf", "==", cpf) // TODO: query for the document ID
 	}
 	if gender := r.Form.Get("gender"); len(gender) > 0 {
