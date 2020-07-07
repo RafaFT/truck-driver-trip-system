@@ -148,6 +148,16 @@ func padTwoZeros(value int) string {
 	return fmt.Sprintf("%02d", value)
 }
 
+func setFilterByYear(r *http.Request) {
+	year, _ := strconv.Atoi(mux.Vars(r)["year"])
+	r.Form["start_date"] = []string{
+		fmt.Sprintf("%s-01-01", padFourZeros(year)),
+	}
+	r.Form["end_date"] = []string{
+		fmt.Sprintf("%s-01-01", padFourZeros(year+1)),
+	}
+}
+
 func setFilterByMonth(r *http.Request) error {
 	year, _ := strconv.Atoi(mux.Vars(r)["year"])
 	month, _ := strconv.Atoi(mux.Vars(r)["month"])

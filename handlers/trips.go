@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"cloud.google.com/go/firestore"
-	"github.com/gorilla/mux"
 	"github.com/rafaft/truck-pad/models"
 )
 
@@ -102,13 +100,7 @@ func GetTripsByYear(client *firestore.Client) func(w http.ResponseWriter, r *htt
 
 		r.ParseForm()
 
-		year, _ := strconv.Atoi(mux.Vars(r)["year"])
-		r.Form["start_date"] = []string{
-			fmt.Sprintf("%s-01-01", padFourZeros(year)),
-		}
-		r.Form["end_date"] = []string{
-			fmt.Sprintf("%s-01-01", padFourZeros(year+1)),
-		}
+		setFilterByYear(r)
 
 		q := createTripsQuery(client, r)
 
