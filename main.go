@@ -42,7 +42,10 @@ func init() {
 	// route for trips
 	router.HandleFunc("/trips", handlers.GetAllTrips(client)).Methods("GET")
 	router.HandleFunc(`/trips/{year:\d{1,4}}`, handlers.GetTripsByYear(client)).Methods("GET")
-	router.HandleFunc(`/trips/{year:\d{1,4}}/{month:\d{1,2}}`, handlers.GetTripsByMonth(client)).Methods("GET")
+	router.HandleFunc(`/trips/{year:\d{1,4}}/{month:\d{1,2}}`,
+		handlers.GetTripsByMonth(client)).Methods("GET")
+	router.HandleFunc(`/trips/{year:\d{1,4}}/{month:\d{1,2}}/{day:\d{1,2}}`,
+		handlers.GetTripsByDay(client)).Methods("GET")
 }
 
 func main() {

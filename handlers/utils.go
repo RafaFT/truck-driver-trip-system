@@ -169,3 +169,34 @@ func setFilterByMonth(r *http.Request) error {
 
 	return nil
 }
+
+func setFilterByDay(r *http.Request) error {
+	year, _ := strconv.Atoi(mux.Vars(r)["year"])
+	month, _ := strconv.Atoi(mux.Vars(r)["month"])
+	day, _ := strconv.Atoi(mux.Vars(r)["day"])
+
+	if month < 1 || month > 12 {
+		return fmt.Errorf("invalid month value=%d", month)
+	}
+
+	yearPadded := padFourZeros(year)
+	monthPadded := padTwoZeros(month)
+	dayPadded := padTwoZeros(day)
+
+	startDate, err := time.Parse(ISO8601,
+		fmt.Sprintf("%s-%s-%s", yearPadded, monthPadded, dayPadded),
+	)
+	if err != nil {
+		return fmt.Errorf("invalid day value=%d", day)
+	}
+	endDate := startDate.AddDate(0, 0, 1)
+
+	r.Form["start_date"] = []string{
+		startDate.Format(ISO8601),
+	}
+	r.Form["end_date"] = []string{
+		endDate.Format(ISO8601),
+	}
+
+	return nil
+}
