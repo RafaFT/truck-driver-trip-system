@@ -141,3 +141,31 @@ func calculateAge(birthDate, now time.Time) int {
 func padFourZeros(value int) string {
 	return fmt.Sprintf("%04d", value)
 }
+
+func padTwoZeros(value int) string {
+	return fmt.Sprintf("%02d", value)
+}
+
+func setFilterByMonth(r *http.Request) error {
+	year, _ := strconv.Atoi(mux.Vars(r)["year"])
+	month, _ := strconv.Atoi(mux.Vars(r)["month"])
+
+	if month < 1 || month > 12 {
+		return fmt.Errorf("invalid month value=%d", month)
+	}
+
+	yearPadded := padFourZeros(year)
+	monthPadded := padTwoZeros(month)
+
+	startDate, _ := time.Parse(ISO8601, fmt.Sprintf("%s-%s-01", yearPadded, monthPadded))
+	endDate := startDate.AddDate(0, 1, 0)
+
+	r.Form["start_date"] = []string{
+		startDate.Format(ISO8601),
+	}
+	r.Form["end_date"] = []string{
+		endDate.Format(ISO8601),
+	}
+
+	return nil
+}
