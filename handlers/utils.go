@@ -60,8 +60,8 @@ func createTripsQuery(client *firestore.Client, r *http.Request) firestore.Query
 	q := client.CollectionGroup("trips").Query
 
 	// add filters
-	if cpf := r.Form.Get("cpf"); len(cpf) > 0 {
-		q = q.Where("cpf", "==", cpf)
+	if driver_id := r.Form.Get("driver_id"); len(driver_id) > 0 {
+		q = q.Where("driver_id", "==", driver_id)
 	}
 	if id := r.Form.Get("id"); len(id) > 0 {
 		q = q.Where("id", "==", id)

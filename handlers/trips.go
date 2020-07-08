@@ -30,12 +30,12 @@ func AddTrip(client *firestore.Client) func(w http.ResponseWriter, r *http.Reque
 		}
 
 		ctx := r.Context()
-		collection := client.Collection("drivers").Doc(string(*trip.CPF)).Collection("trips")
+		collection := client.Collection("drivers").Doc(string(*trip.DriverID)).Collection("trips")
 		_, err = collection.Where("id", "==", trip.ID).Documents(ctx).Next()
 		if err != iterator.Done {
 			w.WriteHeader(http.StatusConflict)
 			w.Write(createErrorJSON(fmt.Errorf(
-				"there is already a trip with the same timestamp under driver=%s", *trip.CPF),
+				"there is already a trip with the same timestamp under driver=%s", *trip.DriverID),
 			))
 			return
 		}

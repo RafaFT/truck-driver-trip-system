@@ -11,7 +11,7 @@ import (
 // Trip type for Firestore Trips collection
 type Trip struct {
 	ID          string         `firestore:"id" json:"id,omitempty"`
-	CPF         *CPF           `firestore:"cpf" json:"cpf,omitempty"`
+	DriverID    *DriverID      `firestore:"driver_id" json:"driver_id,omitempty"`
 	HasLoad     *bool          `firestore:"has_load" json:"has_load,omitempty"`
 	VehicleType *VehicleType   `firestore:"vehicle_type" json:"vehicle_type,omitempty"`
 	Time        *time.Time     `firestore:"time" json:"time,omitempty"`
@@ -26,13 +26,13 @@ func NewTrip(b []byte) (*Trip, error) {
 		return nil, err
 	}
 
-	if trip.CPF == nil ||
+	if trip.DriverID == nil ||
 		trip.HasLoad == nil ||
 		trip.VehicleType == nil ||
 		trip.Time == nil ||
 		trip.Origin == nil ||
 		trip.Destination == nil {
-		fields := "['cpf', 'has_load', 'vehicle_type', 'time', 'origin', 'destination']"
+		fields := "['driver_id', 'has_load', 'vehicle_type', 'time', 'origin', 'destination']"
 		return nil, fmt.Errorf("Trip must have all fields: %s", fields)
 	}
 
