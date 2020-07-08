@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"cloud.google.com/go/firestore"
@@ -10,6 +11,57 @@ import (
 	"github.com/rafaft/truck-pad/models"
 	"google.golang.org/api/iterator"
 )
+
+func AddTripByDriver(client *firestore.Client) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		content, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(createErrorJSON(err))
+			return
+		}
+
+		var trip models.Trip
+		err = json.Unmarshal(content, &trip)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(createErrorJSON(err))
+			return
+		}
+
+		cpf := models.DriverID(mux.Vars(r)["cpf"])
+		trip.DriverID = &cpf
+		if err = trip.ValidateTrip(); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(createErrorJSON(err))
+			return
+		}
+		trip.SetID()
+
+		ctx := r.Context()
+		collection := client.Collection("drivers").Doc(string(*trip.DriverID)).Collection("trips")
+		_, err = collection.Where("id", "==", trip.ID).Documents(ctx).Next()
+		if err != iterator.Done {
+			w.WriteHeader(http.StatusConflict)
+			w.Write(createErrorJSON(fmt.Errorf(
+				"there is already a trip with the same timestamp under driver=%s", *trip.DriverID),
+			))
+			return
+		}
+
+		_, _, err = collection.Add(ctx, &trip)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+	}
+}
 
 func GetTripsByDriver(client *firestore.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
