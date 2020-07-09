@@ -187,9 +187,14 @@ func UpdateDriver(client *firestore.Client) func(w http.ResponseWriter, r *http.
 		// load content into Driver instance
 		var driver models.Driver
 		err = json.Unmarshal(content, &driver)
-		if err != nil || driver.CPF != nil { // cannot update CPF
+		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write(createErrorJSON(err))
+			return
+		}
+		if driver.CPF != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(createErrorJSON(fmt.Errorf("cannot update a Driver's CPF")))
 			return
 		}
 
