@@ -127,6 +127,10 @@ func GetDriver(client *firestore.Client) func(w http.ResponseWriter, r *http.Req
 			returnAge = strings.Contains(fields, "age")
 			returnBirthDate = strings.Contains(fields, "birth_date")
 		}
+		// remove (filter) query parameters
+		r.Form.Del("gender")
+		r.Form.Del("has_vehicle")
+		r.Form.Del("cnh_type")
 
 		q := createDriversQuery(client, r)
 		docSnapshot, err := q.Documents(r.Context()).Next()
