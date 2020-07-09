@@ -30,6 +30,16 @@ func (t *Trip) ValidateTrip() error {
 		return fmt.Errorf("Trip must have all fields: %s", fields)
 	}
 
+	if t.Origin.Latitude > 90 || t.Origin.Latitude < -90 ||
+		t.Destination.Latitude > 90 || t.Destination.Latitude < -90 {
+		return fmt.Errorf("latitude outside permitted range -90.0 to 90.0")
+	}
+
+	if t.Origin.Longitude > 180 || t.Origin.Longitude < -180 ||
+		t.Destination.Longitude > 180 || t.Destination.Longitude < -180 {
+		return fmt.Errorf("longitude outside permitted range -180.0 to 180.0")
+	}
+
 	return nil
 }
 
