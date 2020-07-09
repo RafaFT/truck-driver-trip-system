@@ -73,56 +73,38 @@ func GetTripsByDriver(client *firestore.Client) func(w http.ResponseWriter, r *h
 		r.Form.Set("driver_id", cpf)
 
 		q := createTripsQuery(client, r)
+		docs, err := q.Documents(r.Context()).GetAll()
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+			return
+		}
 
-		getTrips(w, r, q)
-	}
-}
+		result := make([]*models.Trip, len(docs))
+		for i, docSnapShot := range docs {
+			var trip models.Trip
+			err = docSnapShot.DataTo(&trip)
+			if err != nil {
+				fmt.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+				return
+			}
 
-func GetTripsByDriverByYear(client *firestore.Client) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+			result[i] = &trip
+		}
 
-		r.ParseForm()
+		b, err := json.Marshal(result)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+			return
+		}
 
-		cpf := mux.Vars(r)["cpf"]
-		r.Form.Set("driver_id", cpf)
-		setFilterByYear(r)
-
-		q := createTripsQuery(client, r)
-
-		getTrips(w, r, q)
-	}
-}
-
-func GetTripsByDriverByMonth(client *firestore.Client) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		r.ParseForm()
-
-		cpf := mux.Vars(r)["cpf"]
-		r.Form.Set("driver_id", cpf)
-		setFilterByMonth(r)
-
-		q := createTripsQuery(client, r)
-
-		getTrips(w, r, q)
-	}
-}
-
-func GetTripsByDriverByDay(client *firestore.Client) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		r.ParseForm()
-
-		cpf := mux.Vars(r)["cpf"]
-		r.Form.Set("driver_id", cpf)
-		setFilterByDay(r)
-
-		q := createTripsQuery(client, r)
-
-		getTrips(w, r, q)
+		w.WriteHeader(http.StatusOK)
+		w.Write(b)
 	}
 }
 

@@ -42,22 +42,11 @@ func init() {
 	// route for trips by driver
 	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips`, handlers.GetTripsByDriver(client)).Methods("GET")
 	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips`, handlers.AddTripByDriver(client)).Methods("POST")
-	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips/{year:\d{1,4}}`,
-		handlers.GetTripsByDriverByYear(client)).Methods("GET")
-	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips/{year:\d{1,4}}/{month:\d{1,2}}`,
-		handlers.GetTripsByDriverByMonth(client)).Methods("GET")
-	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips/{year:\d{1,4}}/{month:\d{1,2}}/{day:\d{1,2}}`,
-		handlers.GetTripsByDriverByMonth(client)).Methods("GET")
 	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips/latest`, handlers.GetLatestTrip(client)).Methods("GET")
 
 	// route for trips
 	router.HandleFunc("/trips", handlers.GetAllTrips(client)).Methods("GET")
 	router.HandleFunc("/trips", handlers.AddTrip(client)).Methods("POST")
-	router.HandleFunc(`/trips/{year:\d{1,4}}`, handlers.GetTripsByYear(client)).Methods("GET")
-	router.HandleFunc(`/trips/{year:\d{1,4}}/{month:\d{1,2}}`,
-		handlers.GetTripsByMonth(client)).Methods("GET")
-	router.HandleFunc(`/trips/{year:\d{1,4}}/{month:\d{1,2}}/{day:\d{1,2}}`,
-		handlers.GetTripsByDay(client)).Methods("GET")
 }
 
 func main() {
