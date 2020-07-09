@@ -117,8 +117,8 @@ func GetLatestTrip(client *firestore.Client) func(w http.ResponseWriter, r *http
 		r.Form.Del("id")
 		r.Form.Del("has_load")
 		r.Form.Del("vehicle_type")
-		r.Form.Del("start_date")
-		r.Form.Del("end_date")
+		r.Form.Del("from")
+		r.Form.Del("to")
 
 		cpf := mux.Vars(r)["cpf"]
 		r.Form.Set("driver_id", cpf)
