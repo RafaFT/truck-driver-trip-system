@@ -42,6 +42,7 @@ func init() {
 	// route for trips by driver
 	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips`, handlers.GetTripsByDriver(client)).Methods("GET")
 	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips`, handlers.AddTripByDriver(client)).Methods("POST")
+	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips/{id:\d{14}}`, handlers.GetTripByID(client)).Methods("GET")
 	router.HandleFunc(`/drivers/{cpf:\d{11}}/trips/latest`, handlers.GetLatestTrip(client)).Methods("GET")
 
 	// route for trips

@@ -108,6 +108,54 @@ func GetTripsByDriver(client *firestore.Client) func(w http.ResponseWriter, r *h
 	}
 }
 
+// Trip IDs are only unique whithin a Driver's trips...
+func GetTripByID(client *firestore.Client) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		r.ParseForm()
+
+		r.Form.Del("has_load")
+		r.Form.Del("vehicle_type")
+		r.Form.Del("from")
+		r.Form.Del("to")
+
+		cpf := mux.Vars(r)["cpf"]
+		id := mux.Vars(r)["id"]
+
+		r.Form.Set("driver_id", cpf)
+		r.Form.Set("id", id)
+
+		q := createTripsQuery(client, r)
+		doc, err := q.Documents(r.Context()).Next()
+		if err == iterator.Done {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write(createErrorJSON(fmt.Errorf("driver or trip id not found")))
+			return
+		}
+
+		var trip models.Trip
+		err = doc.DataTo(&trip)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+			return
+		}
+
+		b, err := json.Marshal(&trip)
+		if err != nil {
+			fmt.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write(createErrorJSON(fmt.Errorf("internal server error")))
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(b)
+	}
+}
+
 func GetLatestTrip(client *firestore.Client) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
