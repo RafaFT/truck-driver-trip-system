@@ -57,6 +57,9 @@ func createDriversQuery(client *firestore.Client, r *http.Request) firestore.Que
 }
 
 func createTripsQuery(client *firestore.Client, r *http.Request) firestore.Query {
+	// TODO: Since I query "trips" always by using Collection Group, I
+	// 	should probably organize trips as a top level collection
+	//  https://firebase.googleblog.com/2019/06/understanding-collection-group-queries.html
 	q := client.CollectionGroup("trips").Query
 
 	// add filters
@@ -90,6 +93,7 @@ func createTripsQuery(client *firestore.Client, r *http.Request) firestore.Query
 			q = q.Where("time", "<", to)
 		}
 	}
+	// TODO: add query by origin and destination on lat and lng values
 	if order := r.Form.Get("order"); strings.ToLower(order) == "asc" {
 		q = q.OrderBy("time", firestore.Asc)
 	} else {
