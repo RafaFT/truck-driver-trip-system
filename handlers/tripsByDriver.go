@@ -130,6 +130,7 @@ func GetLatestTrip(client *firestore.Client) func(w http.ResponseWriter, r *http
 		if err == iterator.Done {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write(createErrorJSON(fmt.Errorf("no trip found for driver=%s", cpf)))
+			return
 		}
 
 		var trip models.Trip
