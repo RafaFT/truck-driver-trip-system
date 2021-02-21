@@ -53,7 +53,7 @@ func NewName(name string) (Name, error) {
 }
 
 func NewBirthDate(birthDate time.Time) (BirthDate, error) {
-	age := calculateAge(birthDate)
+	age := CalculateAge(time.Now(), birthDate)
 
 	// if system supported drivers from other countries,
 	// the minimum age would depend on the location of the
