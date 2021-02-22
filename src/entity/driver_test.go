@@ -34,6 +34,97 @@ func TestCalculateAge(t *testing.T) {
 	}
 }
 
+func TestGender(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+		error error
+	}{
+		// invalid input
+		{"", "", ErrInvalidGender},
+		{"not even trying", "", ErrInvalidGender},
+		{"a", "", ErrInvalidGender},
+		{"5", "", ErrInvalidGender},
+		{"Ó", "", ErrInvalidGender},
+		{"ô", "", ErrInvalidGender},
+		// valid input
+		{"M", "M", nil},
+		{"F", "F", nil},
+		{"O", "O", nil},
+		{"m", "M", nil},
+		{"f", "F", nil},
+		{"o", "O", nil},
+	}
+
+	for _, test := range tests {
+		got, gotError := NewGender(test.input)
+
+		if test.want != got || test.error != gotError {
+			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
+				test.input, test.want, test.error, got, gotError,
+			)
+		}
+	}
+}
+
+func TestCNHType(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+		error error
+	}{
+		// invalid input
+		{"", "", ErrInvalidCNHType},
+		{"not even trying", "", ErrInvalidCNHType},
+		{"f", "", ErrInvalidCNHType},
+		{"0", "", ErrInvalidCNHType},
+		{"é", "", ErrInvalidCNHType},
+		{"ẽ", "", ErrInvalidCNHType},
+		{"ç", "", ErrInvalidCNHType},
+		// valid input
+		{"A", "A", nil},
+		{"B", "B", nil},
+		{"C", "C", nil},
+		{"d", "D", nil},
+		{"e", "E", nil},
+	}
+
+	for _, test := range tests {
+		got, gotError := NewCNHType(test.input)
+
+		if test.want != got || test.error != gotError {
+			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
+				test.input, test.want, test.error, got, gotError,
+			)
+		}
+	}
+}
+
+func TestName(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+		error error
+	}{
+		// invalid input
+		{"", "", ErrInvalidName},
+		// valid input
+		{"Rafael Trad", "rafael trad", nil},
+		{"rafael trad", "rafael trad", nil},
+		{"12345", "12345", nil},
+	}
+
+	for _, test := range tests {
+		got, gotError := NewName(test.input)
+
+		if test.want != got || test.error != gotError {
+			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
+				test.input, test.want, test.error, got, gotError,
+			)
+		}
+	}
+}
+
 func TestNewTruckDriver(t *testing.T) {
 	now := time.Now()
 
@@ -124,7 +215,7 @@ func TestNewTruckDriver(t *testing.T) {
 				name:       "alexandre thiago caleb ferreira",
 				gender:     "M",
 				cnhType:    "A",
-				birthDate:  BirthDate(time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC)),
+				birthDate:  time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC),
 				hasVehicle: true,
 			},
 			nil,
@@ -143,7 +234,7 @@ func TestNewTruckDriver(t *testing.T) {
 				name:       "ricardo igor luiz barbosa",
 				gender:     "O",
 				cnhType:    "D",
-				birthDate:  BirthDate(now.AddDate(-18, 0, 0)),
+				birthDate:  now.AddDate(-18, 0, 0),
 				hasVehicle: false,
 			},
 			nil,
@@ -167,7 +258,7 @@ func TestNewTruckDriver(t *testing.T) {
 				got.Name() != test.want.Name() ||
 				got.Gender() != test.want.Gender() ||
 				got.CNHType() != test.want.CNHType() ||
-				!(time.Time(got.BirthDate()).Equal(time.Time(test.want.BirthDate()))) ||
+				!(time.Time(got.BirthDate()).Equal(test.want.BirthDate())) ||
 				got.HasVehicle() != test.want.HasVehicle() {
 				t.Errorf("%d: [want: %v] [got: %v]", i, test.want, got)
 			}
