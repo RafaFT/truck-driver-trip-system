@@ -63,7 +63,7 @@ func NewTruckDriver(cpf, name, gender, cnhType string, birthDate time.Time, hasV
 }
 
 func (td *TruckDriver) Age() int {
-	return CalculateAge(time.Now(), time.Time(td.birthDate))
+	return calculateAge(time.Now(), time.Time(td.birthDate))
 }
 
 func (td *TruckDriver) BirthDate() BirthDate {
@@ -90,8 +90,8 @@ func (td *TruckDriver) Name() Name {
 	return td.name
 }
 
-func CalculateAge(baseDate, birthDate time.Time) int {
-	years := birthDate.Year() - baseDate.Year()
+func calculateAge(baseDate, birthDate time.Time) int {
+	years := baseDate.Year() - birthDate.Year()
 	if years < 0 {
 		return 0
 	}
@@ -99,7 +99,7 @@ func CalculateAge(baseDate, birthDate time.Time) int {
 	birthMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(birthDate.Month()), birthDate.Day()))
 	baseDateMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(baseDate.Month()), baseDate.Day()))
 
-	if birthMonthNDay < baseDateMonthNDay {
+	if birthMonthNDay > baseDateMonthNDay {
 		years--
 	}
 
