@@ -10,21 +10,20 @@ import (
 
 var (
 	ErrInvalidBirthDate = errors.New("Invalid birth date")
-	ErrInvalidCNHType   = errors.New("Invalid cnhType")
 	ErrInvalidGender    = errors.New("Invalid gender")
 	ErrInvalidName      = errors.New("Invalid name")
 )
 
 type TruckDriver struct {
 	birthDate  time.Time
-	cnhType    string
+	cnh        CNH
 	cpf        CPF
 	gender     string
 	hasVehicle bool
 	name       string
 }
 
-func NewTruckDriver(cpf, name, gender, cnhType string, birthDate time.Time, hasVehicle bool) (*TruckDriver, error) {
+func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bool) (*TruckDriver, error) {
 	var err error
 
 	newCPF, err := NewCPF(cpf)
@@ -42,7 +41,7 @@ func NewTruckDriver(cpf, name, gender, cnhType string, birthDate time.Time, hasV
 		return nil, err
 	}
 
-	cnhType, err = NewCNHType(cnhType)
+	newCNH, err := NewCNH(cnh)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +55,7 @@ func NewTruckDriver(cpf, name, gender, cnhType string, birthDate time.Time, hasV
 		cpf:        newCPF,
 		name:       name,
 		gender:     gender,
-		cnhType:    cnhType,
+		cnh:        newCNH,
 		birthDate:  birthDate,
 		hasVehicle: hasVehicle,
 	}
@@ -73,7 +72,7 @@ func (td *TruckDriver) BirthDate() time.Time {
 }
 
 func (td *TruckDriver) CNHType() string {
-	return td.cnhType
+	return string(td.cnh)
 }
 
 func (td *TruckDriver) CPF() string {
@@ -117,17 +116,6 @@ func NewGender(gender string) (string, error) {
 	}
 
 	return gender, nil
-}
-
-func NewCNHType(cnhType string) (string, error) {
-	cnhType = strings.ToUpper(cnhType)
-	cnhTypeOptions := "ABCDE"
-
-	if len(cnhType) != 1 || !strings.Contains(cnhTypeOptions, cnhType) {
-		return "", ErrInvalidCNHType
-	}
-
-	return cnhType, nil
 }
 
 func NewName(name string) (string, error) {

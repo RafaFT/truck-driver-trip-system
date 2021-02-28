@@ -101,17 +101,17 @@ func TestGender(t *testing.T) {
 func TestCNHType(t *testing.T) {
 	tests := []struct {
 		input string
-		want  string
+		want  CNH
 		error error
 	}{
 		// invalid input
-		{"", "", ErrInvalidCNHType},
-		{"not even trying", "", ErrInvalidCNHType},
-		{"f", "", ErrInvalidCNHType},
-		{"0", "", ErrInvalidCNHType},
-		{"é", "", ErrInvalidCNHType},
-		{"ẽ", "", ErrInvalidCNHType},
-		{"ç", "", ErrInvalidCNHType},
+		{"", "", newErrInvalidCNH("")},
+		{"not even trying", "", newErrInvalidCNH("not even trying")},
+		{"f", "", newErrInvalidCNH("f")},
+		{"0", "", newErrInvalidCNH("0")},
+		{"é", "", newErrInvalidCNH("é")},
+		{"ẽ", "", newErrInvalidCNH("ẽ")},
+		{"ç", "", newErrInvalidCNH("ç")},
 		// valid input
 		{"A", "A", nil},
 		{"B", "B", nil},
@@ -121,7 +121,7 @@ func TestCNHType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		got, gotError := NewCNHType(test.input)
+		got, gotError := NewCNH(test.input)
 
 		if test.want != got || test.error != gotError {
 			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
@@ -218,7 +218,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: true,
 			},
 			nil,
-			ErrInvalidCNHType,
+			newErrInvalidCNH("G"),
 		},
 		{
 			Input{
@@ -245,7 +245,7 @@ func TestNewTruckDriver(t *testing.T) {
 				cpf:        "22349860442",
 				name:       "alexandre thiago caleb ferreira",
 				gender:     "M",
-				cnhType:    "A",
+				cnh:    "A",
 				birthDate:  time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC),
 				hasVehicle: true,
 			},
@@ -264,7 +264,7 @@ func TestNewTruckDriver(t *testing.T) {
 				cpf:        "59706144757",
 				name:       "ricardo igor luiz barbosa",
 				gender:     "O",
-				cnhType:    "D",
+				cnh:    "D",
 				birthDate:  now.AddDate(-18, 0, 0),
 				hasVehicle: false,
 			},
