@@ -5,6 +5,37 @@ import (
 	"time"
 )
 
+func TestNewCPF(t *testing.T) {
+	tests := []struct {
+		input string
+		want  CPF
+		err   error
+	}{
+		// invalid CPF values
+		{"", "", newErrInvalidCPF("")},
+		{"not even trying", "", newErrInvalidCPF("not even trying")},
+		{"12345678901", "", newErrInvalidCPF("12345678901")},
+		{"00000000000", "", newErrInvalidCPF("00000000000")},
+		{"10804773069", "", newErrInvalidCPF("10804773069")},
+		{"643.512.830-84", "", newErrInvalidCPF("643.512.830-84")},
+		{"64351283084a", "", newErrInvalidCPF("64351283084a")},
+		{"64351f283084", "", newErrInvalidCPF("64351f283084")},
+		// valid cases
+		{"64351283084", CPF("64351283084"), nil},
+		{"10804773068", CPF("10804773068"), nil},
+	}
+
+	for _, test := range tests {
+		got, gotErr := NewCPF(test.input)
+
+		if test.want != got || gotErr != test.err {
+			t.Errorf("[input: %v] [want: %v] [err: %v] [got: %v] [gotErr: %v]",
+				test.input, test.want, test.err, got, gotErr,
+			)
+		}
+	}
+}
+
 func TestCalculateAge(t *testing.T) {
 	baseDate := time.Date(2021, time.Month(2), 21, 20, 12, 0, 0, time.UTC)
 
@@ -151,7 +182,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: false,
 			},
 			nil,
-			ErrInvalidCPF,
+			newErrInvalidCPF("369063555110"),
 		},
 		{
 			Input{
@@ -179,7 +210,7 @@ func TestNewTruckDriver(t *testing.T) {
 		},
 		{
 			Input{
-				cpf:        "71031301160",
+				cpf:        "48858994000",
 				name:       "Isabelly Luiza das Neves",
 				gender:     "F",
 				cnhType:    "G", // invalid CNHType
