@@ -10,6 +10,10 @@ type ErrInvalidCPF struct {
 	msg string
 }
 
+type ErrInvalidGender struct {
+	msg string
+}
+
 func newErrInvalidCNH(cnh string) ErrInvalidCNH {
 	return ErrInvalidCNH{
 		msg: fmt.Sprintf("CNH invalid. cnh=[%s]", cnh),
@@ -27,5 +31,15 @@ func newErrInvalidCPF(cpf string) ErrInvalidCPF {
 }
 
 func (e ErrInvalidCPF) Error() string {
+	return e.msg
+}
+
+func newErrInvalidGender(gender string) ErrInvalidGender {
+	return ErrInvalidGender{
+		msg: fmt.Sprintf("Gender invalid. gender=[%s]", gender),
+	}
+}
+
+func (e ErrInvalidGender) Error() string {
 	return e.msg
 }

@@ -68,23 +68,23 @@ func TestCalculateAge(t *testing.T) {
 func TestGender(t *testing.T) {
 	tests := []struct {
 		input string
-		want  string
+		want  Gender
 		error error
 	}{
 		// invalid input
-		{"", "", ErrInvalidGender},
-		{"not even trying", "", ErrInvalidGender},
-		{"a", "", ErrInvalidGender},
-		{"5", "", ErrInvalidGender},
-		{"Ó", "", ErrInvalidGender},
-		{"ô", "", ErrInvalidGender},
+		{"", "", newErrInvalidGender("")},
+		{"not even trying", "", newErrInvalidGender("not even trying")},
+		{"a", "", newErrInvalidGender("a")},
+		{"5", "", newErrInvalidGender("5")},
+		{"Ó", "", newErrInvalidGender("Ó")},
+		{"ô", "", newErrInvalidGender("ô")},
 		// valid input
-		{"M", "M", nil},
-		{"F", "F", nil},
-		{"O", "O", nil},
-		{"m", "M", nil},
-		{"f", "F", nil},
-		{"o", "O", nil},
+		{"M", Gender("M"), nil},
+		{"F", Gender("F"), nil},
+		{"O", Gender("O"), nil},
+		{"m", Gender("M"), nil},
+		{"f", Gender("F"), nil},
+		{"o", Gender("O"), nil},
 	}
 
 	for _, test := range tests {
@@ -206,7 +206,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: false,
 			},
 			nil,
-			ErrInvalidGender,
+			newErrInvalidGender("H"),
 		},
 		{
 			Input{
@@ -245,7 +245,7 @@ func TestNewTruckDriver(t *testing.T) {
 				cpf:        "22349860442",
 				name:       "alexandre thiago caleb ferreira",
 				gender:     "M",
-				cnh:    "A",
+				cnh:        "A",
 				birthDate:  time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC),
 				hasVehicle: true,
 			},
@@ -264,7 +264,7 @@ func TestNewTruckDriver(t *testing.T) {
 				cpf:        "59706144757",
 				name:       "ricardo igor luiz barbosa",
 				gender:     "O",
-				cnh:    "D",
+				cnh:        "D",
 				birthDate:  now.AddDate(-18, 0, 0),
 				hasVehicle: false,
 			},

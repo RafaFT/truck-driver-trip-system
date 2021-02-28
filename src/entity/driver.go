@@ -10,7 +10,6 @@ import (
 
 var (
 	ErrInvalidBirthDate = errors.New("Invalid birth date")
-	ErrInvalidGender    = errors.New("Invalid gender")
 	ErrInvalidName      = errors.New("Invalid name")
 )
 
@@ -18,7 +17,7 @@ type TruckDriver struct {
 	birthDate  time.Time
 	cnh        CNH
 	cpf        CPF
-	gender     string
+	gender     Gender
 	hasVehicle bool
 	name       string
 }
@@ -36,7 +35,7 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 		return nil, err
 	}
 
-	gender, err = NewGender(gender)
+	newGender, err := NewGender(gender)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,7 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 	driver := TruckDriver{
 		cpf:        newCPF,
 		name:       name,
-		gender:     gender,
+		gender:     newGender,
 		cnh:        newCNH,
 		birthDate:  birthDate,
 		hasVehicle: hasVehicle,
@@ -80,7 +79,7 @@ func (td *TruckDriver) CPF() string {
 }
 
 func (td *TruckDriver) Gender() string {
-	return td.gender
+	return string(td.gender)
 }
 
 func (td *TruckDriver) HasVehicle() bool {
@@ -105,17 +104,6 @@ func calculateAge(baseDate, birthDate time.Time) int {
 	}
 
 	return years
-}
-
-func NewGender(gender string) (string, error) {
-	gender = strings.ToUpper(gender)
-	genderOptions := "FMO"
-
-	if len(gender) != 1 || !strings.Contains(genderOptions, gender) {
-		return "", ErrInvalidGender
-	}
-
-	return gender, nil
 }
 
 func NewName(name string) (string, error) {
