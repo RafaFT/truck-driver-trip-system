@@ -20,6 +20,10 @@ type ErrInvalidGender struct {
 	msg string
 }
 
+type ErrInvalidName struct {
+	msg string
+}
+
 func newErrInvalidAge(age int) ErrInvalidAge {
 	return ErrInvalidAge{
 		msg: fmt.Sprintf("Age invalid. age=[%d]", age),
@@ -57,5 +61,15 @@ func newErrInvalidGender(gender string) ErrInvalidGender {
 }
 
 func (e ErrInvalidGender) Error() string {
+	return e.msg
+}
+
+func newErrInvalidName(name string) ErrInvalidName {
+	return ErrInvalidName{
+		msg: fmt.Sprintf("Name invalid. name=[%s]", name),
+	}
+}
+
+func (e ErrInvalidName) Error() string {
 	return e.msg
 }

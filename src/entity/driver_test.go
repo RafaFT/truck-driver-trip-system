@@ -134,15 +134,21 @@ func TestCNHType(t *testing.T) {
 func TestName(t *testing.T) {
 	tests := []struct {
 		input string
-		want  string
+		want  Name
 		error error
 	}{
 		// invalid input
-		{"", "", ErrInvalidName},
+		{"", "", newErrInvalidName("")},
+		{"12345", "", newErrInvalidName("12345")},
+		{"Húgo Diego Barros ", "", newErrInvalidName("Húgo Diego Barros ")},   // trailing space
+		{" Húgo Diego Barros", "", newErrInvalidName(" Húgo Diego Barros")},   // leading space
+		{"Húgo  Diego  Barros", "", newErrInvalidName("Húgo  Diego  Barros")}, // double spacing
+		{"Húgo Diego Barros 1", "", newErrInvalidName("Húgo Diego Barros 1")}, // digit
+		{"Húgo\tDiego\vBarros", "", newErrInvalidName("Húgo\tDiego\vBarros")}, // use of tab/v space
+		{"张伟 ", "", newErrInvalidName("张伟 ")},                                 // chine name with trailing space
 		// valid input
-		{"Rafael Trad", "rafael trad", nil},
-		{"rafael trad", "rafael trad", nil},
-		{"12345", "12345", nil},
+		{"Húgo Diego Barros", "húgo diego barros", nil},
+		{"张伟", "张伟", nil},
 	}
 
 	for _, test := range tests {
@@ -194,7 +200,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: true,
 			},
 			nil,
-			ErrInvalidName,
+			newErrInvalidName(""),
 		},
 		{
 			Input{

@@ -1,16 +1,10 @@
 package entity
 
 import (
-	"errors"
-	"strings"
 	"time"
 )
 
 const minimumDriverAge = 18
-
-var (
-	ErrInvalidName = errors.New("Invalid name")
-)
 
 type TruckDriver struct {
 	birthDate  BirthDate
@@ -18,18 +12,16 @@ type TruckDriver struct {
 	cpf        CPF
 	gender     Gender
 	hasVehicle bool
-	name       string
+	name       Name
 }
 
 func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bool) (*TruckDriver, error) {
-	var err error
-
 	newCPF, err := NewCPF(cpf)
 	if err != nil {
 		return nil, err
 	}
 
-	name, err = NewName(name)
+	newName, err := NewName(name)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +43,7 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 
 	driver := TruckDriver{
 		cpf:        newCPF,
-		name:       name,
+		name:       newName,
 		gender:     newGender,
 		cnh:        newCNH,
 		birthDate:  newBirthDate,
@@ -86,13 +78,5 @@ func (td *TruckDriver) HasVehicle() bool {
 }
 
 func (td *TruckDriver) Name() string {
-	return td.name
-}
-
-func NewName(name string) (string, error) {
-	if len(name) == 0 {
-		return "", ErrInvalidName
-	}
-
-	return strings.ToLower(name), nil
+	return string(td.name)
 }
