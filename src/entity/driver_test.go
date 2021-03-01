@@ -37,29 +37,29 @@ func TestNewCPF(t *testing.T) {
 }
 
 func TestCalculateAge(t *testing.T) {
-	baseDate := time.Date(2021, time.Month(2), 21, 20, 12, 0, 0, time.UTC)
+	now := time.Now()
 
 	tests := []struct {
-		baseDate  time.Time
-		birthDate time.Time
-		want      int
+		input time.Time
+		want  int
 	}{
-		{baseDate, time.Time{}, 2020},
-		{baseDate, baseDate, 0},
-		{baseDate, time.Date(2021, time.Month(1), 1, 9, 59, 59, 59, time.UTC), 0},
-		{baseDate, time.Date(2020, time.Month(2), 22, 10, 0, 0, 1, time.UTC), 0},
-		{baseDate, time.Date(2020, time.Month(2), 21, 10, 0, 0, 1, time.UTC), 1},
-		{baseDate, time.Date(2020, time.Month(2), 20, 10, 0, 0, 1, time.UTC), 1},
-		{baseDate, time.Date(1989, time.Month(12), 12, 0, 0, 0, 0, time.UTC), 31},
-		{baseDate, time.Date(2000, time.Month(6), 25, 0, 0, 0, 0, time.UTC), 20},
+		{now.AddDate(-2020, 0, 0), 2020},
+		{now, 0},
+		{now.AddDate(0, -1, 0), 0},
+		{now.AddDate(-1, 0, 1), 0},
+		{now.AddDate(-1, 0, 0), 1},
+		{now.AddDate(-1, -1, 0), 1},
+		{now.AddDate(-31, 0, 0), 31},
+		{now.AddDate(-20, -12, 1), 20},
 	}
 
 	for _, test := range tests {
-		got := calculateAge(test.baseDate, test.birthDate)
+		bd := NewBirthDate(test.input)
+		got := bd.CalculateAge()
 
 		if got != test.want {
-			t.Errorf("[baseDate: %v] [birthDate: %v] [want: %v] [got: %v]",
-				test.baseDate, test.birthDate, test.want, got,
+			t.Errorf("[input: %v] [want: %v] [got: %v]",
+				test.input, test.want, got,
 			)
 		}
 	}
@@ -230,7 +230,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: false,
 			},
 			nil,
-			ErrInvalidBirthDate,
+			newErrInvalidAge(17),
 		},
 		{
 			Input{
@@ -246,7 +246,7 @@ func TestNewTruckDriver(t *testing.T) {
 				name:       "alexandre thiago caleb ferreira",
 				gender:     "M",
 				cnh:        "A",
-				birthDate:  time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC),
+				birthDate:  NewBirthDate(time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC)),
 				hasVehicle: true,
 			},
 			nil,
@@ -265,7 +265,7 @@ func TestNewTruckDriver(t *testing.T) {
 				name:       "ricardo igor luiz barbosa",
 				gender:     "O",
 				cnh:        "D",
-				birthDate:  now.AddDate(-18, 0, 0),
+				birthDate:  NewBirthDate(now.AddDate(-18, 0, 0)),
 				hasVehicle: false,
 			},
 			nil,

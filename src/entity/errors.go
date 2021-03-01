@@ -1,6 +1,12 @@
 package entity
 
-import "fmt"
+import (
+	"fmt"
+)
+
+type ErrInvalidAge struct {
+	msg string
+}
 
 type ErrInvalidCNH struct {
 	msg string
@@ -12,6 +18,16 @@ type ErrInvalidCPF struct {
 
 type ErrInvalidGender struct {
 	msg string
+}
+
+func newErrInvalidAge(age int) ErrInvalidAge {
+	return ErrInvalidAge{
+		msg: fmt.Sprintf("Age invalid. age=[%d]", age),
+	}
+}
+
+func (e ErrInvalidAge) Error() string {
+	return e.msg
 }
 
 func newErrInvalidCNH(cnh string) ErrInvalidCNH {

@@ -2,19 +2,18 @@ package entity
 
 import (
 	"errors"
-	"fmt"
-	"strconv"
 	"strings"
 	"time"
 )
 
+const minimumDriverAge = 18
+
 var (
-	ErrInvalidBirthDate = errors.New("Invalid birth date")
-	ErrInvalidName      = errors.New("Invalid name")
+	ErrInvalidName = errors.New("Invalid name")
 )
 
 type TruckDriver struct {
-	birthDate  time.Time
+	birthDate  BirthDate
 	cnh        CNH
 	cpf        CPF
 	gender     Gender
@@ -45,9 +44,9 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 		return nil, err
 	}
 
-	birthDate, err = NewBirthDate(birthDate)
-	if err != nil {
-		return nil, err
+	newBirthDate := NewBirthDate(birthDate)
+	if age := newBirthDate.CalculateAge(); age < minimumDriverAge {
+		return nil, newErrInvalidAge(age)
 	}
 
 	driver := TruckDriver{
@@ -55,7 +54,7 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 		name:       name,
 		gender:     newGender,
 		cnh:        newCNH,
-		birthDate:  birthDate,
+		birthDate:  newBirthDate,
 		hasVehicle: hasVehicle,
 	}
 
@@ -63,11 +62,11 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 }
 
 func (td *TruckDriver) Age() int {
-	return calculateAge(time.Now(), time.Time(td.birthDate))
+	return td.birthDate.CalculateAge()
 }
 
 func (td *TruckDriver) BirthDate() time.Time {
-	return td.birthDate
+	return td.birthDate.Time
 }
 
 func (td *TruckDriver) CNHType() string {
@@ -90,39 +89,10 @@ func (td *TruckDriver) Name() string {
 	return td.name
 }
 
-func calculateAge(baseDate, birthDate time.Time) int {
-	years := baseDate.Year() - birthDate.Year()
-	if years < 0 {
-		return 0
-	}
-
-	birthMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(birthDate.Month()), birthDate.Day()))
-	baseDateMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(baseDate.Month()), baseDate.Day()))
-
-	if birthMonthNDay > baseDateMonthNDay {
-		years--
-	}
-
-	return years
-}
-
 func NewName(name string) (string, error) {
 	if len(name) == 0 {
 		return "", ErrInvalidName
 	}
 
 	return strings.ToLower(name), nil
-}
-
-func NewBirthDate(birthDate time.Time) (time.Time, error) {
-	age := calculateAge(time.Now(), birthDate)
-
-	// if system supported drivers from other countries,
-	// the minimum age would depend on the location of the
-	// CNH Type
-	if age < 18 {
-		return time.Time{}, ErrInvalidBirthDate
-	}
-
-	return birthDate, nil
 }
