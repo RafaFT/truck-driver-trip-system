@@ -53,6 +53,7 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 	return &driver, nil
 }
 
+// getters
 func (td *TruckDriver) Age() int {
 	return td.birthDate.CalculateAge()
 }
@@ -79,4 +80,42 @@ func (td *TruckDriver) HasVehicle() bool {
 
 func (td *TruckDriver) Name() Name {
 	return td.name
+}
+
+// setters
+func (td *TruckDriver) SetCNHType(cnh string) error {
+	newCNH, err := NewCNH(cnh)
+	if err != nil {
+		return err
+	}
+
+	td.cnh = newCNH
+
+	return nil
+}
+
+func (td *TruckDriver) SetGender(gender string) error {
+	newGender, err := NewGender(gender)
+	if err != nil {
+		return err
+	}
+
+	td.gender = newGender
+
+	return nil
+}
+
+func (td *TruckDriver) SetHasVehicle(hasVehicle bool) {
+	td.hasVehicle = hasVehicle
+}
+
+func (td *TruckDriver) SetName(name string) error {
+	newName, err := NewName(name)
+	if err != nil {
+		return err
+	}
+
+	td.name = newName
+
+	return nil
 }
