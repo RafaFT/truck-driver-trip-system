@@ -295,7 +295,7 @@ func TestNewTruckDriver(t *testing.T) {
 				got.Name() != test.want.Name() ||
 				got.Gender() != test.want.Gender() ||
 				got.CNHType() != test.want.CNHType() ||
-				!(time.Time(got.BirthDate()).Equal(test.want.BirthDate())) ||
+				!got.BirthDate().Equal(test.want.BirthDate().Time) ||
 				got.HasVehicle() != test.want.HasVehicle() {
 				t.Errorf("%d: [want: %v] [got: %v]", i, test.want, got)
 			}

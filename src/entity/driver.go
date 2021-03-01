@@ -57,26 +57,26 @@ func (td *TruckDriver) Age() int {
 	return td.birthDate.CalculateAge()
 }
 
-func (td *TruckDriver) BirthDate() time.Time {
-	return td.birthDate.Time
+func (td *TruckDriver) BirthDate() BirthDate {
+	return td.birthDate
 }
 
-func (td *TruckDriver) CNHType() string {
-	return string(td.cnh)
+func (td *TruckDriver) CNHType() CNH {
+	return td.cnh
 }
 
-func (td *TruckDriver) CPF() string {
-	return string(td.cpf)
+func (td *TruckDriver) CPF() CPF {
+	return td.cpf
 }
 
-func (td *TruckDriver) Gender() string {
-	return string(td.gender)
+func (td *TruckDriver) Gender() Gender {
+	return td.gender
 }
 
 func (td *TruckDriver) HasVehicle() bool {
 	return td.hasVehicle
 }
 
-func (td *TruckDriver) Name() string {
-	return string(td.name)
+func (td *TruckDriver) Name() Name {
+	return td.name
 }
