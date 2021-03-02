@@ -2,9 +2,14 @@ package entity
 
 import (
 	"fmt"
+	"time"
 )
 
 type ErrInvalidAge struct {
+	msg string
+}
+
+type ErrInvalidBirthDate struct {
 	msg string
 }
 
@@ -31,6 +36,16 @@ func newErrInvalidAge(age int) ErrInvalidAge {
 }
 
 func (e ErrInvalidAge) Error() string {
+	return e.msg
+}
+
+func newErrInvalidBirthDate(birthDate time.Time) ErrInvalidBirthDate {
+	return ErrInvalidBirthDate{
+		msg: fmt.Sprintf("Birth Date invalid. birthDate=[%v]", birthDate),
+	}
+}
+
+func (e ErrInvalidBirthDate) Error() string {
 	return e.msg
 }
 

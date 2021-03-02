@@ -36,7 +36,11 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 		return nil, err
 	}
 
-	newBirthDate := NewBirthDate(birthDate)
+	newBirthDate, err := NewBirthDate(birthDate)
+	if err != nil {
+		return nil, err
+	}
+
 	if age := newBirthDate.CalculateAge(); age < minimumDriverAge {
 		return nil, newErrInvalidAge(age)
 	}

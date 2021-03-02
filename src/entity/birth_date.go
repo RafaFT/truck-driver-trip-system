@@ -10,10 +10,15 @@ type BirthDate struct {
 	time.Time
 }
 
-func NewBirthDate(birthDate time.Time) BirthDate {
-	return BirthDate{
-		birthDate,
+// arbitrary lowest valid birth date
+var minBirthDate = time.Date(1950, 1, 1, 0, 0, 0, 0, time.UTC)
+
+func NewBirthDate(birthDate time.Time) (BirthDate, error) {
+	if minBirthDate.Before(birthDate) {
+		return BirthDate{}, newErrInvalidBirthDate(birthDate)
 	}
+
+	return BirthDate{birthDate}, nil
 }
 
 func (bd BirthDate) CalculateAge() int {

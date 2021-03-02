@@ -54,7 +54,7 @@ func TestCalculateAge(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		bd := NewBirthDate(test.input)
+		bd, _ := NewBirthDate(test.input)
 		got := bd.CalculateAge()
 
 		if got != test.want {
@@ -248,11 +248,11 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: true,
 			},
 			&TruckDriver{
-				cpf:        "22349860442",
-				name:       "alexandre thiago caleb ferreira",
-				gender:     "M",
-				cnh:        "A",
-				birthDate:  NewBirthDate(time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC)),
+				cpf:        CPF("22349860442"),
+				name:       Name("alexandre thiago caleb ferreira"),
+				gender:     Gender("M"),
+				cnh:        CNH("A"),
+				birthDate:  BirthDate{time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC)},
 				hasVehicle: true,
 			},
 			nil,
@@ -267,11 +267,11 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: false,
 			},
 			&TruckDriver{
-				cpf:        "59706144757",
-				name:       "ricardo igor luiz barbosa",
-				gender:     "O",
-				cnh:        "D",
-				birthDate:  NewBirthDate(now.AddDate(-18, 0, 0)),
+				cpf:        CPF("59706144757"),
+				name:       Name("ricardo igor luiz barbosa"),
+				gender:     Gender("O"),
+				cnh:        CNH("D"),
+				birthDate:  BirthDate{now.AddDate(-18, 0, 0)},
 				hasVehicle: false,
 			},
 			nil,
