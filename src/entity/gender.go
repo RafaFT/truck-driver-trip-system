@@ -2,14 +2,18 @@ package entity
 
 import "strings"
 
-var genderValues = "FMO"
+var genderValues = map[string]string{
+	"F": "female",
+	"M": "male",
+	"O": "other",
+}
 
 type Gender string
 
 func NewGender(gender string) (Gender, error) {
 	genderUpper := strings.ToUpper(gender)
 
-	if len(genderUpper) != 1 || !strings.Contains(genderValues, genderUpper) {
+	if _, ok := genderValues[genderUpper]; !ok {
 		return "", newErrInvalidGender(gender)
 	}
 
