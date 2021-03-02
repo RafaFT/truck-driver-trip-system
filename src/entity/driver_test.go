@@ -5,6 +5,45 @@ import (
 	"time"
 )
 
+func TestNewBirthDate(t *testing.T) {
+	tests := []struct {
+		input time.Time
+		want  BirthDate
+		err   error
+	}{
+		{
+			minBirthDate.AddDate(0, 0, -1),
+			BirthDate{time.Time{}},
+			newErrInvalidBirthDate(minBirthDate.AddDate(0, 0, -1)),
+		},
+		{
+			time.Time{},
+			BirthDate{time.Time{}},
+			newErrInvalidBirthDate(time.Time{}),
+		},
+		{
+			minBirthDate,
+			BirthDate{minBirthDate},
+			nil,
+		},
+		{
+			time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC),
+			BirthDate{time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC)},
+			nil,
+		},
+	}
+
+	for _, test := range tests {
+		got, gotErr := NewBirthDate(test.input)
+
+		if !got.Time.Equal(test.want.Time) || test.err != gotErr {
+			t.Errorf("[input: %v] [want: %v] [err: %v] [got: %v] [gotErr: %v]",
+				test.input, test.want, test.err, got, gotErr,
+			)
+		}
+	}
+}
+
 func TestNewCPF(t *testing.T) {
 	tests := []struct {
 		input string
