@@ -214,7 +214,7 @@ func TestNewTruckDriver(t *testing.T) {
 	}
 	tests := []struct {
 		input Input
-		want  *TruckDriver
+		want  *Driver
 		error error
 	}{
 		{
@@ -286,7 +286,7 @@ func TestNewTruckDriver(t *testing.T) {
 				birthDate:  time.Date(1979, time.Month(5), 6, 0, 0, 0, 0, time.UTC),
 				hasVehicle: true,
 			},
-			&TruckDriver{
+			&Driver{
 				cpf:        CPF("22349860442"),
 				name:       Name("alexandre thiago caleb ferreira"),
 				gender:     Gender("M"),
@@ -305,7 +305,7 @@ func TestNewTruckDriver(t *testing.T) {
 				birthDate:  now.AddDate(-18, 0, 0),
 				hasVehicle: false,
 			},
-			&TruckDriver{
+			&Driver{
 				cpf:        CPF("59706144757"),
 				name:       Name("ricardo igor luiz barbosa"),
 				gender:     Gender("O"),

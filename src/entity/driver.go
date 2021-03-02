@@ -6,7 +6,7 @@ import (
 
 const minimumDriverAge = 18
 
-type TruckDriver struct {
+type Driver struct {
 	birthDate  BirthDate
 	cnh        CNH
 	cpf        CPF
@@ -15,7 +15,7 @@ type TruckDriver struct {
 	name       Name
 }
 
-func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bool) (*TruckDriver, error) {
+func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bool) (*Driver, error) {
 	newCPF, err := NewCPF(cpf)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 		return nil, newErrInvalidAge(age)
 	}
 
-	driver := TruckDriver{
+	driver := Driver{
 		cpf:        newCPF,
 		name:       newName,
 		gender:     newGender,
@@ -58,36 +58,36 @@ func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehic
 }
 
 // getters
-func (td *TruckDriver) Age() int {
+func (td *Driver) Age() int {
 	return td.birthDate.CalculateAge()
 }
 
-func (td *TruckDriver) BirthDate() BirthDate {
+func (td *Driver) BirthDate() BirthDate {
 	return td.birthDate
 }
 
-func (td *TruckDriver) CNHType() CNH {
+func (td *Driver) CNHType() CNH {
 	return td.cnh
 }
 
-func (td *TruckDriver) CPF() CPF {
+func (td *Driver) CPF() CPF {
 	return td.cpf
 }
 
-func (td *TruckDriver) Gender() Gender {
+func (td *Driver) Gender() Gender {
 	return td.gender
 }
 
-func (td *TruckDriver) HasVehicle() bool {
+func (td *Driver) HasVehicle() bool {
 	return td.hasVehicle
 }
 
-func (td *TruckDriver) Name() Name {
+func (td *Driver) Name() Name {
 	return td.name
 }
 
 // setters
-func (td *TruckDriver) SetCNHType(cnh string) error {
+func (td *Driver) SetCNHType(cnh string) error {
 	newCNH, err := NewCNH(cnh)
 	if err != nil {
 		return err
@@ -98,7 +98,7 @@ func (td *TruckDriver) SetCNHType(cnh string) error {
 	return nil
 }
 
-func (td *TruckDriver) SetGender(gender string) error {
+func (td *Driver) SetGender(gender string) error {
 	newGender, err := NewGender(gender)
 	if err != nil {
 		return err
@@ -109,11 +109,11 @@ func (td *TruckDriver) SetGender(gender string) error {
 	return nil
 }
 
-func (td *TruckDriver) SetHasVehicle(hasVehicle bool) {
+func (td *Driver) SetHasVehicle(hasVehicle bool) {
 	td.hasVehicle = hasVehicle
 }
 
-func (td *TruckDriver) SetName(name string) error {
+func (td *Driver) SetName(name string) error {
 	newName, err := NewName(name)
 	if err != nil {
 		return err
