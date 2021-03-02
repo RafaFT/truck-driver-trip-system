@@ -2,14 +2,20 @@ package entity
 
 import "strings"
 
-var cnhValues = "ABCDE"
+var cnhValues = map[string]bool{
+	"A": true,
+	"B": true,
+	"C": true,
+	"D": true,
+	"E": true,
+}
 
 type CNH string
 
 func NewCNH(cnh string) (CNH, error) {
 	cnhUpper := strings.ToUpper(cnh)
 
-	if len(cnhUpper) != 1 || !strings.Contains(cnhValues, cnhUpper) {
+	if _, ok := cnhValues[cnhUpper]; !ok {
 		return "", newErrInvalidCNH(cnh)
 	}
 
