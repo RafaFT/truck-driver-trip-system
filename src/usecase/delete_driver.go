@@ -6,7 +6,27 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-func (di DriverInteractor) DeleteDriver(ctx context.Context, cpf string) error {
+// input port
+type DeleteDriverUseCase interface {
+	Execute(context.Context, string) error
+}
+
+// input port implementation
+type DeleteDriverInteractor struct {
+	logger Logger
+	// presenter DeleteDriverPresenter
+	repo entity.DriverRepository
+}
+
+func NewDeleteDriverInteractor(logger Logger, repo entity.DriverRepository) DeleteDriverUseCase {
+	return DeleteDriverInteractor{
+		logger: logger,
+		// presenter: presenter,
+		repo: repo,
+	}
+}
+
+func (di DeleteDriverInteractor) Execute(ctx context.Context, cpf string) error {
 	driverCPF, err := entity.NewCPF(cpf)
 	if err != nil {
 		return err
