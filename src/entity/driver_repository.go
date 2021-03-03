@@ -9,12 +9,5 @@ type DriverRepository interface {
 	FindDriverByCPF(context.Context, CPF) (*Driver, error)
 	FindDrivers(context.Context) ([]*Driver, error)
 	SaveDriver(context.Context, *Driver) error
-	UpdateDriver(context.Context, UpdateDriverInput) (*Driver, error)
-}
-
-type UpdateDriverInput struct {
-	CNH        *CNH
-	Gender     *Gender
-	HasVehicle *bool
-	Name       *Name
+	UpdateDriver(context.Context, *Driver) error
 }
