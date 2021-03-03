@@ -6,6 +6,13 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
+// interactor implements the input port
+type DriverInteractor struct {
+	logger    Logger
+	repo      entity.DriverRepository
+	presenter DriverPresenter
+}
+
 // input port
 type DriverUseCase interface {
 	CreateDriver(context.Context, CreateDriverInput) (CreateDriverOutput, error)
@@ -18,4 +25,12 @@ type DriverPresenter interface {
 	CreateDriverOutput(*entity.Driver) CreateDriverOutput
 	DeleteDriverOutput(error) error
 	UpdateDriverOutput(*entity.Driver) UpdateDriverOutput
+}
+
+func NewDriverInteractor(logger Logger, repo entity.DriverRepository, presenter DriverPresenter) DriverUseCase {
+	return DriverInteractor{
+		logger:    logger,
+		repo:      repo,
+		presenter: presenter,
+	}
 }

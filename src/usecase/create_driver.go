@@ -1,6 +1,11 @@
 package usecase
 
-import "time"
+import (
+	"context"
+	"time"
+
+	"github.com/rafaft/truck-driver-trip-system/entity"
+)
 
 type CreateDriverInput struct {
 	BirthDate  time.Time `json:"birth_date"`
@@ -19,4 +24,26 @@ type CreateDriverOutput struct {
 	Gender     string    `json:"gender"`
 	HasVehicle bool      `json:"has_vehicle"`
 	Name       string    `json:"name"`
+}
+
+func (di DriverInteractor) CreateDriver(ctx context.Context, input CreateDriverInput) (CreateDriverOutput, error) {
+	driver, err := entity.NewTruckDriver(
+		input.CPF,
+		input.Name,
+		input.Gender,
+		input.CNH,
+		input.BirthDate,
+		input.HasVehicle,
+	)
+
+	if err != nil {
+		return di.presenter.CreateDriverOutput(nil), err
+	}
+
+	err = di.repo.SaveDriver(ctx, driver)
+	if err != nil {
+		return di.presenter.CreateDriverOutput(nil), err
+	}
+
+	return di.presenter.CreateDriverOutput(driver), nil
 }
