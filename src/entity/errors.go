@@ -5,6 +5,14 @@ import (
 	"time"
 )
 
+type ErrDriverAlreadyExists struct {
+	msg string
+}
+
+type ErrDriverNotFound struct {
+	msg string
+}
+
 type ErrInvalidAge struct {
 	msg string
 }
@@ -27,6 +35,26 @@ type ErrInvalidGender struct {
 
 type ErrInvalidName struct {
 	msg string
+}
+
+func NewErrDriverAlreadyExists(cpf CPF) ErrDriverAlreadyExists {
+	return ErrDriverAlreadyExists{
+		msg: fmt.Sprintf("Driver already exists. cpf=[%s]", cpf),
+	}
+}
+
+func (e ErrDriverAlreadyExists) Error() string {
+	return e.msg
+}
+
+func NewErrDriverNotFound(cpf CPF) ErrDriverNotFound {
+	return ErrDriverNotFound{
+		msg: fmt.Sprintf("Driver not found. cpf=[%s]", cpf),
+	}
+}
+
+func (e ErrDriverNotFound) Error() string {
+	return e.msg
 }
 
 func newErrInvalidAge(age int) ErrInvalidAge {
