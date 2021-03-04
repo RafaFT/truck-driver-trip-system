@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
@@ -62,13 +63,17 @@ func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriver
 	)
 
 	if err != nil {
+		di.logger.Debug(err.Error())
 		return di.presenter.Output(nil), err
 	}
 
 	err = di.repo.SaveDriver(ctx, driver)
 	if err != nil {
+		di.logger.Warning(err.Error())
 		return di.presenter.Output(nil), err
 	}
+
+	di.logger.Info(fmt.Sprintf("new driver created. driver=[%v]", &driver))
 
 	return di.presenter.Output(driver), nil
 }

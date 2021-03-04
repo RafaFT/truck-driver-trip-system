@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
@@ -29,13 +30,17 @@ func NewDeleteDriverInteractor(logger Logger, repo entity.DriverRepository) Dele
 func (di DeleteDriverInteractor) Execute(ctx context.Context, cpf string) error {
 	driverCPF, err := entity.NewCPF(cpf)
 	if err != nil {
+		di.logger.Debug(err.Error())
 		return err
 	}
 
 	err = di.repo.DeleteDriverByCPF(ctx, driverCPF)
 	if err != nil {
+		di.logger.Warning(err.Error())
 		return err
 	}
+
+	di.logger.Info(fmt.Sprintf("driver deleted. cpf=[%s]", cpf))
 
 	return nil
 }
