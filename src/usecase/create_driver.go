@@ -35,7 +35,7 @@ type CreateDriverInput struct {
 }
 
 type CreateDriverOutput struct {
-	BirthDate  time.Time `json:"birth_date"`
+	BirthDate  string    `json:"birth_date"`
 	CNH        string    `json:"cnh"`
 	CPF        string    `json:"cpf"`
 	CreatedAt  time.Time `json:"created_at"`
