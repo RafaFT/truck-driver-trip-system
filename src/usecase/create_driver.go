@@ -69,6 +69,12 @@ func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriver
 
 	err = di.repo.SaveDriver(ctx, driver)
 	if err != nil {
+		switch err.(type) {
+		case entity.ErrDriverAlreadyExists:
+			di.logger.Debug(err.Error())
+		default:
+			di.logger.Error(err.Error())
+		}
 		di.logger.Warning(err.Error())
 		return di.presenter.Output(nil), err
 	}
