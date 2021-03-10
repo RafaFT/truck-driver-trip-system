@@ -1,4 +1,4 @@
-package mocks
+package database
 
 import (
 	"context"
@@ -9,6 +9,12 @@ import (
 // driver repository mock implementation
 type InMemoryDrivers struct {
 	Drivers []*entity.Driver
+}
+
+func NewDriverInMemory() entity.DriverRepository {
+	return InMemoryDrivers{
+		Drivers: make([]*entity.Driver, 0),
+	}
 }
 
 func (d InMemoryDrivers) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {

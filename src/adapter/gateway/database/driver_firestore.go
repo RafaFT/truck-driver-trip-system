@@ -24,25 +24,25 @@ type driverDoc struct {
 }
 
 // driver repository implementation
-type DriverFirestore struct {
+type driverFirestore struct {
 	client     *firestore.Client
 	collection string
 }
 
-func NewDriverFirestore(ctx context.Context, projectId string) (*DriverFirestore, error) {
+func NewDriverFirestore(ctx context.Context, projectId string) (entity.DriverRepository, error) {
 	// TODO: NewClient uses credentials from environment variables, if not given explicitly
 	client, err := firestore.NewClient(ctx, projectId)
 	if err != nil {
 		return nil, err
 	}
 
-	return &DriverFirestore{
+	return &driverFirestore{
 		client:     client,
 		collection: "drivers",
 	}, nil
 }
 
-func (df DriverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {
+func (df driverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {
 	doc := df.client.Doc(fmt.Sprintf("%s/%s", df.collection, cpf))
 
 	if _, err := doc.Get(ctx); err != nil {
@@ -60,7 +60,7 @@ func (df DriverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF)
 	return nil
 }
 
-func (df DriverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
+func (df driverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
 	docSnap, err := df.client.Doc(fmt.Sprintf("%s/%s", df.collection, cpf)).Get(ctx)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
@@ -90,7 +90,7 @@ func (df DriverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (
 	return driver, nil
 }
 
-func (df DriverFirestore) FindDrivers(ctx context.Context) ([]*entity.Driver, error) {
+func (df driverFirestore) FindDrivers(ctx context.Context) ([]*entity.Driver, error) {
 	docs, err := df.client.Collection(df.collection).Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func (df DriverFirestore) FindDrivers(ctx context.Context) ([]*entity.Driver, er
 	return drivers, nil
 }
 
-func (df DriverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver) error {
+func (df driverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver) error {
 	newDriverDoc := driverDoc{
 		BirthDate:  driver.BirthDate().Time,
 		CNH:        string(driver.CNHType()),
@@ -143,7 +143,7 @@ func (df DriverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver)
 	return nil
 }
 
-func (df DriverFirestore) UpdateDriver(ctx context.Context, driver *entity.Driver) error {
+func (df driverFirestore) UpdateDriver(ctx context.Context, driver *entity.Driver) error {
 	driverDocument := driverDoc{
 		BirthDate:  driver.BirthDate().Time,
 		CNH:        string(driver.CNHType()),
