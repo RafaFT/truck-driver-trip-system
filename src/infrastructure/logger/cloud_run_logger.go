@@ -22,6 +22,8 @@ package logger
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
 type logEntry struct {
@@ -31,7 +33,7 @@ type logEntry struct {
 	Type     string `json:"@type,omitempty"`
 }
 
-func NewLogger(GCPProject, GCPTrace string) logEntry {
+func NewCloudRunLogger(GCPProject, GCPTrace string) usecase.Logger {
 	var logger logEntry
 	if GCPProject != "" && GCPTrace != "" {
 		logger.Trace = fmt.Sprintf("projects/%s/traces/%s", GCPProject, GCPTrace)
