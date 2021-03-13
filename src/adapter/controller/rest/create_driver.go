@@ -27,16 +27,16 @@ func (c CreateDriverController) ServerHTTP(w http.ResponseWriter, r *http.Reques
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.Write([]byte(`{"error": "invalid request body"}`))
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error": "invalid request body"}`))
 		return
 	}
 
 	var input usecase.CreateDriverInput
 	err = json.Unmarshal(body, &input)
 	if err != nil {
-		w.Write([]byte(`{"error": "invalid request body"}`))
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error": "invalid request body"}`))
 		return
 	}
 
@@ -62,14 +62,14 @@ func (c CreateDriverController) ServerHTTP(w http.ResponseWriter, r *http.Reques
 			msg = "internal server error"
 		}
 
-		w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, msg)))
 		w.WriteHeader(code)
+		w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, msg)))
 		return
 	}
 
 	response, _ := json.Marshal(&output)
 
-	w.Write(response)
 	w.WriteHeader(http.StatusCreated)
+	w.Write(response)
 	w.Header().Set("location", fmt.Sprintf("%s/%s", c.url, input.CPF))
 }
