@@ -46,12 +46,12 @@ func (c CreateDriverController) ServerHTTP(w http.ResponseWriter, r *http.Reques
 		var msg string
 
 		switch err.(type) {
-		case entity.ErrInvalidAge:
-		case entity.ErrInvalidBirthDate:
-		case entity.ErrInvalidCNH:
-		case entity.ErrInvalidCPF:
-		case entity.ErrInvalidGender:
-		case entity.ErrInvalidName:
+		case entity.ErrInvalidAge,
+			entity.ErrInvalidBirthDate,
+			entity.ErrInvalidCNH,
+			entity.ErrInvalidCPF,
+			entity.ErrInvalidGender,
+			entity.ErrInvalidName:
 			code = http.StatusBadRequest
 			msg = err.Error()
 		case entity.ErrDriverAlreadyExists:
