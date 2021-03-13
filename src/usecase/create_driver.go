@@ -75,7 +75,6 @@ func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriver
 		default:
 			di.logger.Error(err.Error())
 		}
-		di.logger.Warning(err.Error())
 		return di.presenter.Output(nil), err
 	}
 
