@@ -1,0 +1,51 @@
+package router
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"github.com/rafaft/truck-driver-trip-system/adapter/controller/rest"
+	"github.com/rafaft/truck-driver-trip-system/adapter/presenter"
+	"github.com/rafaft/truck-driver-trip-system/entity"
+	"github.com/rafaft/truck-driver-trip-system/infrastructure/logger"
+	"github.com/rafaft/truck-driver-trip-system/usecase"
+)
+
+type localHostRouter struct {
+	baseURL string
+	port    string
+	repo    entity.DriverRepository
+	router  *mux.Router
+}
+
+func NewDriverLocalHost(port string, repo entity.DriverRepository) http.Handler {
+	r := &localHostRouter{
+		baseURL: "http://localhost",
+		port:    "8080",
+		repo:    repo,
+		router:  mux.NewRouter(),
+	}
+
+	r.router.HandleFunc("/drivers", r.CreateDriverRoute()).Methods(http.MethodPost)
+
+	return r
+}
+
+func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
+	url := fmt.Sprintf("%s:%s/%s", router.baseURL, router.port, "drivers")
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		l := logger.NewPrintLogger()
+		p := presenter.NewCreateDriverPresenter()
+		uc := usecase.NewCreateDriverInteractor(l, p, router.repo)
+		c := rest.NewCreateDriverController(url, uc)
+
+		c.ServerHTTP(w, r)
+	}
+}
+
+func (router *localHostRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	router.router.ServeHTTP(w, r)
+}
