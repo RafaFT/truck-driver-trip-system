@@ -1,6 +1,6 @@
 // https://pkg.go.dev/cloud.google.com/go/firestore
 
-package database
+package repo
 
 import (
 	"context"
@@ -29,17 +29,11 @@ type driverFirestore struct {
 	collection string
 }
 
-func NewDriverFirestore(ctx context.Context, projectId string) (entity.DriverRepository, error) {
-	// TODO: NewClient uses credentials from environment variables, if not given explicitly
-	client, err := firestore.NewClient(ctx, projectId)
-	if err != nil {
-		return nil, err
-	}
-
+func NewDriverFirestore(c *firestore.Client) entity.DriverRepository {
 	return &driverFirestore{
-		client:     client,
+		client:     c,
 		collection: "drivers",
-	}, nil
+	}
 }
 
 func (df driverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {
