@@ -13,17 +13,17 @@ func NewPrintLogger() usecase.Logger {
 }
 
 func (l printLogger) Debug(msg string) {
-	fmt.Println(msg)
+	fmt.Println("Debug:", msg)
 }
 
 func (l printLogger) Info(msg string) {
-	fmt.Println(msg)
+	fmt.Println("Info:", msg)
 }
 
 func (l printLogger) Warning(msg string) {
-	fmt.Println(msg)
+	fmt.Println("Warning:", msg)
 }
 
 func (l printLogger) Error(msg string) {
-	fmt.Println(msg)
+	fmt.Println("Error:", msg)
 }
