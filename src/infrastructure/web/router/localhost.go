@@ -42,7 +42,7 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 		uc := usecase.NewCreateDriverInteractor(l, router.repo)
 		c := rest.NewCreateDriverController(p, url, uc)
 
-		c.ServerHTTP(w, r)
+		c.ServeHTTP(w, r)
 	}
 }
 

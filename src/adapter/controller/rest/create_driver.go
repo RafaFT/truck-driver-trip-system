@@ -76,7 +76,7 @@ func NewCreateDriverController(p CreateDriverPresenter, url string, uc usecase.C
 	}
 }
 
-func (c CreateDriverController) ServerHTTP(w http.ResponseWriter, r *http.Request) {
+func (c CreateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var input createDriverInput
