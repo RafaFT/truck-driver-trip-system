@@ -11,6 +11,12 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
+// output port (out of place, according to clean architecture, this interface should be declared on usecase layer)
+type CreateDriverPresenter interface {
+	Output(*usecase.CreateDriverOutput) []byte
+	OutputError(error) []byte
+}
+
 type createDriverInput struct {
 	BirthDate  *time.Time `json:"birth_date"`
 	CNH        *string    `json:"cnh"`
@@ -57,12 +63,14 @@ func (cd createDriverInput) writeUCInput(ucInput *usecase.CreateDriverInput) err
 }
 
 type CreateDriverController struct {
+	p   CreateDriverPresenter
 	url string
 	uc  usecase.CreateDriverUseCase
 }
 
-func NewCreateDriverController(url string, uc usecase.CreateDriverUseCase) CreateDriverController {
+func NewCreateDriverController(p CreateDriverPresenter, url string, uc usecase.CreateDriverUseCase) CreateDriverController {
 	return CreateDriverController{
+		p:   p,
 		url: url,
 		uc:  uc,
 	}
@@ -74,21 +82,20 @@ func (c CreateDriverController) ServerHTTP(w http.ResponseWriter, r *http.Reques
 	var input createDriverInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "invalid request body"}`))
+		w.Write(c.p.OutputError(err))
 		return
 	}
 
 	var ucInput usecase.CreateDriverInput
 	if err := input.writeUCInput(&ucInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, err.Error())))
+		w.Write(c.p.OutputError(err))
 		return
 	}
 
 	output, err := c.uc.Execute(r.Context(), ucInput)
 	if err != nil {
 		var code int
-		var msg string
 
 		switch err.(type) {
 		case entity.ErrInvalidAge,
@@ -98,23 +105,19 @@ func (c CreateDriverController) ServerHTTP(w http.ResponseWriter, r *http.Reques
 			entity.ErrInvalidGender,
 			entity.ErrInvalidName:
 			code = http.StatusBadRequest
-			msg = err.Error()
 		case entity.ErrDriverAlreadyExists:
 			code = http.StatusConflict
-			msg = err.Error()
 		default:
 			code = http.StatusInternalServerError
-			msg = "internal server error"
+			err = fmt.Errorf("internal server error")
 		}
 
 		w.WriteHeader(code)
-		w.Write([]byte(fmt.Sprintf(`{"error": "%s"}`, msg)))
+		w.Write(c.p.OutputError(err))
 		return
 	}
 
-	response, _ := json.Marshal(&output)
-
 	w.WriteHeader(http.StatusCreated)
-	w.Write(response)
-	w.Header().Set("location", fmt.Sprintf("%s/%s", c.url, input.CPF))
+	w.Write(c.p.Output(output))
+	w.Header().Set("location", fmt.Sprintf("%s/%s", c.url, *input.CPF))
 }

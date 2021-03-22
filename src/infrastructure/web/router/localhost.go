@@ -39,8 +39,8 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		l := logger.NewPrintLogger()
 		p := presenter.NewCreateDriverPresenter()
-		uc := usecase.NewCreateDriverInteractor(l, p, router.repo)
-		c := rest.NewCreateDriverController(url, uc)
+		uc := usecase.NewCreateDriverInteractor(l, router.repo)
+		c := rest.NewCreateDriverController(p, url, uc)
 
 		c.ServerHTTP(w, r)
 	}

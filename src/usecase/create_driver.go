@@ -10,49 +10,42 @@ import (
 
 // input port
 type CreateDriverUseCase interface {
-	Execute(context.Context, CreateDriverInput) (CreateDriverOutput, error)
+	Execute(context.Context, CreateDriverInput) (*CreateDriverOutput, error)
 }
 
 // input port implementation
 type CreateDriverInteractor struct {
-	logger    Logger
-	presenter CreateDriverPresenter
-	repo      entity.DriverRepository
-}
-
-// output port
-type CreateDriverPresenter interface {
-	Output(*entity.Driver) CreateDriverOutput
+	logger Logger
+	repo   entity.DriverRepository
 }
 
 type CreateDriverInput struct {
-	BirthDate  time.Time `json:"birth_date"`
-	CNH        string    `json:"cnh"`
-	CPF        string    `json:"cpf"`
-	Gender     string    `json:"gender"`
-	HasVehicle bool      `json:"has_vehicle"`
-	Name       string    `json:"name"`
+	BirthDate  time.Time
+	CNH        string
+	CPF        string
+	Gender     string
+	HasVehicle bool
+	Name       string
 }
 
 type CreateDriverOutput struct {
-	BirthDate  string    `json:"birth_date"`
-	CNH        string    `json:"cnh"`
-	CPF        string    `json:"cpf"`
-	CreatedAt  time.Time `json:"created_at"`
-	Gender     string    `json:"gender"`
-	HasVehicle bool      `json:"has_vehicle"`
-	Name       string    `json:"name"`
+	BirthDate  time.Time
+	CNH        string
+	CPF        string
+	CreatedAt  time.Time
+	Gender     string
+	HasVehicle bool
+	Name       string
 }
 
-func NewCreateDriverInteractor(logger Logger, presenter CreateDriverPresenter, repo entity.DriverRepository) CreateDriverUseCase {
+func NewCreateDriverInteractor(logger Logger, repo entity.DriverRepository) CreateDriverUseCase {
 	return CreateDriverInteractor{
-		logger:    logger,
-		presenter: presenter,
-		repo:      repo,
+		logger: logger,
+		repo:   repo,
 	}
 }
 
-func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriverInput) (CreateDriverOutput, error) {
+func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriverInput) (*CreateDriverOutput, error) {
 	driver, err := entity.NewTruckDriver(
 		input.CPF,
 		input.Name,
@@ -64,7 +57,7 @@ func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriver
 
 	if err != nil {
 		di.logger.Debug(err.Error())
-		return di.presenter.Output(nil), err
+		return nil, err
 	}
 
 	err = di.repo.SaveDriver(ctx, driver)
@@ -75,10 +68,20 @@ func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriver
 		default:
 			di.logger.Error(err.Error())
 		}
-		return di.presenter.Output(nil), err
+		return nil, err
 	}
 
 	di.logger.Info(fmt.Sprintf("new driver created. driver=[%v]", &driver))
 
-	return di.presenter.Output(driver), nil
+	result := CreateDriverOutput{
+		BirthDate:  driver.BirthDate().Time,
+		CNH:        string(driver.CNHType()),
+		CPF:        string(driver.CPF()),
+		CreatedAt:  time.Now(),
+		Gender:     string(driver.Gender()),
+		HasVehicle: driver.HasVehicle(),
+		Name:       string(driver.Name()),
+	}
+
+	return &result, nil
 }
