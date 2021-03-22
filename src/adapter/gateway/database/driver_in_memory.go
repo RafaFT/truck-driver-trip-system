@@ -12,12 +12,12 @@ type InMemoryDrivers struct {
 }
 
 func NewDriverInMemory() entity.DriverRepository {
-	return InMemoryDrivers{
+	return &InMemoryDrivers{
 		Drivers: make([]*entity.Driver, 0),
 	}
 }
 
-func (d InMemoryDrivers) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {
+func (d *InMemoryDrivers) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {
 	for i, driver := range d.Drivers {
 		if driver.CPF() == cpf {
 			d.Drivers[i] = d.Drivers[len(d.Drivers)-1]
@@ -30,7 +30,7 @@ func (d InMemoryDrivers) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) 
 	return entity.NewErrDriverNotFound(cpf)
 }
 
-func (d InMemoryDrivers) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
+func (d *InMemoryDrivers) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
 	for _, driver := range d.Drivers {
 		if driver.CPF() == cpf {
 			return driver, nil
@@ -40,11 +40,11 @@ func (d InMemoryDrivers) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (*
 	return nil, entity.NewErrDriverNotFound(cpf)
 }
 
-func (d InMemoryDrivers) FindDrivers(ctx context.Context) ([]*entity.Driver, error) {
+func (d *InMemoryDrivers) FindDrivers(ctx context.Context) ([]*entity.Driver, error) {
 	return d.Drivers, nil
 }
 
-func (d InMemoryDrivers) SaveDriver(ctx context.Context, driver *entity.Driver) error {
+func (d *InMemoryDrivers) SaveDriver(ctx context.Context, driver *entity.Driver) error {
 	for _, storedDriver := range d.Drivers {
 		if storedDriver.CPF() == driver.CPF() {
 			return entity.NewErrDriverAlreadyExists(driver.CPF())
@@ -56,7 +56,7 @@ func (d InMemoryDrivers) SaveDriver(ctx context.Context, driver *entity.Driver) 
 	return nil
 }
 
-func (d InMemoryDrivers) UpdateDriver(ctx context.Context, driver *entity.Driver) error {
+func (d *InMemoryDrivers) UpdateDriver(ctx context.Context, driver *entity.Driver) error {
 	for i, storedDriver := range d.Drivers {
 		if storedDriver.CPF() == driver.CPF() {
 			updatedDriver := *driver
