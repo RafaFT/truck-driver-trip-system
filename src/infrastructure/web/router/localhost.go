@@ -23,7 +23,7 @@ type localHostRouter struct {
 func NewDriverLocalHost(port string, repo entity.DriverRepository) http.Handler {
 	r := &localHostRouter{
 		baseURL: "http://localhost",
-		port:    "8080",
+		port:    port,
 		repo:    repo,
 		router:  mux.NewRouter(),
 	}
