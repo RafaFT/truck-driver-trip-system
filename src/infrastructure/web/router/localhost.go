@@ -37,6 +37,8 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 	url := fmt.Sprintf("%s:%s/%s", router.baseURL, router.port, "drivers")
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
 		l := logger.NewPrintLogger()
 		p := presenter.NewCreateDriverPresenter()
 		uc := usecase.NewCreateDriverInteractor(l, router.repo)
