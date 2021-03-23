@@ -15,15 +15,13 @@ type DeleteDriverUseCase interface {
 // input port implementation
 type DeleteDriverInteractor struct {
 	logger Logger
-	// presenter DeleteDriverPresenter
-	repo entity.DriverRepository
+	repo   entity.DriverRepository
 }
 
 func NewDeleteDriverInteractor(logger Logger, repo entity.DriverRepository) DeleteDriverUseCase {
 	return DeleteDriverInteractor{
 		logger: logger,
-		// presenter: presenter,
-		repo: repo,
+		repo:   repo,
 	}
 }
 
@@ -36,7 +34,13 @@ func (di DeleteDriverInteractor) Execute(ctx context.Context, cpf string) error 
 
 	err = di.repo.DeleteDriverByCPF(ctx, driverCPF)
 	if err != nil {
-		di.logger.Warning(err.Error())
+		switch err.(type) {
+		case entity.ErrDriverNotFound:
+			di.logger.Debug(err.Error())
+		default:
+			di.logger.Error(err.Error())
+		}
+
 		return err
 	}
 
