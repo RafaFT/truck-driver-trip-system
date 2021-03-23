@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
@@ -13,31 +14,24 @@ type GetDriversUseCase interface {
 
 // input port implementation - interactor
 type GetDriversInteractor struct {
-	logger    Logger
-	presenter GetDriversPresenter
-	repo      entity.DriverRepository
-}
-
-// output port - (presenter) interface
-type GetDriversPresenter interface {
-	Output([]*entity.Driver) []*GetDriversOutput
+	logger Logger
+	repo   entity.DriverRepository
 }
 
 // output data - type
 type GetDriversOutput struct {
-	BirthDate  *string `json:"birth_date,omitempty"`
-	CNH        *string `json:"cnh,omitempty"`
-	CPF        *string `json:"cpf,omitempty"`
-	Gender     *string `json:"gender,omitempty"`
-	HasVehicle *bool   `json:"has_vehicle,omitempty"`
-	Name       *string `json:"name,omitempty"`
+	BirthDate  time.Time
+	CNH        string
+	CPF        string
+	Gender     string
+	HasVehicle bool
+	Name       string
 }
 
-func NewGetDriversInteractor(logger Logger, presenter GetDriversPresenter, repo entity.DriverRepository) GetDriversUseCase {
+func NewGetDriversInteractor(logger Logger, repo entity.DriverRepository) GetDriversUseCase {
 	return GetDriversInteractor{
-		logger:    logger,
-		presenter: presenter,
-		repo:      repo,
+		logger: logger,
+		repo:   repo,
 	}
 }
 
@@ -45,8 +39,20 @@ func (di GetDriversInteractor) Execute(ctx context.Context) ([]*GetDriversOutput
 	drivers, err := di.repo.FindDrivers(ctx)
 	if err != nil {
 		di.logger.Error(err.Error())
-		return di.presenter.Output(nil), err
+		return nil, err
 	}
 
-	return di.presenter.Output(drivers), nil
+	output := make([]*GetDriversOutput, len(drivers))
+	for i, driver := range drivers {
+		output[i] = &GetDriversOutput{
+			BirthDate:  driver.BirthDate().Time,
+			CNH:        string(driver.CNHType()),
+			CPF:        string(driver.CPF()),
+			Gender:     string(driver.Gender()),
+			HasVehicle: driver.HasVehicle(),
+			Name:       string(driver.Name()),
+		}
+	}
+
+	return output, nil
 }

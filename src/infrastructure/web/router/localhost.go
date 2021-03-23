@@ -28,6 +28,7 @@ func NewDriverLocalHost(port string, repo entity.DriverRepository) http.Handler 
 		router:  mux.NewRouter(),
 	}
 
+	r.router.HandleFunc("/drivers", r.GetDriversRoute()).Methods(http.MethodGet)
 	r.router.HandleFunc("/drivers", r.CreateDriverRoute()).Methods(http.MethodPost)
 
 	return r
@@ -43,6 +44,19 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 		p := presenter.NewCreateDriverPresenter()
 		uc := usecase.NewCreateDriverInteractor(l, router.repo)
 		c := rest.NewCreateDriverController(p, url, uc)
+
+		c.ServeHTTP(w, r)
+	}
+}
+
+func (router *localHostRouter) GetDriversRoute() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		l := logger.NewPrintLogger()
+		p := presenter.NewGetDriversPresenter()
+		uc := usecase.NewGetDriversInteractor(l, router.repo)
+		c := rest.NewGetDriversController(p, uc)
 
 		c.ServeHTTP(w, r)
 	}
