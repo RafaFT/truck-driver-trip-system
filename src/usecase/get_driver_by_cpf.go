@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
@@ -13,30 +14,24 @@ type GetDriverByCPFUseCase interface {
 
 // input port implementation - interactor
 type GetDriverByCPFInteractor struct {
-	logger    Logger
-	presenter GetDriverByCPFPresenter
-	repo      entity.DriverRepository
-}
-
-// output port - (presenter) interface
-type GetDriverByCPFPresenter interface {
-	Output(*entity.Driver) *GetDriverByCPFOutput
+	logger Logger
+	repo   entity.DriverRepository
 }
 
 // output data - type
 type GetDriverByCPFOutput struct {
-	BirthDate  *string `json:"birth_date,omitempty"`
-	CNH        *string `json:"cnh,omitempty"`
-	Gender     *string `json:"gender,omitempty"`
-	HasVehicle *bool   `json:"has_vehicle,omitempty"`
-	Name       *string `json:"name,omitempty"`
+	BirthDate  time.Time
+	CNH        string
+	CPF        string
+	Gender     string
+	HasVehicle bool
+	Name       string
 }
 
-func NewGetDriverByCPFInteractor(logger Logger, presenter GetDriverByCPFPresenter, repo entity.DriverRepository) GetDriverByCPFUseCase {
+func NewGetDriverByCPFInteractor(logger Logger, repo entity.DriverRepository) GetDriverByCPFUseCase {
 	return GetDriverByCPFInteractor{
-		logger:    logger,
-		presenter: presenter,
-		repo:      repo,
+		logger: logger,
+		repo:   repo,
 	}
 }
 
@@ -44,7 +39,7 @@ func (di GetDriverByCPFInteractor) Execute(ctx context.Context, cpf string) (*Ge
 	driverCPF, err := entity.NewCPF(cpf)
 	if err != nil {
 		di.logger.Debug(err.Error())
-		return di.presenter.Output(nil), err
+		return nil, err
 	}
 
 	driver, err := di.repo.FindDriverByCPF(ctx, driverCPF)
@@ -56,8 +51,15 @@ func (di GetDriverByCPFInteractor) Execute(ctx context.Context, cpf string) (*Ge
 			di.logger.Error(err.Error())
 		}
 
-		return di.presenter.Output(nil), err
+		return nil, err
 	}
 
-	return di.presenter.Output(driver), nil
+	return &GetDriverByCPFOutput{
+		BirthDate:  driver.BirthDate().Time,
+		CNH:        string(driver.CNHType()),
+		CPF:        string(driver.CPF()),
+		Gender:     string(driver.Gender()),
+		HasVehicle: driver.HasVehicle(),
+		Name:       string(driver.Name()),
+	}, nil
 }
