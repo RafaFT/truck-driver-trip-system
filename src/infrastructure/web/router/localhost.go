@@ -33,6 +33,7 @@ func NewDriverLocalHost(port string, repo entity.DriverRepository) http.Handler 
 	r.router.HandleFunc("/drivers", r.CreateDriverRoute()).Methods(http.MethodPost)
 	r.router.HandleFunc("/drivers/{cpf:[0-9]+}", r.GetDriverByCPFRoute()).Methods(http.MethodGet)
 	r.router.HandleFunc("/drivers/{cpf:[0-9]+}", r.DeleteDriverRoute()).Methods(http.MethodDelete)
+	r.router.HandleFunc("/drivers/{cpf:[0-9]+}", r.UpdateDriverRoute()).Methods(http.MethodPatch)
 
 	return r
 }
@@ -94,6 +95,22 @@ func (router *localHostRouter) GetDriversRoute() http.HandlerFunc {
 		c := rest.NewGetDriversController(p, uc)
 
 		c.ServeHTTP(w, r)
+	}
+}
+
+func (router *localHostRouter) UpdateDriverRoute() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cpf := mux.Vars(r)["cpf"]
+		ctx := context.WithValue(r.Context(), rest.CPFKey, cpf)
+
+		w.Header().Set("Content-Type", "application/json")
+
+		l := logger.NewPrintLogger()
+		p := presenter.NewUpdateDriverPresenter()
+		uc := usecase.NewUpdateDriverInteractor(l, router.repo)
+		c := rest.NewUpdateDriverController(p, uc)
+
+		c.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
 
