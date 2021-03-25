@@ -42,14 +42,16 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 	url := fmt.Sprintf("%s:%s/%s", router.baseURL, router.port, "drivers")
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), rest.URLKey("url"), url)
+
 		w.Header().Set("Content-Type", "application/json")
 
 		l := logger.NewPrintLogger()
 		p := presenter.NewCreateDriverPresenter()
 		uc := usecase.NewCreateDriverInteractor(l, router.repo)
-		c := rest.NewCreateDriverController(p, url, uc)
+		c := rest.NewCreateDriverController(p, uc)
 
-		c.ServeHTTP(w, r)
+		c.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
 

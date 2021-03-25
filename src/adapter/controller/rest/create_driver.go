@@ -11,6 +11,8 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
+type URLKey string
+
 // output port (out of place, according to clean architecture, this interface should be declared on usecase layer)
 type CreateDriverPresenter interface {
 	Output(*usecase.CreateDriverOutput) []byte
@@ -63,16 +65,14 @@ func (cd createDriverInput) writeUCInput(ucInput *usecase.CreateDriverInput) err
 }
 
 type CreateDriverController struct {
-	p   CreateDriverPresenter
-	url string
-	uc  usecase.CreateDriverUseCase
+	p  CreateDriverPresenter
+	uc usecase.CreateDriverUseCase
 }
 
-func NewCreateDriverController(p CreateDriverPresenter, url string, uc usecase.CreateDriverUseCase) CreateDriverController {
+func NewCreateDriverController(p CreateDriverPresenter, uc usecase.CreateDriverUseCase) CreateDriverController {
 	return CreateDriverController{
-		p:   p,
-		url: url,
-		uc:  uc,
+		p:  p,
+		uc: uc,
 	}
 }
 
@@ -115,7 +115,7 @@ func (c CreateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	w.Header().Set("location", fmt.Sprintf("%s/%s", c.url, *input.CPF))
+	w.Header().Set("location", fmt.Sprintf("%s/%s", r.Context().Value(URLKey("url")).(string), *input.CPF))
 	w.WriteHeader(http.StatusCreated)
 	w.Write(c.p.Output(output))
 }
