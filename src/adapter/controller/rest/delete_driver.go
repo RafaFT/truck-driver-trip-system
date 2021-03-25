@@ -26,7 +26,7 @@ func NewDeleteDriverByCPFController(p DeleteDriverPresenter, uc usecase.DeleteDr
 }
 
 func (c DeleteDriverByCPFController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	cpf := r.Context().Value(CPFKey).(string)
+	cpf := r.Context().Value(CPFKey("cpf")).(string)
 
 	err := c.uc.Execute(r.Context(), cpf)
 	if err != nil {

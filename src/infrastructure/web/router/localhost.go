@@ -58,7 +58,7 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 func (router *localHostRouter) DeleteDriverRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cpf := mux.Vars(r)["cpf"]
-		ctx := context.WithValue(r.Context(), rest.CPFKey, cpf)
+		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), cpf)
 
 		w.Header().Set("Content-Type", "application/json")
 
@@ -74,7 +74,7 @@ func (router *localHostRouter) DeleteDriverRoute() http.HandlerFunc {
 func (router *localHostRouter) GetDriverByCPFRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cpf := mux.Vars(r)["cpf"]
-		ctx := context.WithValue(r.Context(), rest.CPFKey, cpf)
+		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), cpf)
 
 		w.Header().Set("Content-Type", "application/json")
 
@@ -103,7 +103,7 @@ func (router *localHostRouter) GetDriversRoute() http.HandlerFunc {
 func (router *localHostRouter) UpdateDriverRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cpf := mux.Vars(r)["cpf"]
-		ctx := context.WithValue(r.Context(), rest.CPFKey, cpf)
+		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), cpf)
 
 		w.Header().Set("Content-Type", "application/json")
 

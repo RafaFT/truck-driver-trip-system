@@ -48,7 +48,7 @@ func (c UpdateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	cpf := r.Context().Value(CPFKey).(string)
+	cpf := r.Context().Value(CPFKey("cpf")).(string)
 	ucInput := usecase.UpdateDriverInput{
 		CNH:        input.CNH,
 		Gender:     input.Gender,

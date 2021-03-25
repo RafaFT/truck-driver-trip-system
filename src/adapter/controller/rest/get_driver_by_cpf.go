@@ -8,7 +8,7 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
-var CPFKey string
+type CPFKey string
 
 // output port (out of place, according to clean architecture, this interface should be declared on usecase layer)
 type GetDriverByCPFPresenter interface {
@@ -29,7 +29,7 @@ func NewGetDriverByCPFController(p GetDriverByCPFPresenter, uc usecase.GetDriver
 }
 
 func (c GetDriverByCPFController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	cpf := r.Context().Value(CPFKey).(string)
+	cpf := r.Context().Value(CPFKey("cpf")).(string)
 
 	output, err := c.uc.Execute(r.Context(), cpf)
 	if err != nil {
