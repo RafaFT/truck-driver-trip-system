@@ -115,7 +115,7 @@ func (c CreateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	w.Header().Set("location", fmt.Sprintf("%s/%s", c.url, *input.CPF))
 	w.WriteHeader(http.StatusCreated)
 	w.Write(c.p.Output(output))
-	w.Header().Set("location", fmt.Sprintf("%s/%s", c.url, *input.CPF))
 }
