@@ -25,14 +25,14 @@ type driverDoc struct {
 
 // driver repository implementation
 type driverFirestore struct {
-	client     *firestore.Client
-	coll string
+	client *firestore.Client
+	coll   string
 }
 
 func NewDriverFirestore(c *firestore.Client) entity.DriverRepository {
 	return &driverFirestore{
-		client:     c,
-		coll: "drivers",
+		client: c,
+		coll:   "drivers",
 	}
 }
 
@@ -126,7 +126,8 @@ func (df driverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver)
 		Name:       string(driver.Name()),
 	}
 
-	_, err := df.client.Doc(string(driver.CPF())).Create(ctx, &newDriverDoc)
+	path := fmt.Sprintf("%s/%s", df.coll, driver.CPF())
+	_, err := df.client.Doc(path).Create(ctx, &newDriverDoc)
 	if err != nil {
 		if status.Code(err) == codes.AlreadyExists {
 			return entity.NewErrDriverAlreadyExists(driver.CPF())
@@ -148,7 +149,8 @@ func (df driverFirestore) UpdateDriver(ctx context.Context, driver *entity.Drive
 	}
 
 	// TODO: set behaves as an upsert (update/create)
-	_, err := df.client.Doc(string(driver.CPF())).Set(ctx, &driverDocument)
+	path := fmt.Sprintf("%s/%s", df.coll, driver.CPF())
+	_, err := df.client.Doc(path).Set(ctx, &driverDocument)
 	if err != nil {
 		return err
 	}
