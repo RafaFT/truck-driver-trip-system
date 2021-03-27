@@ -26,18 +26,18 @@ type driverDoc struct {
 // driver repository implementation
 type driverFirestore struct {
 	client     *firestore.Client
-	collection string
+	coll string
 }
 
 func NewDriverFirestore(c *firestore.Client) entity.DriverRepository {
 	return &driverFirestore{
 		client:     c,
-		collection: "drivers",
+		coll: "drivers",
 	}
 }
 
 func (df driverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {
-	doc := df.client.Doc(fmt.Sprintf("%s/%s", df.collection, cpf))
+	doc := df.client.Doc(fmt.Sprintf("%s/%s", df.coll, cpf))
 
 	if _, err := doc.Get(ctx); err != nil {
 		if status.Code(err) == codes.NotFound {
@@ -55,7 +55,7 @@ func (df driverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF)
 }
 
 func (df driverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
-	docSnap, err := df.client.Doc(fmt.Sprintf("%s/%s", df.collection, cpf)).Get(ctx)
+	docSnap, err := df.client.Doc(fmt.Sprintf("%s/%s", df.coll, cpf)).Get(ctx)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			return nil, entity.NewErrDriverNotFound(cpf)
@@ -85,7 +85,7 @@ func (df driverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (
 }
 
 func (df driverFirestore) FindDrivers(ctx context.Context) ([]*entity.Driver, error) {
-	docs, err := df.client.Collection(df.collection).Documents(ctx).GetAll()
+	docs, err := df.client.Collection(df.coll).Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
 	}
