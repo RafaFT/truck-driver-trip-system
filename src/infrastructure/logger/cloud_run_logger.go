@@ -22,15 +22,24 @@ package logger
 import (
 	"encoding/json"
 	"fmt"
+	"runtime"
+	"strconv"
 
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
 type logEntry struct {
-	Message  string `json:"message"`
-	Severity string `json:"severity"`
-	Trace    string `json:"logging.googleapis.com/trace,omitempty"`
-	Type     string `json:"@type,omitempty"`
+	Message        string          `json:"message"`
+	Severity       string          `json:"severity"`
+	SourceLocation *sourceLocation `json:"logging.googleapis.com/sourceLocation,omitempty"`
+	Trace          string          `json:"logging.googleapis.com/trace,omitempty"`
+	Type           string          `json:"@type,omitempty"`
+}
+
+type sourceLocation struct {
+	File     string `json:"file"`
+	Line     string `json:"line"`
+	Function string `json:"function"`
 }
 
 func NewCloudRunLogger(GCPProject, GCPTrace string) usecase.Logger {
@@ -51,24 +60,43 @@ func (e logEntry) String() string {
 func (e logEntry) Debug(msg string) {
 	e.Severity = "DEBUG"
 	e.Message = msg
+	e.SourceLocation = e.getSourceLocationJSON(2)
 	fmt.Println(e)
 }
 
 func (e logEntry) Info(msg string) {
 	e.Severity = "INFO"
 	e.Message = msg
+	e.SourceLocation = e.getSourceLocationJSON(2)
 	fmt.Println(e)
 }
 
 func (e logEntry) Warning(msg string) {
 	e.Severity = "WARNING"
 	e.Message = msg
+	e.SourceLocation = e.getSourceLocationJSON(2)
 	fmt.Println(e)
 }
 
 func (e logEntry) Error(msg string) {
 	e.Severity = "ERROR"
 	e.Message = msg
+	e.SourceLocation = e.getSourceLocationJSON(2)
 	// e.Type = "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent"
 	fmt.Println(e)
+}
+
+func (e logEntry) getSourceLocationJSON(skip int) *sourceLocation {
+	pc, file, line, ok := runtime.Caller(skip)
+	if !ok {
+		return nil
+	}
+
+	sl := sourceLocation{
+		File:     file,
+		Line:     strconv.Itoa(line),
+		Function: runtime.FuncForPC(pc).Name(),
+	}
+
+	return &sl
 }
