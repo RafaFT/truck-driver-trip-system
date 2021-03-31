@@ -62,6 +62,8 @@ func TestNewCPF(t *testing.T) {
 		// valid cases
 		{"64351283084", CPF("64351283084"), nil},
 		{"10804773068", CPF("10804773068"), nil},
+		{"14316382004", CPF("14316382004"), nil},
+		{"54692539020", CPF("54692539020"), nil},
 	}
 
 	for _, test := range tests {
