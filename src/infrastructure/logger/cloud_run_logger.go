@@ -96,7 +96,7 @@ func (l cloudRunLogger) Error(msg string) {
 		Severity:       "DEBUG",
 		SourceLocation: l.getSourceLocationJSON(2),
 		Trace:          l.trace,
-		// Type:           "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
+		Type:           "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
 	})
 }
 
