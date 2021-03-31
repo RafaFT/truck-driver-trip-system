@@ -54,7 +54,7 @@ func isCPFValid(cpf string) bool {
 		digit, _ := strconv.Atoi(string(strDigit))
 		sum += digit * (11 - i)
 	}
-	if secondDigitCheck := (sum * 10) % 11; strconv.Itoa(secondDigitCheck) != string(cpf[10]) {
+	if secondDigitCheck := (sum * 10) % 11 % 10; strconv.Itoa(secondDigitCheck) != string(cpf[10]) {
 		return false
 	}
 
