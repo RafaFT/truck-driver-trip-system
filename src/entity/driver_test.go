@@ -186,7 +186,7 @@ func TestName(t *testing.T) {
 		{"Húgo  Diego  Barros", "", newErrInvalidName("Húgo  Diego  Barros")}, // double spacing
 		{"Húgo Diego Barros 1", "", newErrInvalidName("Húgo Diego Barros 1")}, // digit
 		{"Húgo\tDiego\vBarros", "", newErrInvalidName("Húgo\tDiego\vBarros")}, // use of tab/v space
-		{"张伟 ", "", newErrInvalidName("张伟 ")},                                 // chine name with trailing space
+		{"张伟 ", "", newErrInvalidName("张伟 ")},                                 // chinese name with trailing space
 		// valid input
 		{"Húgo Diego Barros", "húgo diego barros", nil},
 		{"张伟", "张伟", nil},
