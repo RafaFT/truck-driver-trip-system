@@ -93,7 +93,7 @@ func (l cloudRunLogger) Warning(msg string) {
 func (l cloudRunLogger) Error(msg string) {
 	fmt.Println(logEntry{
 		Message:        msg,
-		Severity:       "DEBUG",
+		Severity:       "ERROR",
 		SourceLocation: l.getSourceLocationJSON(2),
 		Trace:          l.trace,
 		Type:           "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
