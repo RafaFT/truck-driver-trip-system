@@ -33,15 +33,16 @@ type cloudRunLogger struct {
 	trace string
 }
 
+// https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
 type logEntry struct {
-	Message        string          `json:"message"`
-	Severity       string          `json:"severity"`
-	SourceLocation *sourceLocation `json:"logging.googleapis.com/sourceLocation,omitempty"`
-	Trace          string          `json:"logging.googleapis.com/trace,omitempty"`
-	Type           string          `json:"@type,omitempty"`
+	Message        string                  `json:"message"`
+	Severity       string                  `json:"severity"`
+	SourceLocation *logEntrySourceLocation `json:"logging.googleapis.com/sourceLocation,omitempty"`
+	Trace          string                  `json:"logging.googleapis.com/trace,omitempty"`
+	Type           string                  `json:"@type,omitempty"`
 }
 
-type sourceLocation struct {
+type logEntrySourceLocation struct {
 	File     string `json:"file"`
 	Line     string `json:"line"`
 	Function string `json:"function"`
@@ -99,13 +100,13 @@ func (l cloudRunLogger) Error(msg string) {
 	})
 }
 
-func (l cloudRunLogger) getSourceLocationJSON(skip int) *sourceLocation {
+func (l cloudRunLogger) getSourceLocationJSON(skip int) *logEntrySourceLocation {
 	pc, file, line, ok := runtime.Caller(skip)
 	if !ok {
 		return nil
 	}
 
-	sl := sourceLocation{
+	sl := logEntrySourceLocation{
 		File:     file,
 		Line:     strconv.Itoa(line),
 		Function: runtime.FuncForPC(pc).Name(),
