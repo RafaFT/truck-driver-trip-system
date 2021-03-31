@@ -28,6 +28,11 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
+// usecase Logger implementation
+type cloudRunLogger struct {
+	trace string
+}
+
 type logEntry struct {
 	Message        string          `json:"message"`
 	Severity       string          `json:"severity"`
@@ -43,9 +48,9 @@ type sourceLocation struct {
 }
 
 func NewCloudRunLogger(GCPProject, GCPTrace string) usecase.Logger {
-	var logger logEntry
+	var logger cloudRunLogger
 	if GCPProject != "" && GCPTrace != "" {
-		logger.Trace = fmt.Sprintf("projects/%s/traces/%s", GCPProject, GCPTrace)
+		logger.trace = fmt.Sprintf("projects/%s/traces/%s", GCPProject, GCPTrace)
 	}
 
 	return logger
@@ -57,36 +62,44 @@ func (e logEntry) String() string {
 	return string(b)
 }
 
-func (e logEntry) Debug(msg string) {
-	e.Severity = "DEBUG"
-	e.Message = msg
-	e.SourceLocation = e.getSourceLocationJSON(2)
-	fmt.Println(e)
+func (l cloudRunLogger) Debug(msg string) {
+	fmt.Println(logEntry{
+		Message:        msg,
+		Severity:       "DEBUG",
+		SourceLocation: l.getSourceLocationJSON(2),
+		Trace:          l.trace,
+	})
 }
 
-func (e logEntry) Info(msg string) {
-	e.Severity = "INFO"
-	e.Message = msg
-	e.SourceLocation = e.getSourceLocationJSON(2)
-	fmt.Println(e)
+func (l cloudRunLogger) Info(msg string) {
+	fmt.Println(logEntry{
+		Message:        msg,
+		Severity:       "INFO",
+		SourceLocation: l.getSourceLocationJSON(2),
+		Trace:          l.trace,
+	})
 }
 
-func (e logEntry) Warning(msg string) {
-	e.Severity = "WARNING"
-	e.Message = msg
-	e.SourceLocation = e.getSourceLocationJSON(2)
-	fmt.Println(e)
+func (l cloudRunLogger) Warning(msg string) {
+	fmt.Println(logEntry{
+		Message:        msg,
+		Severity:       "WARNING",
+		SourceLocation: l.getSourceLocationJSON(2),
+		Trace:          l.trace,
+	})
 }
 
-func (e logEntry) Error(msg string) {
-	e.Severity = "ERROR"
-	e.Message = msg
-	e.SourceLocation = e.getSourceLocationJSON(2)
-	// e.Type = "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent"
-	fmt.Println(e)
+func (l cloudRunLogger) Error(msg string) {
+	fmt.Println(logEntry{
+		Message:        msg,
+		Severity:       "DEBUG",
+		SourceLocation: l.getSourceLocationJSON(2),
+		Trace:          l.trace,
+		// Type:           "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
+	})
 }
 
-func (e logEntry) getSourceLocationJSON(skip int) *sourceLocation {
+func (l cloudRunLogger) getSourceLocationJSON(skip int) *sourceLocation {
 	pc, file, line, ok := runtime.Caller(skip)
 	if !ok {
 		return nil
