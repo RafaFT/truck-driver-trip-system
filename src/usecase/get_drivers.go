@@ -20,6 +20,7 @@ type GetDriversInteractor struct {
 
 // output data - type
 type GetDriversOutput struct {
+	Age        int
 	BirthDate  time.Time
 	CNH        string
 	CPF        string
@@ -45,6 +46,7 @@ func (di GetDriversInteractor) Execute(ctx context.Context) ([]*GetDriversOutput
 	output := make([]*GetDriversOutput, len(drivers))
 	for i, driver := range drivers {
 		output[i] = &GetDriversOutput{
+			Age:        driver.Age(),
 			BirthDate:  driver.BirthDate().Time,
 			CNH:        string(driver.CNHType()),
 			CPF:        string(driver.CPF()),

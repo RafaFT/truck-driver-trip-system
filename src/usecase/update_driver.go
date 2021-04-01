@@ -28,6 +28,7 @@ type UpdateDriverInput struct {
 }
 
 type UpdateDriverOutput struct {
+	Age        int
 	BirthDate  time.Time
 	CNH        string
 	CPF        string
@@ -98,6 +99,7 @@ func (di UpdateDriverInteractor) Execute(ctx context.Context, cpf string, input 
 	di.logger.Info(fmt.Sprintf("driver updated. cpf=[%s], update=[%s]", cpf, logInput))
 
 	return &UpdateDriverOutput{
+		Age:        driver.Age(),
 		BirthDate:  driver.BirthDate().Time,
 		CNH:        string(driver.CNHType()),
 		CPF:        string(driver.CPF()),

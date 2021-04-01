@@ -30,6 +30,7 @@ type CreateDriverInput struct {
 }
 
 type CreateDriverOutput struct {
+	Age        int
 	BirthDate  time.Time
 	CNH        string
 	CPF        string
@@ -76,6 +77,7 @@ func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriver
 	di.logger.Info(fmt.Sprintf("new driver created. input=[%s]", string(logInput)))
 
 	result := CreateDriverOutput{
+		Age:        driver.Age(),
 		BirthDate:  driver.BirthDate().Time,
 		CNH:        string(driver.CNHType()),
 		CPF:        string(driver.CPF()),

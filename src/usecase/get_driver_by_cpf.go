@@ -20,6 +20,7 @@ type GetDriverByCPFInteractor struct {
 
 // output data - type
 type GetDriverByCPFOutput struct {
+	Age        int
 	BirthDate  time.Time
 	CNH        string
 	CPF        string
@@ -55,6 +56,7 @@ func (di GetDriverByCPFInteractor) Execute(ctx context.Context, cpf string) (*Ge
 	}
 
 	return &GetDriverByCPFOutput{
+		Age:        driver.Age(),
 		BirthDate:  driver.BirthDate().Time,
 		CNH:        string(driver.CNHType()),
 		CPF:        string(driver.CPF()),
