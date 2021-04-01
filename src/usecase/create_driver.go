@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -71,7 +72,8 @@ func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriver
 		return nil, err
 	}
 
-	di.logger.Info(fmt.Sprintf("new driver created. driver=[%v]", &driver))
+	logInput, _ := json.MarshalIndent(input, "", "\t")
+	di.logger.Info(fmt.Sprintf("new driver created. input=[%s]", string(logInput)))
 
 	result := CreateDriverOutput{
 		BirthDate:  driver.BirthDate().Time,
