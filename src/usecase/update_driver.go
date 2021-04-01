@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -93,7 +94,8 @@ func (di UpdateDriverInteractor) Execute(ctx context.Context, cpf string, input 
 		return nil, err
 	}
 
-	di.logger.Info(fmt.Sprintf("driver updated. cpf=[%s], update=[%v]", cpf, input))
+	logInput, _ := json.MarshalIndent(input, "", "\t")
+	di.logger.Info(fmt.Sprintf("driver updated. cpf=[%s], update=[%s]", cpf, logInput))
 
 	return &UpdateDriverOutput{
 		BirthDate:  driver.BirthDate().Time,
