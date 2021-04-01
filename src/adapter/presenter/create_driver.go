@@ -9,6 +9,7 @@ import (
 )
 
 type createDriverOutput struct {
+	Age        int       `json:"age"`
 	BirthDate  string    `json:"birth_date"`
 	CNH        string    `json:"cnh"`
 	CPF        string    `json:"cpf"`
@@ -33,6 +34,7 @@ func NewCreateDriverPresenter() rest.CreateDriverPresenter {
 func (p CreateDriverPresenter) Output(driver *usecase.CreateDriverOutput) []byte {
 	var output createDriverOutput
 
+	output.Age = driver.Age
 	output.BirthDate = driver.BirthDate.Format("2006-01-02")
 	output.CNH = driver.CNH
 	output.CPF = driver.CPF

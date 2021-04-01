@@ -8,6 +8,7 @@ import (
 )
 
 type getDriverByCPFOutput struct {
+	Age        int    `json:"age"`
 	BirthDate  string `json:"birth_date"`
 	CNH        string `json:"cnh"`
 	CPF        string `json:"cpf"`
@@ -31,6 +32,7 @@ func NewGetDriverByCPFPresenter() rest.GetDriverByCPFPresenter {
 func (p getDriverByCPFPresenter) Output(driver *usecase.GetDriverByCPFOutput) []byte {
 	var output createDriverOutput
 
+	output.Age = driver.Age
 	output.BirthDate = driver.BirthDate.Format("2006-01-02")
 	output.CNH = driver.CNH
 	output.CPF = driver.CPF

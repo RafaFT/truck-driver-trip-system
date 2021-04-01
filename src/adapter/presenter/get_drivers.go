@@ -8,6 +8,7 @@ import (
 )
 
 type getDriversOutput struct {
+	Age        int    `json:"age"`
 	BirthDate  string `json:"birth_date"`
 	CNH        string `json:"cnh"`
 	CPF        string `json:"cpf"`
@@ -33,6 +34,7 @@ func (p GetDriversPresenter) Output(drivers []*usecase.GetDriversOutput) []byte 
 
 	for i, driver := range drivers {
 		output[i] = &getDriversOutput{
+			Age:        driver.Age,
 			BirthDate:  driver.BirthDate.Format("2006-01-02"),
 			CNH:        driver.CNH,
 			CPF:        driver.CPF,
