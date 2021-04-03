@@ -8,13 +8,13 @@ import (
 )
 
 type getDriverByCPFOutput struct {
-	Age        int    `json:"age"`
-	BirthDate  string `json:"birth_date"`
-	CNH        string `json:"cnh"`
-	CPF        string `json:"cpf"`
-	Gender     string `json:"gender"`
-	HasVehicle bool   `json:"has_vehicle"`
-	Name       string `json:"name"`
+	Age        *int    `json:"age,omitempty"`
+	BirthDate  *string `json:"birth_date,omitempty"`
+	CNH        *string `json:"cnh,omitempty"`
+	CPF        *string `json:"cpf,omitempty"`
+	Gender     *string `json:"gender,omitempty"`
+	HasVehicle *bool   `json:"has_vehicle,omitempty"`
+	Name       *string `json:"name,omitempty"`
 }
 
 type getDriverByCPFOutputError struct {
@@ -29,16 +29,31 @@ func NewGetDriverByCPFPresenter() rest.GetDriverByCPFPresenter {
 	return getDriverByCPFPresenter{}
 }
 
-func (p getDriverByCPFPresenter) Output(driver *usecase.GetDriverByCPFOutput) []byte {
+func (p getDriverByCPFPresenter) Output(driver *usecase.GetDriverByCPFOutput, fields ...string) []byte {
 	var output getDriverByCPFOutput
 
-	output.Age = driver.Age
-	output.BirthDate = driver.BirthDate.Format("2006-01-02")
-	output.CNH = driver.CNH
-	output.CPF = driver.CPF
-	output.Gender = driver.Gender
-	output.HasVehicle = driver.HasVehicle
-	output.Name = driver.Name
+	if containsField("age", fields) {
+		output.Age = &driver.Age
+	}
+	if containsField("age", fields) {
+		birthDate := driver.BirthDate.Format("2006-01-02")
+		output.BirthDate = &birthDate
+	}
+	if containsField("cnh", fields) {
+		output.CNH = &driver.CNH
+	}
+	if containsField("cpf", fields) {
+		output.CPF = &driver.CPF
+	}
+	if containsField("gender", fields) {
+		output.Gender = &driver.Gender
+	}
+	if containsField("has_vehicle", fields) {
+		output.HasVehicle = &driver.HasVehicle
+	}
+	if containsField("cpf", fields) {
+		output.Name = &driver.Name
+	}
 
 	b, _ := json.Marshal(&output)
 
@@ -53,4 +68,13 @@ func (p getDriverByCPFPresenter) OutputError(err error) []byte {
 	b, _ := json.Marshal(&output)
 
 	return b
+}
+
+func containsField(field string, fields []string) bool {
+	for _, v := range fields {
+		if v == field {
+			return true
+		}
+	}
+	return false
 }

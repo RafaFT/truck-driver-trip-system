@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
@@ -12,7 +13,7 @@ type CPFKey string
 
 // output port (out of place, according to clean architecture, this interface should be declared on usecase layer)
 type GetDriverByCPFPresenter interface {
-	Output(*usecase.GetDriverByCPFOutput) []byte
+	Output(*usecase.GetDriverByCPFOutput, ...string) []byte
 	OutputError(error) []byte
 }
 
@@ -45,6 +46,12 @@ func (c GetDriverByCPFController) ServeHTTP(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	var driverFields []string
+	err = r.ParseForm()
+	if err == nil {
+		driverFields = strings.Split(r.Form.Get("fields"), ",")
+	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write(c.p.Output(output))
+	w.Write(c.p.Output(output, driverFields...))
 }
