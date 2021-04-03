@@ -30,7 +30,7 @@ func NewGetDriverByCPFPresenter() rest.GetDriverByCPFPresenter {
 }
 
 func (p getDriverByCPFPresenter) Output(driver *usecase.GetDriverByCPFOutput) []byte {
-	var output createDriverOutput
+	var output getDriverByCPFOutput
 
 	output.Age = driver.Age
 	output.BirthDate = driver.BirthDate.Format("2006-01-02")
