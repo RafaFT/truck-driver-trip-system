@@ -84,8 +84,23 @@ func (df driverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (
 	return driver, nil
 }
 
-func (df driverFirestore) FindDrivers(ctx context.Context) ([]*entity.Driver, error) {
-	docs, err := df.client.Collection(df.coll).Documents(ctx).GetAll()
+func (df driverFirestore) FindDrivers(ctx context.Context, rawQ entity.FindDriversQuery) ([]*entity.Driver, error) {
+	q := df.client.Collection(df.coll).Query
+
+	if rawQ.CNH != nil {
+		q = q.Where("cnh", "==", *rawQ.CNH)
+	}
+	if rawQ.Gender != nil {
+		q = q.Where("gender", "==", *rawQ.Gender)
+	}
+	if rawQ.HasVehicle != nil {
+		q = q.Where("has_vehicle", "==", *rawQ.HasVehicle)
+	}
+	if rawQ.Limit != nil {
+		q = q.Limit(int(*rawQ.Limit))
+	}
+
+	docs, err := q.Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
 	}

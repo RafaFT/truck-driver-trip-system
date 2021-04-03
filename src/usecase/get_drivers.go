@@ -9,13 +9,20 @@ import (
 
 // input port - interface
 type GetDriversUseCase interface {
-	Execute(context.Context) ([]*GetDriversOutput, error)
+	Execute(context.Context, GetDriversQuery) ([]*GetDriversOutput, error)
 }
 
 // input port implementation - interactor
 type GetDriversInteractor struct {
 	logger Logger
 	repo   entity.DriverRepository
+}
+
+type GetDriversQuery struct {
+	CNH        string
+	Gender     string
+	HasVehicle *bool
+	Limit      *uint
 }
 
 // output data - type
@@ -36,8 +43,8 @@ func NewGetDriversInteractor(logger Logger, repo entity.DriverRepository) GetDri
 	}
 }
 
-func (di GetDriversInteractor) Execute(ctx context.Context) ([]*GetDriversOutput, error) {
-	drivers, err := di.repo.FindDrivers(ctx)
+func (di GetDriversInteractor) Execute(ctx context.Context, q GetDriversQuery) ([]*GetDriversOutput, error) {
+	drivers, err := di.repo.FindDrivers(ctx, entity.NewFindDriversQuery(q.CNH, q.Gender, q.HasVehicle, q.Limit))
 	if err != nil {
 		di.logger.Error(err.Error())
 		return nil, err

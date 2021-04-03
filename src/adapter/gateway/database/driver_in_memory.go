@@ -40,8 +40,33 @@ func (d *InMemoryDrivers) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (
 	return nil, entity.NewErrDriverNotFound(cpf)
 }
 
-func (d *InMemoryDrivers) FindDrivers(ctx context.Context) ([]*entity.Driver, error) {
-	return d.Drivers, nil
+func (d *InMemoryDrivers) FindDrivers(ctx context.Context, q entity.FindDriversQuery) ([]*entity.Driver, error) {
+	limit := len(d.Drivers)
+	if q.Limit != nil {
+		limit = int(*q.Limit)
+	}
+
+	drivers := make([]*entity.Driver, 0, limit)
+
+	for _, driver := range d.Drivers {
+		if len(drivers) == limit {
+			break
+		}
+
+		if q.CNH != nil && driver.CNHType() != *q.CNH {
+			break
+		}
+		if q.Gender != nil && driver.Gender() != *q.Gender {
+			break
+		}
+		if q.HasVehicle != nil && driver.HasVehicle() != *q.HasVehicle {
+			break
+		}
+
+		drivers = append(drivers, driver)
+	}
+
+	return drivers, nil
 }
 
 func (d *InMemoryDrivers) SaveDriver(ctx context.Context, driver *entity.Driver) error {
