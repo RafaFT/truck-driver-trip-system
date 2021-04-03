@@ -34,6 +34,7 @@ func (c GetDriversController) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// TODO: how to decouple controllers from presenters?
 	var driverFields []string
 	err = r.ParseForm()
 	if err == nil {
