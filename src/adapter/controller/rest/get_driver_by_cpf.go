@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -40,7 +39,7 @@ func (c GetDriverByCPFController) ServeHTTP(w http.ResponseWriter, r *http.Reque
 			w.WriteHeader(http.StatusNotFound)
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(c.p.OutputError(fmt.Errorf("internal server error")))
+			w.Write(c.p.OutputError(ErrInternalServerError))
 		}
 
 		return

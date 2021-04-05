@@ -5,6 +5,8 @@ import (
 	"reflect"
 )
 
+var ErrInternalServerError = fmt.Errorf("internal server error")
+
 type ErrInvalidParameterValue struct {
 	msg string
 }

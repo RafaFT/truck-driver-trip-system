@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
@@ -37,7 +36,7 @@ func (c DeleteDriverByCPFController) ServeHTTP(w http.ResponseWriter, r *http.Re
 			w.Header().Del("content-type")
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(c.p.OutputError(fmt.Errorf("internal server error")))
+			w.Write(c.p.OutputError(ErrInternalServerError))
 		}
 
 		return

@@ -107,7 +107,7 @@ func (c CreateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 			code = http.StatusConflict
 		default:
 			code = http.StatusInternalServerError
-			err = fmt.Errorf("internal server error")
+			err = ErrInternalServerError
 		}
 
 		w.WriteHeader(code)

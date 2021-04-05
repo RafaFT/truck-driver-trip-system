@@ -71,7 +71,7 @@ func (c UpdateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 			w.Write(c.p.OutputError(err))
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write(c.p.OutputError(fmt.Errorf("internal server error")))
+			w.Write(c.p.OutputError(ErrInternalServerError))
 		}
 
 		return

@@ -2,7 +2,6 @@ package rest
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -74,7 +73,7 @@ func (c GetDriversController) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			ucErr = newErrInvalidParameterValue("gender", r.Form.Get("gender"), reflect.TypeOf((*entity.Gender)(nil)).Elem())
 		default:
 			code = http.StatusInternalServerError
-			ucErr = fmt.Errorf("internal server error")
+			ucErr = ErrInternalServerError
 		}
 
 		w.WriteHeader(code)
