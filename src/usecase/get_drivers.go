@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
@@ -19,8 +21,8 @@ type GetDriversInteractor struct {
 }
 
 type GetDriversQuery struct {
-	CNH        string
-	Gender     string
+	CNH        *string
+	Gender     *string
 	HasVehicle *bool
 	Limit      *uint
 }
@@ -43,8 +45,17 @@ func NewGetDriversInteractor(logger Logger, repo entity.DriverRepository) GetDri
 	}
 }
 
-func (di GetDriversInteractor) Execute(ctx context.Context, q GetDriversQuery) ([]*GetDriversOutput, error) {
-	drivers, err := di.repo.FindDrivers(ctx, entity.NewFindDriversQuery(q.CNH, q.Gender, q.HasVehicle, q.Limit))
+func (di GetDriversInteractor) Execute(ctx context.Context, rawQ GetDriversQuery) ([]*GetDriversOutput, error) {
+	q, err := entity.NewFindDriversQuery(rawQ.CNH, rawQ.Gender, rawQ.HasVehicle, rawQ.Limit)
+	if err != nil {
+		di.logger.Debug(err.Error())
+		return nil, err
+	}
+
+	logQ, _ := json.MarshalIndent(q, "", "\t")
+	di.logger.Debug(fmt.Sprintf("FindDriversQuery: %s", string(logQ)))
+
+	drivers, err := di.repo.FindDrivers(ctx, q)
 	if err != nil {
 		di.logger.Error(err.Error())
 		return nil, err

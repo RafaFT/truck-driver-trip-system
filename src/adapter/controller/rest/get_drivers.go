@@ -1,11 +1,14 @@
 package rest
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 
+	"github.com/rafaft/truck-driver-trip-system/entity"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
@@ -32,21 +35,52 @@ func (c GetDriversController) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	formError := r.ParseForm()
 	if formError == nil {
-		q.CNH = r.Form.Get("cnh")
-		q.Gender = r.Form.Get("gender")
-		if hasVehicle, err := strconv.ParseBool(r.Form.Get("has_vehicle")); err == nil {
-			q.HasVehicle = &hasVehicle
+		if rawHasVehicle := r.Form.Get("has_vehicle"); rawHasVehicle != "" {
+			if hasVehicle, err := strconv.ParseBool(rawHasVehicle); err == nil {
+				q.HasVehicle = &hasVehicle
+			} else {
+				err := newErrInvalidParameterValue("has_vehicle", rawHasVehicle, reflect.TypeOf((*bool)(nil)).Elem())
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write(c.p.OutputError(err))
+				return
+			}
 		}
-		if limit, err := strconv.ParseUint(r.Form.Get("limit"), 10, 64); err == nil {
-			ulimit := uint(limit)
-			q.Limit = &ulimit
+		if rawLimit := r.Form.Get("limit"); rawLimit != "" {
+			if limit, err := strconv.ParseUint(rawLimit, 10, 64); err == nil {
+				ulimit := uint(limit)
+				q.Limit = &ulimit
+			} else {
+				err := newErrInvalidParameterValue("limit", rawLimit, reflect.TypeOf((*uint)(nil)).Elem())
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write(c.p.OutputError(err))
+				return
+			}
+		}
+		if cnh := r.Form.Get("cnh"); cnh != "" {
+			q.CNH = &cnh
+		}
+		if gender := r.Form.Get("gender"); gender != "" {
+			q.Gender = &gender
 		}
 	}
 
 	output, err := c.uc.Execute(r.Context(), q)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(c.p.OutputError(fmt.Errorf("internal server error")))
+		var ucErr error
+		code := http.StatusBadRequest
+
+		switch errors.Unwrap(err).(type) {
+		case entity.ErrInvalidCNH:
+			ucErr = newErrInvalidParameterValue("cnh", r.Form.Get("cnh"), reflect.TypeOf((*entity.CNH)(nil)).Elem())
+		case entity.ErrInvalidGender:
+			ucErr = newErrInvalidParameterValue("gender", r.Form.Get("gender"), reflect.TypeOf((*entity.Gender)(nil)).Elem())
+		default:
+			code = http.StatusInternalServerError
+			ucErr = fmt.Errorf("internal server error")
+		}
+
+		w.WriteHeader(code)
+		w.Write(c.p.OutputError(ucErr))
 		return
 	}
 

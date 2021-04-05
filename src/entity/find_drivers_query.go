@@ -1,5 +1,7 @@
 package entity
 
+import "fmt"
+
 type FindDriversQuery struct {
 	CNH        *CNH
 	Gender     *Gender
@@ -7,16 +9,23 @@ type FindDriversQuery struct {
 	Limit      *uint
 }
 
-func NewFindDriversQuery(cnh, gender string, has_vehicle *bool, limit *uint) FindDriversQuery {
+func NewFindDriversQuery(cnh, gender *string, has_vehicle *bool, limit *uint) (FindDriversQuery, error) {
+	errorMsg := "Invalid FindDriversQuery: %w"
 	var q FindDriversQuery
 
-	cnhT, err := NewCNH(cnh)
-	if err == nil {
+	if cnh != nil {
+		cnhT, err := NewCNH(*cnh)
+		if err != nil {
+			return q, fmt.Errorf(errorMsg, err)
+		}
 		q.CNH = &cnhT
 	}
 
-	genderT, err := NewGender(gender)
-	if err == nil {
+	if gender != nil {
+		genderT, err := NewGender(*gender)
+		if err != nil {
+			return q, fmt.Errorf(errorMsg, err)
+		}
 		q.Gender = &genderT
 	}
 
@@ -28,5 +37,5 @@ func NewFindDriversQuery(cnh, gender string, has_vehicle *bool, limit *uint) Fin
 		q.Limit = limit
 	}
 
-	return q
+	return q, nil
 }
