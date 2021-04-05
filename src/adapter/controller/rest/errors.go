@@ -38,24 +38,24 @@ func newErrInvalidParameterValue(p, v string, t reflect.Type) error {
 	}
 }
 
+func (e ErrInvalidParameterValue) Error() string {
+	return e.msg
+}
+
 func newErrParseQueryString(queryString string) error {
 	return ErrParseQueryString{
 		msg: fmt.Sprintf("could not parse query string: %s", queryString),
 	}
 }
 
+func (e ErrParseQueryString) Error() string {
+	return e.msg
+}
+
 func newErrUnknownParameter(p string) error {
 	return ErrUnknownParameter{
 		msg: fmt.Sprintf("unknown query parameter: %s", p),
 	}
-}
-
-func (e ErrInvalidParameterValue) Error() string {
-	return e.msg
-}
-
-func (e ErrParseQueryString) Error() string {
-	return e.msg
 }
 
 func (e ErrUnknownParameter) Error() string {
