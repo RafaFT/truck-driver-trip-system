@@ -9,6 +9,14 @@ type ErrInvalidParameterValue struct {
 	msg string
 }
 
+type ErrParseQueryString struct {
+	msg string
+}
+
+type ErrUnknownParameter struct {
+	msg string
+}
+
 func newErrInvalidParameterValue(p, v string, t reflect.Type) error {
 	var tName string
 
@@ -30,6 +38,26 @@ func newErrInvalidParameterValue(p, v string, t reflect.Type) error {
 	}
 }
 
+func newErrParseQueryString(queryString string) error {
+	return ErrParseQueryString{
+		msg: fmt.Sprintf("could not parse query string: %s", queryString),
+	}
+}
+
+func newErrUnknownParameter(p string) error {
+	return ErrUnknownParameter{
+		msg: fmt.Sprintf("unknown query parameter: %s", p),
+	}
+}
+
 func (e ErrInvalidParameterValue) Error() string {
+	return e.msg
+}
+
+func (e ErrParseQueryString) Error() string {
+	return e.msg
+}
+
+func (e ErrUnknownParameter) Error() string {
 	return e.msg
 }
