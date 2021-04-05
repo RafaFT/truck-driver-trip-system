@@ -9,7 +9,7 @@ type FindDriversQuery struct {
 	Limit      *uint
 }
 
-func NewFindDriversQuery(cnh, gender *string, has_vehicle *bool, limit *uint) (FindDriversQuery, error) {
+func NewFindDriversQuery(cnh, gender *string, hasVehicle *bool, limit *uint) (FindDriversQuery, error) {
 	errorMsg := "Invalid FindDriversQuery: %w"
 	var q FindDriversQuery
 
@@ -29,8 +29,8 @@ func NewFindDriversQuery(cnh, gender *string, has_vehicle *bool, limit *uint) (F
 		q.Gender = &genderT
 	}
 
-	if has_vehicle != nil {
-		q.HasVehicle = has_vehicle
+	if hasVehicle != nil {
+		q.HasVehicle = hasVehicle
 	}
 
 	if limit != nil {
