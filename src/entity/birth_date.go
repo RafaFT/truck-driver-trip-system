@@ -38,3 +38,7 @@ func (bd BirthDate) CalculateAge() int {
 
 	return years
 }
+
+func MinBirthDate() time.Time {
+	return minBirthDate
+}
