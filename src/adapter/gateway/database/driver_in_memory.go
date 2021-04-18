@@ -47,20 +47,19 @@ func (d *InMemoryDrivers) FindDrivers(ctx context.Context, q entity.FindDriversQ
 	}
 
 	drivers := make([]*entity.Driver, 0, limit)
-
 	for _, driver := range d.Drivers {
 		if len(drivers) == limit {
 			break
 		}
 
 		if q.CNH != nil && driver.CNHType() != *q.CNH {
-			break
+			continue
 		}
 		if q.Gender != nil && driver.Gender() != *q.Gender {
-			break
+			continue
 		}
 		if q.HasVehicle != nil && driver.HasVehicle() != *q.HasVehicle {
-			break
+			continue
 		}
 
 		drivers = append(drivers, driver)
