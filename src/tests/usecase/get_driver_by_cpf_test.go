@@ -47,7 +47,7 @@ func TestGetDriverByCPF(t *testing.T) {
 		},
 	}
 
-	driver, err := entity.NewTruckDriver(
+	driver, err := entity.NewDriver(
 		"85296235762",
 		"Analu Kamilly Sophie Oliveira",
 		"o",

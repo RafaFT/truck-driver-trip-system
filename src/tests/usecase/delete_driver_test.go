@@ -39,7 +39,7 @@ func TestDeleteDriver(t *testing.T) {
 		},
 	}
 
-	driver, err := entity.NewTruckDriver(
+	driver, err := entity.NewDriver(
 		"55177294013",
 		"Amanda Rayssa Oliveira",
 		"f",

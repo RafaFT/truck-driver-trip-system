@@ -15,7 +15,7 @@ type Driver struct {
 	name       Name
 }
 
-func NewTruckDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bool) (*Driver, error) {
+func NewDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bool) (*Driver, error) {
 	newCPF, err := NewCPF(cpf)
 	if err != nil {
 		return nil, err

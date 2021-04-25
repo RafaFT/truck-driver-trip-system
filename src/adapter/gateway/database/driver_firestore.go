@@ -69,7 +69,7 @@ func (df driverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (
 		return nil, err
 	}
 
-	driver, err := entity.NewTruckDriver(
+	driver, err := entity.NewDriver(
 		driverDocument.CPF,
 		driverDocument.Name,
 		driverDocument.Gender,
@@ -113,7 +113,7 @@ func (df driverFirestore) FindDrivers(ctx context.Context, rawQ entity.FindDrive
 			return nil, err
 		}
 
-		driver, err := entity.NewTruckDriver(
+		driver, err := entity.NewDriver(
 			driverDocument.CPF,
 			driverDocument.Name,
 			driverDocument.Gender,

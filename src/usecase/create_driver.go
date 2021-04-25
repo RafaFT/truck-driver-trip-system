@@ -48,7 +48,7 @@ func NewCreateDriver(logger Logger, repo entity.DriverRepository) CreateDriver {
 }
 
 func (di createDriver) Execute(ctx context.Context, input CreateDriverInput) (*CreateDriverOutput, error) {
-	driver, err := entity.NewTruckDriver(
+	driver, err := entity.NewDriver(
 		input.CPF,
 		input.Name,
 		input.Gender,

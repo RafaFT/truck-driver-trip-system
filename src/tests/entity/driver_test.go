@@ -103,7 +103,7 @@ func TestNewTruckDriver(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		got, gotErr := entity.NewTruckDriver(
+		got, gotErr := entity.NewDriver(
 			test.input.cpf,
 			test.input.name,
 			test.input.gender,
