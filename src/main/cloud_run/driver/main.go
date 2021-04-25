@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	repo "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
+	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/infrastructure/database"
 	"github.com/rafaft/truck-driver-trip-system/infrastructure/web/router"
 )
@@ -20,7 +20,7 @@ func main() {
 	}
 
 	fc := database.NewFirestoreClient(context.Background(), projectID)
-	repo := repo.NewDriverFirestore(fc)
+	repo := repository.NewDriverFirestore(fc)
 	router := router.NewDriverCloudRun(port, projectID, repo)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))

@@ -1,6 +1,6 @@
 // https://pkg.go.dev/cloud.google.com/go/firestore
 
-package repo
+package repository
 
 import (
 	"context"

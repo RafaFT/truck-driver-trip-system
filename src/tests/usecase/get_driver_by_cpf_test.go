@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	repo "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
+	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
 	"github.com/rafaft/truck-driver-trip-system/infrastructure/logger"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
@@ -14,7 +14,7 @@ import (
 
 func TestGetDriverByCPF(t *testing.T) {
 	l := logger.NewFakeLogger()
-	r := repo.NewDriverInMemory()
+	r := repository.NewDriverInMemory()
 	uc := usecase.NewGetDriverByCPF(l, r)
 
 	tests := []struct {
