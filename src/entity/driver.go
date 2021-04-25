@@ -66,7 +66,7 @@ func (td *Driver) BirthDate() BirthDate {
 	return td.birthDate
 }
 
-func (td *Driver) CNHType() CNH {
+func (td *Driver) CNH() CNH {
 	return td.cnh
 }
 
@@ -87,7 +87,7 @@ func (td *Driver) Name() Name {
 }
 
 // setters
-func (td *Driver) SetCNHType(cnh string) error {
+func (td *Driver) SetCNH(cnh string) error {
 	newCNH, err := NewCNH(cnh)
 	if err != nil {
 		return err

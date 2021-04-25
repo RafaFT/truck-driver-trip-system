@@ -66,7 +66,7 @@ func (di getDrivers) Execute(ctx context.Context, rawQ GetDriversQuery) ([]*GetD
 		output[i] = &GetDriversOutput{
 			Age:        driver.Age(),
 			BirthDate:  driver.BirthDate().Time,
-			CNH:        string(driver.CNHType()),
+			CNH:        string(driver.CNH()),
 			CPF:        string(driver.CPF()),
 			Gender:     string(driver.Gender()),
 			HasVehicle: driver.HasVehicle(),

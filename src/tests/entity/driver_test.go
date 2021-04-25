@@ -127,7 +127,7 @@ func TestNewTruckDriver(t *testing.T) {
 			if got.CPF() != cpf ||
 				got.Name() != name ||
 				got.Gender() != gender ||
-				got.CNHType() != cnh ||
+				got.CNH() != cnh ||
 				!got.BirthDate().Equal(birthDate.Time) ||
 				got.HasVehicle() != test.input.hasVehicle {
 				t.Errorf("%d: [input: %v] [got: %v]", i, test.input, got)

@@ -58,7 +58,7 @@ func (di getDriverByCPF) Execute(ctx context.Context, cpf string) (*GetDriverByC
 	return &GetDriverByCPFOutput{
 		Age:        driver.Age(),
 		BirthDate:  driver.BirthDate().Time,
-		CNH:        string(driver.CNHType()),
+		CNH:        string(driver.CNH()),
 		CPF:        string(driver.CPF()),
 		Gender:     string(driver.Gender()),
 		HasVehicle: driver.HasVehicle(),

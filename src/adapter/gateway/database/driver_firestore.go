@@ -134,7 +134,7 @@ func (df driverFirestore) FindDrivers(ctx context.Context, rawQ entity.FindDrive
 func (df driverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver) error {
 	newDriverDoc := driverDoc{
 		BirthDate:  driver.BirthDate().Time,
-		CNH:        string(driver.CNHType()),
+		CNH:        string(driver.CNH()),
 		CPF:        string(driver.CPF()),
 		Gender:     string(driver.Gender()),
 		HasVehicle: driver.HasVehicle(),
@@ -156,7 +156,7 @@ func (df driverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver)
 func (df driverFirestore) UpdateDriver(ctx context.Context, driver *entity.Driver) error {
 	driverDocument := driverDoc{
 		BirthDate:  driver.BirthDate().Time,
-		CNH:        string(driver.CNHType()),
+		CNH:        string(driver.CNH()),
 		CPF:        string(driver.CPF()),
 		Gender:     string(driver.Gender()),
 		HasVehicle: driver.HasVehicle(),

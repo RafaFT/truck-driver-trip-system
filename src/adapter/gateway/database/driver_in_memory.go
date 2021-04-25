@@ -52,7 +52,7 @@ func (d *InMemoryDrivers) FindDrivers(ctx context.Context, q entity.FindDriversQ
 			break
 		}
 
-		if q.CNH != nil && driver.CNHType() != *q.CNH {
+		if q.CNH != nil && driver.CNH() != *q.CNH {
 			continue
 		}
 		if q.Gender != nil && driver.Gender() != *q.Gender {

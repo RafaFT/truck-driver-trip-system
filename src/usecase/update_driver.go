@@ -65,7 +65,7 @@ func (di updateDriver) Execute(ctx context.Context, cpf string, input UpdateDriv
 	}
 
 	if input.CNH != nil {
-		if err := driver.SetCNHType(*input.CNH); err != nil {
+		if err := driver.SetCNH(*input.CNH); err != nil {
 			di.logger.Debug(err.Error())
 			return nil, err
 		}
@@ -101,7 +101,7 @@ func (di updateDriver) Execute(ctx context.Context, cpf string, input UpdateDriv
 	return &UpdateDriverOutput{
 		Age:        driver.Age(),
 		BirthDate:  driver.BirthDate().Time,
-		CNH:        string(driver.CNHType()),
+		CNH:        string(driver.CNH()),
 		CPF:        string(driver.CPF()),
 		Gender:     string(driver.Gender()),
 		HasVehicle: driver.HasVehicle(),
