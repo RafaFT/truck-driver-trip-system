@@ -10,12 +10,12 @@ import (
 )
 
 // input port
-type CreateDriverUseCase interface {
+type CreateDriver interface {
 	Execute(context.Context, CreateDriverInput) (*CreateDriverOutput, error)
 }
 
-// input port implementation
-type CreateDriverInteractor struct {
+// input port implementation - Interactor
+type createDriver struct {
 	logger Logger
 	repo   entity.DriverRepository
 }
@@ -40,14 +40,14 @@ type CreateDriverOutput struct {
 	Name       string
 }
 
-func NewCreateDriverInteractor(logger Logger, repo entity.DriverRepository) CreateDriverUseCase {
-	return CreateDriverInteractor{
+func NewCreateDriver(logger Logger, repo entity.DriverRepository) CreateDriver {
+	return createDriver{
 		logger: logger,
 		repo:   repo,
 	}
 }
 
-func (di CreateDriverInteractor) Execute(ctx context.Context, input CreateDriverInput) (*CreateDriverOutput, error) {
+func (di createDriver) Execute(ctx context.Context, input CreateDriverInput) (*CreateDriverOutput, error) {
 	driver, err := entity.NewTruckDriver(
 		input.CPF,
 		input.Name,

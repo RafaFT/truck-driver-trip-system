@@ -15,7 +15,7 @@ import (
 func TestGetDriverByCPF(t *testing.T) {
 	l := logger.NewFakeLogger()
 	r := repo.NewDriverInMemory()
-	uc := usecase.NewGetDriverByCPFInteractor(l, r)
+	uc := usecase.NewGetDriverByCPF(l, r)
 
 	tests := []struct {
 		input string

@@ -16,7 +16,7 @@ func TestCreateDriver(t *testing.T) {
 	now := time.Now()
 	l := logger.NewFakeLogger()
 	r := repo.NewDriverInMemory()
-	uc := usecase.NewCreateDriverInteractor(l, r)
+	uc := usecase.NewCreateDriver(l, r)
 
 	tests := []struct {
 		input usecase.CreateDriverInput

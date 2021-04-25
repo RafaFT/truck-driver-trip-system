@@ -24,10 +24,10 @@ type updateDriverInput struct {
 
 type UpdateDriverController struct {
 	p  UpdateDriverPresenter
-	uc usecase.UpdateDriverUseCase
+	uc usecase.UpdateDriver
 }
 
-func NewUpdateDriverController(p UpdateDriverPresenter, uc usecase.UpdateDriverUseCase) UpdateDriverController {
+func NewUpdateDriverController(p UpdateDriverPresenter, uc usecase.UpdateDriver) UpdateDriverController {
 	return UpdateDriverController{
 		p:  p,
 		uc: uc,

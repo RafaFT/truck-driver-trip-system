@@ -10,12 +10,12 @@ import (
 )
 
 // input port
-type UpdateDriverUseCase interface {
+type UpdateDriver interface {
 	Execute(context.Context, string, UpdateDriverInput) (*UpdateDriverOutput, error)
 }
 
-// input port implementation
-type UpdateDriverInteractor struct {
+// input port implementation - Interactor
+type updateDriver struct {
 	logger Logger
 	repo   entity.DriverRepository
 }
@@ -38,14 +38,14 @@ type UpdateDriverOutput struct {
 	UpdatedAt  time.Time
 }
 
-func NewUpdateDriverInteractor(logger Logger, repo entity.DriverRepository) UpdateDriverUseCase {
-	return UpdateDriverInteractor{
+func NewUpdateDriver(logger Logger, repo entity.DriverRepository) UpdateDriver {
+	return updateDriver{
 		logger: logger,
 		repo:   repo,
 	}
 }
 
-func (di UpdateDriverInteractor) Execute(ctx context.Context, cpf string, input UpdateDriverInput) (*UpdateDriverOutput, error) {
+func (di updateDriver) Execute(ctx context.Context, cpf string, input UpdateDriverInput) (*UpdateDriverOutput, error) {
 	driverCPF, err := entity.NewCPF(cpf)
 	if err != nil {
 		di.logger.Debug(err.Error())

@@ -14,10 +14,10 @@ type DeleteDriverPresenter interface {
 
 type DeleteDriverByCPFController struct {
 	p  DeleteDriverPresenter
-	uc usecase.DeleteDriverUseCase
+	uc usecase.DeleteDriver
 }
 
-func NewDeleteDriverByCPFController(p DeleteDriverPresenter, uc usecase.DeleteDriverUseCase) DeleteDriverByCPFController {
+func NewDeleteDriverByCPFController(p DeleteDriverPresenter, uc usecase.DeleteDriver) DeleteDriverByCPFController {
 	return DeleteDriverByCPFController{
 		p:  p,
 		uc: uc,

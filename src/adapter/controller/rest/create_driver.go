@@ -66,10 +66,10 @@ func (cd createDriverInput) writeUCInput(ucInput *usecase.CreateDriverInput) err
 
 type CreateDriverController struct {
 	p  CreateDriverPresenter
-	uc usecase.CreateDriverUseCase
+	uc usecase.CreateDriver
 }
 
-func NewCreateDriverController(p CreateDriverPresenter, uc usecase.CreateDriverUseCase) CreateDriverController {
+func NewCreateDriverController(p CreateDriverPresenter, uc usecase.CreateDriver) CreateDriverController {
 	return CreateDriverController{
 		p:  p,
 		uc: uc,

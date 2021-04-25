@@ -7,13 +7,13 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port - interface
-type GetDriverByCPFUseCase interface {
+// input port
+type GetDriverByCPF interface {
 	Execute(context.Context, string) (*GetDriverByCPFOutput, error)
 }
 
-// input port implementation - interactor
-type GetDriverByCPFInteractor struct {
+// input port implementation - Interactor
+type getDriverByCPF struct {
 	logger Logger
 	repo   entity.DriverRepository
 }
@@ -29,14 +29,14 @@ type GetDriverByCPFOutput struct {
 	Name       string
 }
 
-func NewGetDriverByCPFInteractor(logger Logger, repo entity.DriverRepository) GetDriverByCPFUseCase {
-	return GetDriverByCPFInteractor{
+func NewGetDriverByCPF(logger Logger, repo entity.DriverRepository) GetDriverByCPF {
+	return getDriverByCPF{
 		logger: logger,
 		repo:   repo,
 	}
 }
 
-func (di GetDriverByCPFInteractor) Execute(ctx context.Context, cpf string) (*GetDriverByCPFOutput, error) {
+func (di getDriverByCPF) Execute(ctx context.Context, cpf string) (*GetDriverByCPFOutput, error) {
 	driverCPF, err := entity.NewCPF(cpf)
 	if err != nil {
 		di.logger.Debug(err.Error())

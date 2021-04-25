@@ -20,7 +20,7 @@ type GetDriversPresenter interface {
 
 type GetDriversController struct {
 	p  GetDriversPresenter
-	uc usecase.GetDriversUseCase
+	uc usecase.GetDrivers
 }
 
 var getDriversParameters = map[string]struct{}{
@@ -31,7 +31,7 @@ var getDriversParameters = map[string]struct{}{
 	"limit":       {},
 }
 
-func NewGetDriversController(p GetDriversPresenter, uc usecase.GetDriversUseCase) GetDriversController {
+func NewGetDriversController(p GetDriversPresenter, uc usecase.GetDrivers) GetDriversController {
 	return GetDriversController{
 		p:  p,
 		uc: uc,

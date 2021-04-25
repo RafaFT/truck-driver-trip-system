@@ -9,13 +9,13 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port - interface
-type GetDriversUseCase interface {
+// input port
+type GetDrivers interface {
 	Execute(context.Context, GetDriversQuery) ([]*GetDriversOutput, error)
 }
 
-// input port implementation - interactor
-type GetDriversInteractor struct {
+// input port implementation - Interactor
+type getDrivers struct {
 	logger Logger
 	repo   entity.DriverRepository
 }
@@ -38,14 +38,14 @@ type GetDriversOutput struct {
 	Name       string
 }
 
-func NewGetDriversInteractor(logger Logger, repo entity.DriverRepository) GetDriversUseCase {
-	return GetDriversInteractor{
+func NewGetDrivers(logger Logger, repo entity.DriverRepository) GetDrivers {
+	return getDrivers{
 		logger: logger,
 		repo:   repo,
 	}
 }
 
-func (di GetDriversInteractor) Execute(ctx context.Context, rawQ GetDriversQuery) ([]*GetDriversOutput, error) {
+func (di getDrivers) Execute(ctx context.Context, rawQ GetDriversQuery) ([]*GetDriversOutput, error) {
 	q, err := entity.NewFindDriversQuery(rawQ.CNH, rawQ.Gender, rawQ.HasVehicle, rawQ.Limit)
 	if err != nil {
 		di.logger.Debug(err.Error())

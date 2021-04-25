@@ -8,24 +8,24 @@ import (
 )
 
 // input port
-type DeleteDriverUseCase interface {
+type DeleteDriver interface {
 	Execute(context.Context, string) error
 }
 
-// input port implementation
-type DeleteDriverInteractor struct {
+// input port implementation - Interactor
+type deleteDriver struct {
 	logger Logger
 	repo   entity.DriverRepository
 }
 
-func NewDeleteDriverInteractor(logger Logger, repo entity.DriverRepository) DeleteDriverUseCase {
-	return DeleteDriverInteractor{
+func NewDeleteDriver(logger Logger, repo entity.DriverRepository) DeleteDriver {
+	return deleteDriver{
 		logger: logger,
 		repo:   repo,
 	}
 }
 
-func (di DeleteDriverInteractor) Execute(ctx context.Context, cpf string) error {
+func (di deleteDriver) Execute(ctx context.Context, cpf string) error {
 	driverCPF, err := entity.NewCPF(cpf)
 	if err != nil {
 		di.logger.Debug(err.Error())
