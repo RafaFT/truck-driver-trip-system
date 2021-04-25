@@ -17,7 +17,7 @@ Issue tracker:
 https://issuetracker.google.com/issues/172694908
 */
 
-package logger
+package log
 
 import (
 	"encoding/json"

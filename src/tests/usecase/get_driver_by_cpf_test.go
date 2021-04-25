@@ -8,12 +8,12 @@ import (
 
 	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/logger"
+	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
 func TestGetDriverByCPF(t *testing.T) {
-	l := logger.NewFakeLogger()
+	l := log.NewFakeLogger()
 	r := repository.NewDriverInMemory()
 	uc := usecase.NewGetDriverByCPF(l, r)
 

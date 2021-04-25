@@ -1,4 +1,4 @@
-package logger
+package log
 
 import "github.com/rafaft/truck-driver-trip-system/usecase"
 

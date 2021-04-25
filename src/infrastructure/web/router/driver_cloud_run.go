@@ -11,7 +11,7 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/adapter/controller/rest"
 	"github.com/rafaft/truck-driver-trip-system/adapter/presenter"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/logger"
+	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
@@ -45,7 +45,7 @@ func (router *cloudRunRouter) CreateDriverRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
 		p := presenter.NewCreateDriverPresenter()
 		uc := usecase.NewCreateDriver(l, router.repo)
 		c := rest.NewCreateDriverController(p, uc)
@@ -60,7 +60,7 @@ func (router *cloudRunRouter) DeleteDriverRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
 		p := presenter.NewDeleteDriverPresenter()
 		uc := usecase.NewDeleteDriver(l, router.repo)
 		c := rest.NewDeleteDriverByCPFController(p, uc)
@@ -75,7 +75,7 @@ func (router *cloudRunRouter) GetDriverByCPFRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
 		p := presenter.NewGetDriverByCPFPresenter()
 		uc := usecase.NewGetDriverByCPF(l, router.repo)
 		c := rest.NewGetDriverByCPFController(p, uc)
@@ -88,7 +88,7 @@ func (router *cloudRunRouter) GetDriversRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
 		p := presenter.NewGetDriversPresenter()
 		uc := usecase.NewGetDrivers(l, router.repo)
 		c := rest.NewGetDriversController(p, uc)
@@ -103,7 +103,7 @@ func (router *cloudRunRouter) UpdateDriverRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
 		p := presenter.NewUpdateDriverPresenter()
 		uc := usecase.NewUpdateDriver(l, router.repo)
 		c := rest.NewUpdateDriverController(p, uc)

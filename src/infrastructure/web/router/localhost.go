@@ -10,7 +10,7 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/adapter/controller/rest"
 	"github.com/rafaft/truck-driver-trip-system/adapter/presenter"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/logger"
+	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
@@ -46,7 +46,7 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewPrintLogger()
+		l := log.NewPrintLogger()
 		p := presenter.NewCreateDriverPresenter()
 		uc := usecase.NewCreateDriver(l, router.repo)
 		c := rest.NewCreateDriverController(p, uc)
@@ -62,7 +62,7 @@ func (router *localHostRouter) DeleteDriverRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewPrintLogger()
+		l := log.NewPrintLogger()
 		p := presenter.NewDeleteDriverPresenter()
 		uc := usecase.NewDeleteDriver(l, router.repo)
 		c := rest.NewDeleteDriverByCPFController(p, uc)
@@ -78,7 +78,7 @@ func (router *localHostRouter) GetDriverByCPFRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewPrintLogger()
+		l := log.NewPrintLogger()
 		p := presenter.NewGetDriverByCPFPresenter()
 		uc := usecase.NewGetDriverByCPF(l, router.repo)
 		c := rest.NewGetDriverByCPFController(p, uc)
@@ -91,7 +91,7 @@ func (router *localHostRouter) GetDriversRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewPrintLogger()
+		l := log.NewPrintLogger()
 		p := presenter.NewGetDriversPresenter()
 		uc := usecase.NewGetDrivers(l, router.repo)
 		c := rest.NewGetDriversController(p, uc)
@@ -107,7 +107,7 @@ func (router *localHostRouter) UpdateDriverRoute() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := logger.NewPrintLogger()
+		l := log.NewPrintLogger()
 		p := presenter.NewUpdateDriverPresenter()
 		uc := usecase.NewUpdateDriver(l, router.repo)
 		c := rest.NewUpdateDriverController(p, uc)
