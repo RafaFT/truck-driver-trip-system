@@ -21,15 +21,15 @@ type getDriverByCPFOutputError struct {
 	Error string `json:"error"`
 }
 
-// output port (presenter) implementation
-type getDriverByCPFPresenter struct {
+// output port implementation - Presenter
+type getDriverByCPF struct {
 }
 
-func NewGetDriverByCPFPresenter() rest.GetDriverByCPFPresenter {
-	return getDriverByCPFPresenter{}
+func NewGetDriverByCPF() rest.GetDriverByCPFPresenter {
+	return getDriverByCPF{}
 }
 
-func (p getDriverByCPFPresenter) Output(driver *usecase.GetDriverByCPFOutput, fields ...string) []byte {
+func (p getDriverByCPF) Output(driver *usecase.GetDriverByCPFOutput, fields ...string) []byte {
 	var output getDriverByCPFOutput
 
 	if containsField("age", fields) {
@@ -60,7 +60,7 @@ func (p getDriverByCPFPresenter) Output(driver *usecase.GetDriverByCPFOutput, fi
 	return b
 }
 
-func (p getDriverByCPFPresenter) OutputError(err error) []byte {
+func (p getDriverByCPF) OutputError(err error) []byte {
 	output := getDriverByCPFOutputError{
 		Error: err.Error(),
 	}

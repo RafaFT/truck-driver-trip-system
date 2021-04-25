@@ -23,15 +23,15 @@ type updateDriverOutputError struct {
 	Error string `json:"error"`
 }
 
-// output port (presenter) implementation
-type UpdateDriverPresenter struct {
+// output port implementation - Presenter
+type updateDriver struct {
 }
 
-func NewUpdateDriverPresenter() rest.UpdateDriverPresenter {
-	return UpdateDriverPresenter{}
+func NewUpdateDriver() rest.UpdateDriverPresenter {
+	return updateDriver{}
 }
 
-func (p UpdateDriverPresenter) Output(driver *usecase.UpdateDriverOutput) []byte {
+func (p updateDriver) Output(driver *usecase.UpdateDriverOutput) []byte {
 	var output updateDriverOutput
 
 	output.Age = driver.Age
@@ -48,7 +48,7 @@ func (p UpdateDriverPresenter) Output(driver *usecase.UpdateDriverOutput) []byte
 	return b
 }
 
-func (p UpdateDriverPresenter) OutputError(err error) []byte {
+func (p updateDriver) OutputError(err error) []byte {
 	output := updateDriverOutputError{
 		Error: err.Error(),
 	}

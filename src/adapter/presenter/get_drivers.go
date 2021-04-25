@@ -21,15 +21,15 @@ type getDriversOutputError struct {
 	Error string `json:"error"`
 }
 
-// output port (presenter) implementation
-type GetDriversPresenter struct {
+// output port implementation - Presenter
+type getDrivers struct {
 }
 
-func NewGetDriversPresenter() rest.GetDriversPresenter {
-	return GetDriversPresenter{}
+func NewGetDrivers() rest.GetDriversPresenter {
+	return getDrivers{}
 }
 
-func (p GetDriversPresenter) Output(drivers []*usecase.GetDriversOutput, fields ...string) []byte {
+func (p getDrivers) Output(drivers []*usecase.GetDriversOutput, fields ...string) []byte {
 	fieldsMap := make(map[string]bool)
 	for _, field := range fields {
 		if len(field) != 0 {
@@ -72,7 +72,7 @@ func (p GetDriversPresenter) Output(drivers []*usecase.GetDriversOutput, fields 
 	return b
 }
 
-func (p GetDriversPresenter) OutputError(err error) []byte {
+func (p getDrivers) OutputError(err error) []byte {
 	output := getDriversOutputError{
 		Error: err.Error(),
 	}

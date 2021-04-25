@@ -47,7 +47,7 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		l := log.NewPrintLogger()
-		p := presenter.NewCreateDriverPresenter()
+		p := presenter.NewCreateDriver()
 		uc := usecase.NewCreateDriver(l, router.repo)
 		c := rest.NewCreateDriverController(p, uc)
 
@@ -63,7 +63,7 @@ func (router *localHostRouter) DeleteDriverRoute() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		l := log.NewPrintLogger()
-		p := presenter.NewDeleteDriverPresenter()
+		p := presenter.NewDeleteDriver()
 		uc := usecase.NewDeleteDriver(l, router.repo)
 		c := rest.NewDeleteDriverByCPFController(p, uc)
 
@@ -79,7 +79,7 @@ func (router *localHostRouter) GetDriverByCPFRoute() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		l := log.NewPrintLogger()
-		p := presenter.NewGetDriverByCPFPresenter()
+		p := presenter.NewGetDriverByCPF()
 		uc := usecase.NewGetDriverByCPF(l, router.repo)
 		c := rest.NewGetDriverByCPFController(p, uc)
 
@@ -92,7 +92,7 @@ func (router *localHostRouter) GetDriversRoute() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		l := log.NewPrintLogger()
-		p := presenter.NewGetDriversPresenter()
+		p := presenter.NewGetDrivers()
 		uc := usecase.NewGetDrivers(l, router.repo)
 		c := rest.NewGetDriversController(p, uc)
 
@@ -108,7 +108,7 @@ func (router *localHostRouter) UpdateDriverRoute() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		l := log.NewPrintLogger()
-		p := presenter.NewUpdateDriverPresenter()
+		p := presenter.NewUpdateDriver()
 		uc := usecase.NewUpdateDriver(l, router.repo)
 		c := rest.NewUpdateDriverController(p, uc)
 

@@ -10,15 +10,15 @@ type deleteDriverOutputError struct {
 	Error string `json:"error"`
 }
 
-// output port (presenter) implementation
-type deleteDriverPresenter struct {
+// output port implementation - Presenter
+type deleteDriver struct {
 }
 
-func NewDeleteDriverPresenter() rest.DeleteDriverPresenter {
-	return deleteDriverPresenter{}
+func NewDeleteDriver() rest.DeleteDriverPresenter {
+	return deleteDriver{}
 }
 
-func (p deleteDriverPresenter) OutputError(err error) []byte {
+func (p deleteDriver) OutputError(err error) []byte {
 	output := deleteDriverOutputError{
 		Error: err.Error(),
 	}
