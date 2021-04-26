@@ -4,7 +4,6 @@ import (
 	"context"
 	"reflect"
 	"testing"
-	"time"
 
 	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
@@ -14,7 +13,7 @@ import (
 
 func TestDeleteDriver(t *testing.T) {
 	l := log.NewFakeLogger()
-	r := repository.NewDriverInMemory(nil)
+	r := repository.NewDriverInMemory(getDriversSample(t))
 	uc := usecase.NewDeleteDriver(l, r)
 
 	tests := []struct {
@@ -30,29 +29,13 @@ func TestDeleteDriver(t *testing.T) {
 			want:  entity.ErrDriverNotFound{},
 		},
 		{
-			input: "55177294013", // driver exists and should be deleted
+			input: "63503201238", // driver exists and should be deleted
 			want:  nil,
 		},
 		{
-			input: "55177294013", // once deleted, it should be not found!
+			input: "63503201238", // once deleted, it should be not found!
 			want:  entity.ErrDriverNotFound{},
 		},
-	}
-
-	driver, err := entity.NewDriver(
-		"55177294013",
-		"Amanda Rayssa Oliveira",
-		"f",
-		"b",
-		time.Now().AddDate(-53, 0, 0),
-		false,
-	)
-	if err != nil {
-		t.Fatalf("could not initialize driver for delete_driver_test")
-	}
-
-	if err := r.SaveDriver(context.Background(), driver); err != nil {
-		t.Fatalf("could not save driver for delete_driver_test")
 	}
 
 	for i, test := range tests {

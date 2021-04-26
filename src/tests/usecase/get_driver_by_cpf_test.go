@@ -14,7 +14,7 @@ import (
 
 func TestGetDriverByCPF(t *testing.T) {
 	l := log.NewFakeLogger()
-	r := repository.NewDriverInMemory(nil)
+	r := repository.NewDriverInMemory(getDriversSample(t))
 	uc := usecase.NewGetDriverByCPF(l, r)
 
 	tests := []struct {
@@ -33,34 +33,18 @@ func TestGetDriverByCPF(t *testing.T) {
 			err:   entity.ErrDriverNotFound{},
 		},
 		{
-			input: "85296235762",
+			input: "77163670303",
 			want: &usecase.GetDriverByCPFOutput{
-				Age:        43,
-				BirthDate:  time.Now().AddDate(-43, 0, 0),
-				CNH:        "B",
-				CPF:        "85296235762",
+				Age:        23,
+				BirthDate:  time.Now().AddDate(-23, 0, 0),
+				CNH:        "E",
+				CPF:        "77163670303",
 				Gender:     "O",
 				HasVehicle: true,
-				Name:       "analu kamilly sophie oliveira",
+				Name:       "allana louise bianca nogueira",
 			},
 			err: nil,
 		},
-	}
-
-	driver, err := entity.NewDriver(
-		"85296235762",
-		"Analu Kamilly Sophie Oliveira",
-		"o",
-		"b",
-		time.Now().AddDate(-43, 0, 0),
-		true,
-	)
-	if err != nil {
-		t.Fatalf("could not initialize driver for get_driver_by_cpf_test")
-	}
-
-	if err := r.SaveDriver(context.Background(), driver); err != nil {
-		t.Fatalf("could not save driver for delete_driver_test")
 	}
 
 	for i, test := range tests {
