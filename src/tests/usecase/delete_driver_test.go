@@ -14,7 +14,7 @@ import (
 
 func TestDeleteDriver(t *testing.T) {
 	l := log.NewFakeLogger()
-	r := repository.NewDriverInMemory()
+	r := repository.NewDriverInMemory(nil)
 	uc := usecase.NewDeleteDriver(l, r)
 
 	tests := []struct {

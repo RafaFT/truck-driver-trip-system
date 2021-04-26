@@ -11,9 +11,9 @@ type InMemoryDrivers struct {
 	Drivers []*entity.Driver
 }
 
-func NewDriverInMemory() entity.DriverRepository {
+func NewDriverInMemory(drivers []*entity.Driver) entity.DriverRepository {
 	return &InMemoryDrivers{
-		Drivers: make([]*entity.Driver, 0),
+		Drivers: drivers,
 	}
 }
 

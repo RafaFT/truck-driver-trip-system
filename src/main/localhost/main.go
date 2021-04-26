@@ -11,7 +11,7 @@ import (
 
 func main() {
 	port := "8080"
-	repo := repository.NewDriverInMemory()
+	repo := repository.NewDriverInMemory(nil)
 	router := router.NewDriverLocalHost(port, repo)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
