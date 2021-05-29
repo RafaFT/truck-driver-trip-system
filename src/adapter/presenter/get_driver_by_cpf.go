@@ -51,7 +51,7 @@ func (p getDriverByCPF) Output(driver *usecase.GetDriverByCPFOutput, fields ...s
 	if containsField("has_vehicle", fields) {
 		output.HasVehicle = &driver.HasVehicle
 	}
-	if containsField("cpf", fields) {
+	if containsField("name", fields) {
 		output.Name = &driver.Name
 	}
 
