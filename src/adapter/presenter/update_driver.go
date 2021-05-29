@@ -10,7 +10,7 @@ import (
 
 type updateDriverOutput struct {
 	Age        int       `json:"age"`
-	BirthDate  string    `json:"birthDate"`
+	BirthDate  string    `json:"birth_date"`
 	CNH        string    `json:"cnh"`
 	CPF        string    `json:"cpf"`
 	Gender     string    `json:"gender"`
