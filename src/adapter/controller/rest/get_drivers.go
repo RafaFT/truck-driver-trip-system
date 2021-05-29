@@ -82,7 +82,10 @@ func (c GetDriversController) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// TODO: how to decouple controllers from presenters?
-	driverFields := strings.Split(params.Get("fields"), ",")
+	var driverFields []string
+	if fields := params.Get("fields"); fields != "" {
+		driverFields = strings.Split(fields, ",")
+	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(c.p.Output(output, driverFields...))
