@@ -35,7 +35,7 @@ func (p getDriverByCPF) Output(driver *usecase.GetDriverByCPFOutput, fields ...s
 	if containsField("age", fields) {
 		output.Age = &driver.Age
 	}
-	if containsField("age", fields) {
+	if containsField("birth_date", fields) {
 		birthDate := driver.BirthDate.Format("2006-01-02")
 		output.BirthDate = &birthDate
 	}
