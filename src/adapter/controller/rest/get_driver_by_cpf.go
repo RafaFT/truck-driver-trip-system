@@ -49,7 +49,9 @@ func (c GetDriverByCPFController) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	var driverFields []string
 	err = r.ParseForm()
 	if err == nil {
-		driverFields = strings.Split(r.Form.Get("fields"), ",")
+		if fields := r.Form.Get("fields"); fields != "" {
+			driverFields = strings.Split(fields, ",")
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
