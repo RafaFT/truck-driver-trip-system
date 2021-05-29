@@ -32,27 +32,40 @@ func NewGetDriverByCPF() rest.GetDriverByCPFPresenter {
 func (p getDriverByCPF) Output(driver *usecase.GetDriverByCPFOutput, fields ...string) []byte {
 	var output getDriverByCPFOutput
 
-	if containsField("age", fields) {
-		output.Age = &driver.Age
-	}
-	if containsField("birth_date", fields) {
+	if fields == nil {
 		birthDate := driver.BirthDate.Format("2006-01-02")
-		output.BirthDate = &birthDate
-	}
-	if containsField("cnh", fields) {
-		output.CNH = &driver.CNH
-	}
-	if containsField("cpf", fields) {
-		output.CPF = &driver.CPF
-	}
-	if containsField("gender", fields) {
-		output.Gender = &driver.Gender
-	}
-	if containsField("has_vehicle", fields) {
-		output.HasVehicle = &driver.HasVehicle
-	}
-	if containsField("name", fields) {
-		output.Name = &driver.Name
+		output = getDriverByCPFOutput{
+			Age:        &driver.Age,
+			BirthDate:  &birthDate,
+			CNH:        &driver.CNH,
+			CPF:        &driver.CPF,
+			Gender:     &driver.Gender,
+			HasVehicle: &driver.HasVehicle,
+			Name:       &driver.Name,
+		}
+	} else {
+		if containsField("age", fields) {
+			output.Age = &driver.Age
+		}
+		if containsField("birth_date", fields) {
+			birthDate := driver.BirthDate.Format("2006-01-02")
+			output.BirthDate = &birthDate
+		}
+		if containsField("cnh", fields) {
+			output.CNH = &driver.CNH
+		}
+		if containsField("cpf", fields) {
+			output.CPF = &driver.CPF
+		}
+		if containsField("gender", fields) {
+			output.Gender = &driver.Gender
+		}
+		if containsField("has_vehicle", fields) {
+			output.HasVehicle = &driver.HasVehicle
+		}
+		if containsField("name", fields) {
+			output.Name = &driver.Name
+		}
 	}
 
 	b, _ := json.Marshal(&output)
