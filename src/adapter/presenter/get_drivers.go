@@ -30,37 +30,38 @@ func NewGetDrivers() rest.GetDriversPresenter {
 }
 
 func (p getDrivers) Output(drivers []*usecase.GetDriversOutput, fields ...string) []byte {
-	fieldsMap := make(map[string]bool)
-	for _, field := range fields {
-		if len(field) != 0 {
-			fieldsMap[field] = true
-		}
-	}
-	output := make([]*getDriversOutput, len(drivers))
+	age := fields == nil || containsField("age", fields)
+	birthDate := fields == nil || containsField("birth_date", fields)
+	cnh := fields == nil || containsField("cnh", fields)
+	cpf := fields == nil || containsField("cpf", fields)
+	gender := fields == nil || containsField("gender", fields)
+	hasVehicle := fields == nil || containsField("has_vehicle", fields)
+	name := fields == nil || containsField("name", fields)
 
+	output := make([]*getDriversOutput, len(drivers))
 	for i, driver := range drivers {
 		var d getDriversOutput
 
-		if _, ok := fieldsMap["age"]; len(fieldsMap) == 0 || ok {
+		if age {
 			d.Age = &driver.Age
 		}
-		if _, ok := fieldsMap["birth_date"]; len(fieldsMap) == 0 || ok {
+		if birthDate {
 			birthDate := driver.BirthDate.Format("2006-01-02")
 			d.BirthDate = &birthDate
 		}
-		if _, ok := fieldsMap["cnh"]; len(fieldsMap) == 0 || ok {
+		if cnh {
 			d.CNH = &driver.CNH
 		}
-		if _, ok := fieldsMap["cpf"]; len(fieldsMap) == 0 || ok {
+		if cpf {
 			d.CPF = &driver.CPF
 		}
-		if _, ok := fieldsMap["gender"]; len(fieldsMap) == 0 || ok {
+		if gender {
 			d.Gender = &driver.Gender
 		}
-		if _, ok := fieldsMap["has_vehicle"]; len(fieldsMap) == 0 || ok {
+		if hasVehicle {
 			d.HasVehicle = &driver.HasVehicle
 		}
-		if _, ok := fieldsMap["name"]; len(fieldsMap) == 0 || ok {
+		if name {
 			d.Name = &driver.Name
 		}
 
