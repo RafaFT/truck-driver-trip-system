@@ -31,7 +31,7 @@ var getDriversParameters = map[string]struct{}{
 	"limit":       {},
 }
 
-func NewGetDriversController(p GetDriversPresenter, uc usecase.GetDrivers) GetDriversController {
+func NewGetDrivers(p GetDriversPresenter, uc usecase.GetDrivers) GetDriversController {
 	return GetDriversController{
 		p:  p,
 		uc: uc,

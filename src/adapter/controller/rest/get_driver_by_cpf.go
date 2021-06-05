@@ -21,7 +21,7 @@ type GetDriverByCPFController struct {
 	uc usecase.GetDriverByCPF
 }
 
-func NewGetDriverByCPFController(p GetDriverByCPFPresenter, uc usecase.GetDriverByCPF) GetDriverByCPFController {
+func NewGetDriverByCPF(p GetDriverByCPFPresenter, uc usecase.GetDriverByCPF) GetDriverByCPFController {
 	return GetDriverByCPFController{
 		p:  p,
 		uc: uc,

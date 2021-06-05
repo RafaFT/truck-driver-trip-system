@@ -27,7 +27,7 @@ type UpdateDriverController struct {
 	uc usecase.UpdateDriver
 }
 
-func NewUpdateDriverController(p UpdateDriverPresenter, uc usecase.UpdateDriver) UpdateDriverController {
+func NewUpdateDriver(p UpdateDriverPresenter, uc usecase.UpdateDriver) UpdateDriverController {
 	return UpdateDriverController{
 		p:  p,
 		uc: uc,

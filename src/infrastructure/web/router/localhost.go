@@ -49,7 +49,7 @@ func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
 		l := log.NewPrintLogger()
 		p := presenter.NewCreateDriver()
 		uc := usecase.NewCreateDriver(l, router.repo)
-		c := rest.NewCreateDriverController(p, uc)
+		c := rest.NewCreateDriver(p, uc)
 
 		c.ServeHTTP(w, r.WithContext(ctx))
 	}
@@ -65,7 +65,7 @@ func (router *localHostRouter) DeleteDriverRoute() http.HandlerFunc {
 		l := log.NewPrintLogger()
 		p := presenter.NewDeleteDriver()
 		uc := usecase.NewDeleteDriver(l, router.repo)
-		c := rest.NewDeleteDriverByCPFController(p, uc)
+		c := rest.NewDeleteDriverByCPF(p, uc)
 
 		c.ServeHTTP(w, r.WithContext(ctx))
 	}
@@ -81,7 +81,7 @@ func (router *localHostRouter) GetDriverByCPFRoute() http.HandlerFunc {
 		l := log.NewPrintLogger()
 		p := presenter.NewGetDriverByCPF()
 		uc := usecase.NewGetDriverByCPF(l, router.repo)
-		c := rest.NewGetDriverByCPFController(p, uc)
+		c := rest.NewGetDriverByCPF(p, uc)
 
 		c.ServeHTTP(w, r.WithContext(ctx))
 	}
@@ -94,7 +94,7 @@ func (router *localHostRouter) GetDriversRoute() http.HandlerFunc {
 		l := log.NewPrintLogger()
 		p := presenter.NewGetDrivers()
 		uc := usecase.NewGetDrivers(l, router.repo)
-		c := rest.NewGetDriversController(p, uc)
+		c := rest.NewGetDrivers(p, uc)
 
 		c.ServeHTTP(w, r)
 	}
@@ -110,7 +110,7 @@ func (router *localHostRouter) UpdateDriverRoute() http.HandlerFunc {
 		l := log.NewPrintLogger()
 		p := presenter.NewUpdateDriver()
 		uc := usecase.NewUpdateDriver(l, router.repo)
-		c := rest.NewUpdateDriverController(p, uc)
+		c := rest.NewUpdateDriver(p, uc)
 
 		c.ServeHTTP(w, r.WithContext(ctx))
 	}

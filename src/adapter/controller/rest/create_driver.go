@@ -69,7 +69,7 @@ type CreateDriverController struct {
 	uc usecase.CreateDriver
 }
 
-func NewCreateDriverController(p CreateDriverPresenter, uc usecase.CreateDriver) CreateDriverController {
+func NewCreateDriver(p CreateDriverPresenter, uc usecase.CreateDriver) CreateDriverController {
 	return CreateDriverController{
 		p:  p,
 		uc: uc,
