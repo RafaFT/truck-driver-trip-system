@@ -1,10 +1,9 @@
-package router
+package web
 
 import (
 	"context"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -15,19 +14,19 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
-type cloudRunRouter struct {
-	port      string
-	projectID string
-	repo      entity.DriverRepository
-	router    *mux.Router
+type localHostRouter struct {
+	baseURL string
+	port    string
+	repo    entity.DriverRepository
+	router  *mux.Router
 }
 
-func NewDriverCloudRun(port, projectID string, repo entity.DriverRepository) http.Handler {
-	r := &cloudRunRouter{
-		port:      port,
-		projectID: projectID,
-		repo:      repo,
-		router:    mux.NewRouter(),
+func NewLocalHostRouter(port string, repo entity.DriverRepository) http.Handler {
+	r := &localHostRouter{
+		baseURL: "http://localhost",
+		port:    port,
+		repo:    repo,
+		router:  mux.NewRouter(),
 	}
 
 	r.router.HandleFunc("/drivers", r.GetDriversRoute()).Methods(http.MethodGet)
@@ -39,28 +38,31 @@ func NewDriverCloudRun(port, projectID string, repo entity.DriverRepository) htt
 	return r
 }
 
-func (router *cloudRunRouter) CreateDriverRoute() http.HandlerFunc {
+func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
+	url := fmt.Sprintf("%s:%s/%s", router.baseURL, router.port, "drivers")
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), rest.URLKey("url"), getURI(router.port, r))
+		ctx := context.WithValue(r.Context(), rest.URLKey("url"), url)
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
-		p := presenter.NewCreateDriver()
+		l := log.NewPrintLogger()
 		uc := usecase.NewCreateDriver(l, router.repo)
+		p := presenter.NewCreateDriver()
 		c := rest.NewCreateDriver(p, uc)
 
 		c.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
 
-func (router *cloudRunRouter) DeleteDriverRoute() http.HandlerFunc {
+func (router *localHostRouter) DeleteDriverRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), mux.Vars(r)["cpf"])
+		cpf := mux.Vars(r)["cpf"]
+		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), cpf)
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewPrintLogger()
 		p := presenter.NewDeleteDriver()
 		uc := usecase.NewDeleteDriver(l, router.repo)
 		c := rest.NewDeleteDriverByCPF(p, uc)
@@ -69,13 +71,14 @@ func (router *cloudRunRouter) DeleteDriverRoute() http.HandlerFunc {
 	}
 }
 
-func (router *cloudRunRouter) GetDriverByCPFRoute() http.HandlerFunc {
+func (router *localHostRouter) GetDriverByCPFRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), mux.Vars(r)["cpf"])
+		cpf := mux.Vars(r)["cpf"]
+		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), cpf)
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewPrintLogger()
 		p := presenter.NewGetDriverByCPF()
 		uc := usecase.NewGetDriverByCPF(l, router.repo)
 		c := rest.NewGetDriverByCPF(p, uc)
@@ -84,11 +87,11 @@ func (router *cloudRunRouter) GetDriverByCPFRoute() http.HandlerFunc {
 	}
 }
 
-func (router *cloudRunRouter) GetDriversRoute() http.HandlerFunc {
+func (router *localHostRouter) GetDriversRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
-		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewPrintLogger()
 		p := presenter.NewGetDrivers()
 		uc := usecase.NewGetDrivers(l, router.repo)
 		c := rest.NewGetDrivers(p, uc)
@@ -97,13 +100,14 @@ func (router *cloudRunRouter) GetDriversRoute() http.HandlerFunc {
 	}
 }
 
-func (router *cloudRunRouter) UpdateDriverRoute() http.HandlerFunc {
+func (router *localHostRouter) UpdateDriverRoute() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), mux.Vars(r)["cpf"])
+		cpf := mux.Vars(r)["cpf"]
+		ctx := context.WithValue(r.Context(), rest.CPFKey("cpf"), cpf)
 
 		w.Header().Set("Content-Type", "application/json")
 
-		l := log.NewCloudRunLogger(router.projectID, getGCPTrace(r))
+		l := log.NewPrintLogger()
 		p := presenter.NewUpdateDriver()
 		uc := usecase.NewUpdateDriver(l, router.repo)
 		c := rest.NewUpdateDriver(p, uc)
@@ -112,22 +116,6 @@ func (router *cloudRunRouter) UpdateDriverRoute() http.HandlerFunc {
 	}
 }
 
-func (router *cloudRunRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (router *localHostRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.router.ServeHTTP(w, r)
-}
-
-func getGCPTrace(r *http.Request) string {
-	var trace string
-
-	traceHeader := r.Header.Get("X-Cloud-Trace-Context")
-	traceParts := strings.Split(traceHeader, "/")
-	if len(traceParts) > 0 && len(traceParts[0]) > 0 {
-		trace = traceParts[0]
-	}
-
-	return trace
-}
-
-func getURI(port string, r *http.Request) string {
-	return fmt.Sprintf("https://%s:%s%s", r.Host, port, r.URL.Path)
 }
