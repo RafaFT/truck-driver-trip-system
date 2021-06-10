@@ -29,11 +29,16 @@ func NewDriverLocalHost(port string, repo entity.DriverRepository) http.Handler 
 		router:  mux.NewRouter(),
 	}
 
-	r.router.HandleFunc("/drivers", r.GetDriversRoute()).Methods(http.MethodGet)
-	r.router.HandleFunc("/drivers", r.CreateDriverRoute()).Methods(http.MethodPost)
-	r.router.HandleFunc("/drivers/{cpf:[0-9]+}", r.GetDriverByCPFRoute()).Methods(http.MethodGet)
-	r.router.HandleFunc("/drivers/{cpf:[0-9]+}", r.DeleteDriverRoute()).Methods(http.MethodDelete)
-	r.router.HandleFunc("/drivers/{cpf:[0-9]+}", r.UpdateDriverRoute()).Methods(http.MethodPatch)
+	driverSubRoute := r.router.PathPrefix("/drivers").Subrouter()
+	driverSubRoute.HandleFunc("", r.GetDriversRoute()).Methods(http.MethodGet)
+	driverSubRoute.HandleFunc("", r.CreateDriverRoute()).Methods(http.MethodPost)
+	driverSubRoute.MethodNotAllowedHandler = MethodNotAllowedHandler(http.MethodGet, http.MethodPost)
+
+	driversCPFSubRoute := r.router.PathPrefix("/drivers/{cpf:[0-9]+}").Subrouter()
+	driversCPFSubRoute.HandleFunc("", r.GetDriverByCPFRoute()).Methods(http.MethodGet)
+	driversCPFSubRoute.HandleFunc("", r.DeleteDriverRoute()).Methods(http.MethodDelete)
+	driversCPFSubRoute.HandleFunc("", r.UpdateDriverRoute()).Methods(http.MethodPatch)
+	driversCPFSubRoute.MethodNotAllowedHandler = MethodNotAllowedHandler(http.MethodGet, http.MethodDelete, http.MethodPatch)
 
 	return r
 }
