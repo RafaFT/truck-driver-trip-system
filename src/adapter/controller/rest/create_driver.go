@@ -80,7 +80,7 @@ func (c CreateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 	var input createDriverInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(c.p.OutputError(err))
+		w.Write(c.p.OutputError(newErrInvalidBody()))
 		return
 	}
 

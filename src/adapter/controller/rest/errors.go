@@ -7,6 +7,10 @@ import (
 
 var ErrInternalServerError = fmt.Errorf("internal server error")
 
+type ErrInvalidBody struct {
+	msg string
+}
+
 type ErrInvalidParameterValue struct {
 	msg string
 }
@@ -17,6 +21,16 @@ type ErrParseQueryString struct {
 
 type ErrUnknownParameter struct {
 	msg string
+}
+
+func newErrInvalidBody() error {
+	return ErrInvalidBody{
+		msg: "Could not parse request body",
+	}
+}
+
+func (e ErrInvalidBody) Error() string {
+	return e.msg
 }
 
 func newErrInvalidParameterValue(p, v string, t reflect.Type) error {
