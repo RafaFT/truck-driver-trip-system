@@ -1,4 +1,4 @@
-package router
+package rest
 
 import (
 	"context"
@@ -22,40 +22,13 @@ type cloudRunRouter struct {
 	router    *mux.Router
 }
 
-func NewDriverCloudRun(port, projectID string, repo entity.DriverRepository) http.Handler {
-	r := &cloudRunRouter{
+func NewDriverCloudRun(port, projectID string, repo entity.DriverRepository) DriversRouter {
+	return &cloudRunRouter{
 		port:      port,
 		projectID: projectID,
 		repo:      repo,
 		router:    mux.NewRouter(),
 	}
-
-	// drivers sub-router
-	driverSubRoute := r.router.PathPrefix("/drivers").Subrouter()
-	driverSubRoute.MethodNotAllowedHandler = MethodNotAllowedHandler(http.MethodGet, http.MethodPost)
-
-	// drivers get
-	driverSubRoute.HandleFunc("", r.GetDriversRoute()).Methods(http.MethodGet)
-
-	// driver post
-	driverSubRoutePost := driverSubRoute.Methods(http.MethodPost).Subrouter()
-	driverSubRoutePost.HandleFunc("", r.CreateDriverRoute())
-	driverSubRoutePost.Use(UnsupportedMediaTypeJSON)
-
-	// drivers by cpf sub-routers
-	driversCPFSubRoute := r.router.PathPrefix("/drivers/{cpf:[0-9]+}").Subrouter()
-	driversCPFSubRoute.MethodNotAllowedHandler = MethodNotAllowedHandler(http.MethodGet, http.MethodDelete, http.MethodPatch)
-
-	// drivers by cpf get, delete
-	driversCPFSubRoute.HandleFunc("", r.GetDriverByCPFRoute()).Methods(http.MethodGet)
-	driversCPFSubRoute.HandleFunc("", r.DeleteDriverRoute()).Methods(http.MethodDelete)
-
-	// drivers by cpf patch
-	driversCPFSubRoutePatch := driversCPFSubRoute.Methods(http.MethodPatch).Subrouter()
-	driversCPFSubRoutePatch.HandleFunc("", r.UpdateDriverRoute())
-	driversCPFSubRoutePatch.Use(UnsupportedMediaTypeJSON)
-
-	return r
 }
 
 func (router *cloudRunRouter) CreateDriverRoute() http.HandlerFunc {
@@ -133,6 +106,10 @@ func (router *cloudRunRouter) UpdateDriverRoute() http.HandlerFunc {
 
 func (router *cloudRunRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.router.ServeHTTP(w, r)
+}
+
+func (router *cloudRunRouter) MuxRouter() *mux.Router {
+	return router.router
 }
 
 func getGCPTrace(r *http.Request) string {

@@ -1,4 +1,4 @@
-package router
+package rest
 
 import (
 	"context"
@@ -21,40 +21,13 @@ type localHostRouter struct {
 	router  *mux.Router
 }
 
-func NewDriverLocalHost(port string, repo entity.DriverRepository) http.Handler {
-	r := &localHostRouter{
+func NewDriverLocalHost(port string, repo entity.DriverRepository) DriversRouter {
+	return &localHostRouter{
 		baseURL: "http://localhost",
 		port:    port,
 		repo:    repo,
 		router:  mux.NewRouter(),
 	}
-
-	// drivers sub-router
-	driverSubRoute := r.router.PathPrefix("/drivers").Subrouter()
-	driverSubRoute.MethodNotAllowedHandler = MethodNotAllowedHandler(http.MethodGet, http.MethodPost)
-
-	// drivers get
-	driverSubRoute.HandleFunc("", r.GetDriversRoute()).Methods(http.MethodGet)
-
-	// driver post
-	driverSubRoutePost := driverSubRoute.Methods(http.MethodPost).Subrouter()
-	driverSubRoutePost.HandleFunc("", r.CreateDriverRoute())
-	driverSubRoutePost.Use(UnsupportedMediaTypeJSON)
-
-	// drivers by cpf sub-routers
-	driversCPFSubRoute := r.router.PathPrefix("/drivers/{cpf:[0-9]+}").Subrouter()
-	driversCPFSubRoute.MethodNotAllowedHandler = MethodNotAllowedHandler(http.MethodGet, http.MethodDelete, http.MethodPatch)
-
-	// drivers by cpf get, delete
-	driversCPFSubRoute.HandleFunc("", r.GetDriverByCPFRoute()).Methods(http.MethodGet)
-	driversCPFSubRoute.HandleFunc("", r.DeleteDriverRoute()).Methods(http.MethodDelete)
-
-	// drivers by cpf patch
-	driversCPFSubRoutePatch := driversCPFSubRoute.Methods(http.MethodPatch).Subrouter()
-	driversCPFSubRoutePatch.HandleFunc("", r.UpdateDriverRoute())
-	driversCPFSubRoutePatch.Use(UnsupportedMediaTypeJSON)
-
-	return r
 }
 
 func (router *localHostRouter) CreateDriverRoute() http.HandlerFunc {
@@ -137,4 +110,8 @@ func (router *localHostRouter) UpdateDriverRoute() http.HandlerFunc {
 
 func (router *localHostRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	router.router.ServeHTTP(w, r)
+}
+
+func (router *localHostRouter) MuxRouter() *mux.Router {
+	return router.router
 }
