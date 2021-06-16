@@ -5,9 +5,15 @@ import (
 	"reflect"
 )
 
-var ErrInternalServerError = fmt.Errorf("internal server error")
+var ErrExpectedJSONObject = fmt.Errorf("Expected JSON Object.")
+var ErrInternalServerError = fmt.Errorf("Internal Server Error.")
+var ErrInvalidJSON = fmt.Errorf("Invalid JSON.")
 
 type ErrInvalidBody struct {
+	msg string
+}
+
+type ErrInvalidJSONFieldType struct {
 	msg string
 }
 
@@ -25,11 +31,31 @@ type ErrUnknownParameter struct {
 
 func newErrInvalidBody() error {
 	return ErrInvalidBody{
-		msg: "Could not parse request body",
+		msg: "Could not read HTTP request body.",
 	}
 }
 
 func (e ErrInvalidBody) Error() string {
+	return e.msg
+}
+
+func newErrInvalidJSONFieldType(jsonField, expectedType, gotType string) error {
+	switch expectedType {
+	case "ISO8601Date":
+		expectedType = "string (ISO-8601 date as 'YYYY-MM-DD')"
+	}
+
+	switch gotType {
+	case "int", "float64":
+		gotType = "number"
+	}
+
+	return ErrInvalidJSONFieldType{
+		msg: fmt.Sprintf("Invalid value at '%s'. Expected %s, got %s.", jsonField, expectedType, gotType),
+	}
+}
+
+func (e ErrInvalidJSONFieldType) Error() string {
 	return e.msg
 }
 
@@ -50,7 +76,7 @@ func newErrInvalidParameterValue(p, v string, t reflect.Type) error {
 	}
 
 	return ErrInvalidParameterValue{
-		msg: fmt.Sprintf("invalid value at '%s' (type: %s), got %s", p, tName, v),
+		msg: fmt.Sprintf("Invalid value at '%s'. Expected %s, got %s.", p, tName, v),
 	}
 }
 
@@ -60,7 +86,7 @@ func (e ErrInvalidParameterValue) Error() string {
 
 func newErrParseQueryString(queryString string) error {
 	return ErrParseQueryString{
-		msg: fmt.Sprintf("could not parse query string: %s", queryString),
+		msg: fmt.Sprintf("Could not parse query string: %s.", queryString),
 	}
 }
 
@@ -70,7 +96,7 @@ func (e ErrParseQueryString) Error() string {
 
 func newErrUnknownParameter(p string) error {
 	return ErrUnknownParameter{
-		msg: fmt.Sprintf("unknown query parameter: %s", p),
+		msg: fmt.Sprintf("Unknown query parameter: %s.", p),
 	}
 }
 
