@@ -3,15 +3,13 @@ package rest
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 var ErrExpectedJSONObject = fmt.Errorf("Expected JSON Object.")
 var ErrInternalServerError = fmt.Errorf("Internal Server Error.")
+var ErrInvalidBody = fmt.Errorf("Could not read HTTP request body.")
 var ErrInvalidJSON = fmt.Errorf("Invalid JSON.")
-
-type ErrInvalidBody struct {
-	msg string
-}
 
 type ErrInvalidJSONFieldType struct {
 	msg string
@@ -21,22 +19,16 @@ type ErrInvalidParameterValue struct {
 	msg string
 }
 
+type ErrMissingJSONFields struct {
+	msg string
+}
+
 type ErrParseQueryString struct {
 	msg string
 }
 
 type ErrUnknownParameter struct {
 	msg string
-}
-
-func newErrInvalidBody() error {
-	return ErrInvalidBody{
-		msg: "Could not read HTTP request body.",
-	}
-}
-
-func (e ErrInvalidBody) Error() string {
-	return e.msg
 }
 
 func newErrInvalidJSONFieldType(jsonField, expectedType, gotType string) error {
@@ -81,6 +73,30 @@ func newErrInvalidParameterValue(p, v string, t reflect.Type) error {
 }
 
 func (e ErrInvalidParameterValue) Error() string {
+	return e.msg
+}
+
+func newErrMissingJSONFields(fieldTypes [][2]string) error {
+	s := make([]string, 0, len(fieldTypes))
+
+	for _, fieldAndType := range fieldTypes {
+		field := fieldAndType[0]
+		type_ := fieldAndType[1]
+
+		switch type_ {
+		case "ISO8601Date":
+			type_ = "string (ISO-8601 date as 'YYYY-MM-DD')"
+		}
+
+		s = append(s, fmt.Sprintf("[%s: %s]", field, type_))
+	}
+
+	return ErrMissingJSONFields{
+		msg: fmt.Sprintf("%s.", fmt.Sprintf("Missing JSON fields. %s", strings.Join(s, ", "))),
+	}
+}
+
+func (e ErrMissingJSONFields) Error() string {
 	return e.msg
 }
 

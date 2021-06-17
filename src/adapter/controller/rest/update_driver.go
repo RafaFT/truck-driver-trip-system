@@ -38,7 +38,7 @@ func (c UpdateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 	var input updateDriverInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(c.p.OutputError(newErrInvalidBody()))
+		w.Write(c.p.OutputError(ErrInvalidBody))
 		return
 	}
 

@@ -1,11 +1,13 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"reflect"
 	"strings"
-	"time"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
@@ -20,46 +22,72 @@ type CreateDriverPresenter interface {
 }
 
 type createDriverInput struct {
-	BirthDate  *time.Time `json:"birth_date"`
-	CNH        *string    `json:"cnh"`
-	CPF        *string    `json:"cpf"`
-	Gender     *string    `json:"gender"`
-	HasVehicle *bool      `json:"has_vehicle"`
-	Name       *string    `json:"name"`
+	BirthDate  *ISO8601Date `json:"birth_date"`
+	CNH        *string      `json:"cnh"`
+	CPF        *string      `json:"cpf"`
+	Gender     *string      `json:"gender"`
+	HasVehicle *bool        `json:"has_vehicle"`
+	Name       *string      `json:"name"`
 }
 
-func (cd createDriverInput) writeUCInput(ucInput *usecase.CreateDriverInput) error {
-	missingFields := make([]string, 0, 6)
-
-	if cd.BirthDate == nil {
-		missingFields = append(missingFields, "birth_date")
-	}
-	if cd.CNH == nil {
-		missingFields = append(missingFields, "cnh")
-	}
-	if cd.CPF == nil {
-		missingFields = append(missingFields, "cpf")
-	}
-	if cd.Gender == nil {
-		missingFields = append(missingFields, "gender")
-	}
-	if cd.HasVehicle == nil {
-		missingFields = append(missingFields, "has_vehicle")
-	}
-	if cd.Name == nil {
-		missingFields = append(missingFields, "name")
+func (cd *createDriverInput) UnmarshalJSON(b []byte) error {
+	if !json.Valid(b) {
+		return ErrInvalidJSON
 	}
 
-	if len(missingFields) > 0 {
-		return fmt.Errorf("missing fields: [%s]", strings.Join(missingFields, ", "))
+	// create and use alias type to prevent infinite recursion
+	type createDriverInput_ createDriverInput
+	var cd_ createDriverInput_
+
+	// Use json.Decoder instead of Unmarshal, to prevent unexpected fields
+	decoder := json.NewDecoder(bytes.NewReader(b))
+	decoder.DisallowUnknownFields()
+
+	err := decoder.Decode(&cd_)
+	if err != nil {
+		if jsonTypeErr, ok := err.(*json.UnmarshalTypeError); ok {
+			if jsonTypeErr.Field == "" && jsonTypeErr.Struct == "" {
+				return ErrExpectedJSONObject
+			}
+
+			return newErrInvalidJSONFieldType(jsonTypeErr.Field, jsonTypeErr.Type.Name(), jsonTypeErr.Value)
+		}
+
+		// TODO: Find out how to make sure this err is caused by
+		// unknown json fields and format it better for the user.
+		return err
 	}
 
-	ucInput.BirthDate = *cd.BirthDate
-	ucInput.CNH = *cd.CNH
-	ucInput.CPF = *cd.CPF
-	ucInput.Gender = *cd.Gender
-	ucInput.HasVehicle = *cd.HasVehicle
-	ucInput.Name = *cd.Name
+	*cd = createDriverInput(cd_)
+
+	if err := cd.hasFieldsMissing(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cd *createDriverInput) hasFieldsMissing() error {
+	v := reflect.ValueOf(*cd)
+	t := reflect.TypeOf(*cd)
+
+	s := make([][2]string, 0, t.NumField())
+	for i := 0; i < t.NumField(); i++ {
+		// This logic only works if all mandatory fields are pointer types and
+		// if all fields have json tags.
+		if v.Field(i).IsNil() {
+			if jsonTags := strings.Split(t.Field(i).Tag.Get("json"), ","); len(jsonTags) > 0 {
+				s = append(s, [2]string{
+					jsonTags[0],
+					t.Field(i).Type.Elem().Name(),
+				})
+			}
+		}
+	}
+
+	if len(s) > 0 {
+		return newErrMissingJSONFields(s)
+	}
 
 	return nil
 }
@@ -77,18 +105,27 @@ func NewCreateDriver(p CreateDriverPresenter, uc usecase.CreateDriver) CreateDri
 }
 
 func (c CreateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var input createDriverInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(c.p.OutputError(newErrInvalidBody()))
+		w.Write(c.p.OutputError(ErrInvalidBody))
 		return
 	}
 
-	var ucInput usecase.CreateDriverInput
-	if err := input.writeUCInput(&ucInput); err != nil {
+	var input createDriverInput
+	if err := json.Unmarshal(b, &input); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(c.p.OutputError(err))
 		return
+	}
+
+	ucInput := usecase.CreateDriverInput{
+		BirthDate:  input.BirthDate.Time,
+		CNH:        *input.CNH,
+		CPF:        *input.CPF,
+		Gender:     *input.Gender,
+		HasVehicle: *input.HasVehicle,
+		Name:       *input.Name,
 	}
 
 	output, err := c.uc.Execute(r.Context(), ucInput)
