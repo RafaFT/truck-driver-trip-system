@@ -14,7 +14,7 @@ func NewName(name string) (Name, error) {
 	err := newErrInvalidName(name)
 
 	// check min and (arbitrary) max runes limit
-	if length := len([]rune(name)); length == 0 || length > 255 {
+	if length := len([]rune(name)); length == 0 || length > 127 {
 		return "", err
 	}
 
