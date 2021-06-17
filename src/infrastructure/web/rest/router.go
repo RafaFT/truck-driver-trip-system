@@ -2,6 +2,7 @@ package rest
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -35,6 +36,7 @@ func SetDriversRoutes(drivers DriversRouter) {
 	// driver post
 	driverSubRoutePost := driverSubRoute.Methods(http.MethodPost).Subrouter()
 	driverSubRoutePost.HandleFunc("", drivers.CreateDriverRoute())
+	driverSubRoutePost.Use(checkPayloadSize)
 	driverSubRoutePost.Use(unsupportedMediaTypeJSON)
 
 	// drivers by cpf sub-routers
@@ -48,7 +50,29 @@ func SetDriversRoutes(drivers DriversRouter) {
 	// drivers by cpf patch
 	driversCPFSubRoutePatch := driversCPFSubRoute.Methods(http.MethodPatch).Subrouter()
 	driversCPFSubRoutePatch.HandleFunc("", drivers.UpdateDriverRoute())
+	driversCPFSubRoutePatch.Use(checkPayloadSize)
 	driversCPFSubRoutePatch.Use(unsupportedMediaTypeJSON)
+}
+
+func checkPayloadSize(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		contentLength, exists := r.Header["Content-Length"]
+
+		if !exists || len(contentLength) != 1 {
+			w.WriteHeader(http.StatusLengthRequired)
+			return
+		}
+
+		if length, err := strconv.Atoi(contentLength[0]); err != nil {
+			w.WriteHeader(http.StatusLengthRequired)
+			return
+		} else if length > 1_000 {
+			w.WriteHeader(http.StatusRequestEntityTooLarge)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }
 
 func methodNotAllowedHandler(allowedMethods ...string) http.Handler {
