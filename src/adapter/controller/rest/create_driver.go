@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
@@ -14,6 +15,8 @@ import (
 )
 
 type URLKey string
+
+var unknownJSONField = regexp.MustCompile(`\"(.*)\"$`)
 
 // output port (out of place, according to clean architecture, this interface should be declared on usecase layer)
 type CreateDriverPresenter interface {
@@ -49,8 +52,12 @@ func (cd *createDriverInput) UnmarshalJSON(b []byte) error {
 			return newErrInvalidJSONFieldType(jsonTypeErr.Field, jsonTypeErr.Type.Name(), jsonTypeErr.Value)
 		}
 
-		// TODO: Find out how to make sure this err is caused by
-		// unknown json fields and format it better for the user.
+		if strings.HasPrefix(err.Error(), "json: unknown field") {
+			if match := unknownJSONField.FindStringSubmatch(err.Error()); match != nil {
+				return newErrUnexpectedJSONField(match[1])
+			}
+		}
+
 		return err
 	}
 
