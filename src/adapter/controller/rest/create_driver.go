@@ -31,10 +31,6 @@ type createDriverInput struct {
 }
 
 func (cd *createDriverInput) UnmarshalJSON(b []byte) error {
-	if !json.Valid(b) {
-		return ErrInvalidJSON
-	}
-
 	// create and use alias type to prevent infinite recursion
 	type createDriverInput_ createDriverInput
 	var cd_ createDriverInput_
@@ -109,6 +105,12 @@ func (c CreateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(c.p.OutputError(ErrInvalidBody))
+		return
+	}
+
+	if !json.Valid(b) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(c.p.OutputError(ErrInvalidJSON))
 		return
 	}
 
