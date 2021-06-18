@@ -27,6 +27,10 @@ type ErrParseQueryString struct {
 	msg string
 }
 
+type ErrUnexpectedJSONField struct {
+	msg string
+}
+
 type ErrUnknownParameter struct {
 	msg string
 }
@@ -107,6 +111,16 @@ func newErrParseQueryString(queryString string) error {
 }
 
 func (e ErrParseQueryString) Error() string {
+	return e.msg
+}
+
+func newErrUnexpectedJSONField(field string) error {
+	return ErrUnexpectedJSONField{
+		msg: fmt.Sprintf("Unexpected JSON field: '%s'", field),
+	}
+}
+
+func (e ErrUnexpectedJSONField) Error() string {
 	return e.msg
 }
 
