@@ -1,4 +1,4 @@
-package usecase_test
+package samples
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-func getDriversSample(t *testing.T) []*entity.Driver {
+func GetDrivers(t *testing.T) []*entity.Driver {
 	now := time.Now()
 
 	driversInput := []struct {
