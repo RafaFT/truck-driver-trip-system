@@ -1,9 +1,12 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
@@ -22,6 +25,39 @@ type updateDriverInput struct {
 	Name       *string `json:"name"`
 }
 
+func (ud *updateDriverInput) UnmarshalJSON(b []byte) error {
+	// create and use alias type to prevent infinite recursion
+	type updateDriverInput_ updateDriverInput
+	var ud_ updateDriverInput_
+
+	// Use json.Decoder instead of Unmarshal, to prevent unexpected fields
+	decoder := json.NewDecoder(bytes.NewReader(b))
+	decoder.DisallowUnknownFields()
+
+	err := decoder.Decode(&ud_)
+	if err != nil {
+		if jsonTypeErr, ok := err.(*json.UnmarshalTypeError); ok {
+			if jsonTypeErr.Field == "" && jsonTypeErr.Struct == "" {
+				return ErrExpectedJSONObject
+			}
+
+			return newErrInvalidJSONFieldType(jsonTypeErr.Field, jsonTypeErr.Type.Name(), jsonTypeErr.Value)
+		}
+
+		if strings.HasPrefix(err.Error(), "json: unknown field") {
+			if match := unknownJSONField.FindStringSubmatch(err.Error()); match != nil {
+				return newErrUnexpectedJSONField(match[1])
+			}
+		}
+
+		return err
+	}
+
+	*ud = updateDriverInput(ud_)
+
+	return nil
+}
+
 type UpdateDriverController struct {
 	p  UpdateDriverPresenter
 	uc usecase.UpdateDriver
@@ -35,16 +71,29 @@ func NewUpdateDriver(p UpdateDriverPresenter, uc usecase.UpdateDriver) UpdateDri
 }
 
 func (c UpdateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var input updateDriverInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(c.p.OutputError(ErrInvalidBody))
 		return
 	}
 
+	if !json.Valid(b) {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(c.p.OutputError(ErrInvalidJSON))
+		return
+	}
+
+	var input updateDriverInput
+	if err := json.Unmarshal(b, &input); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(c.p.OutputError(err))
+		return
+	}
+
 	if input.CNH == nil && input.Gender == nil && input.HasVehicle == nil && input.Name == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(c.p.OutputError(fmt.Errorf("update needs at least one valid field")))
+		w.Write(c.p.OutputError(fmt.Errorf("Empty update.")))
 		return
 	}
 
