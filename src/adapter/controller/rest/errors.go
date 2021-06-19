@@ -116,7 +116,7 @@ func (e ErrParseQueryString) Error() string {
 
 func newErrUnexpectedJSONField(field string) error {
 	return ErrUnexpectedJSONField{
-		msg: fmt.Sprintf("Unexpected JSON field: '%s'", field),
+		msg: fmt.Sprintf("Unexpected JSON field: '%s'.", field),
 	}
 }
 
