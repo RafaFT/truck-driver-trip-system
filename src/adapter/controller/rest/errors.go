@@ -10,6 +10,7 @@ var ErrExpectedJSONObject = fmt.Errorf("Expected JSON Object.")
 var ErrInternalServerError = fmt.Errorf("Internal Server Error.")
 var ErrInvalidBody = fmt.Errorf("Could not read HTTP request body.")
 var ErrInvalidJSON = fmt.Errorf("Invalid JSON.")
+var ErrInvalidQueryString = fmt.Errorf("Could not read URL query string.")
 
 type ErrInvalidJSONFieldType struct {
 	msg string
@@ -20,10 +21,6 @@ type ErrInvalidParameterValue struct {
 }
 
 type ErrMissingJSONFields struct {
-	msg string
-}
-
-type ErrParseQueryString struct {
 	msg string
 }
 
@@ -101,16 +98,6 @@ func newErrMissingJSONFields(fieldTypes [][2]string) error {
 }
 
 func (e ErrMissingJSONFields) Error() string {
-	return e.msg
-}
-
-func newErrParseQueryString(queryString string) error {
-	return ErrParseQueryString{
-		msg: fmt.Sprintf("Could not parse query string: %s.", queryString),
-	}
-}
-
-func (e ErrParseQueryString) Error() string {
 	return e.msg
 }
 

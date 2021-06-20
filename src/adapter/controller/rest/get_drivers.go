@@ -42,7 +42,7 @@ func (c GetDriversController) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	params, err := url.ParseQuery(r.URL.RawQuery)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(c.p.OutputError(newErrParseQueryString(r.URL.RawQuery)))
+		w.Write(c.p.OutputError(ErrInvalidQueryString))
 		return
 	}
 
