@@ -112,8 +112,7 @@ func (c UpdateDriverController) ServeHTTP(w http.ResponseWriter, r *http.Request
 			entity.ErrInvalidCPF:
 			w.WriteHeader(http.StatusNotFound)
 			w.Header().Del("content-type")
-		case entity.ErrInvalidBirthDate,
-			entity.ErrInvalidCNH,
+		case entity.ErrInvalidCNH,
 			entity.ErrInvalidGender,
 			entity.ErrInvalidName:
 			w.WriteHeader(http.StatusBadRequest)
