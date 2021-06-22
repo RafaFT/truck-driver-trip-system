@@ -2,7 +2,6 @@ package rest
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -16,7 +15,7 @@ type ErrInvalidJSONFieldType struct {
 	msg string
 }
 
-type ErrInvalidParameterValue struct {
+type ErrInvalidParameterType struct {
 	msg string
 }
 
@@ -28,7 +27,7 @@ type ErrUnexpectedJSONField struct {
 	msg string
 }
 
-type ErrUnknownParameter struct {
+type ErrUnexpectedParameter struct {
 	msg string
 }
 
@@ -52,28 +51,18 @@ func (e ErrInvalidJSONFieldType) Error() string {
 	return e.msg
 }
 
-func newErrInvalidParameterValue(p, v string, t reflect.Type) error {
-	var tName string
-
-	switch t.Name() {
-	case "bool":
-		tName = "BOOLEAN"
-	case "int":
-		tName = "INTEGER"
+func newErrInvalidParameterType(param, expectedType string) error {
+	switch expectedType {
 	case "uint":
-		tName = "POSITIVE_INTEGER"
-	case "CNH":
-		tName = "CNH"
-	case "Gender":
-		tName = "GENDER"
+		expectedType = "positive integer"
 	}
 
-	return ErrInvalidParameterValue{
-		msg: fmt.Sprintf("Invalid value at '%s'. Expected %s, got %s.", p, tName, v),
+	return ErrInvalidParameterType{
+		msg: fmt.Sprintf("Invalid value at '%s'. Expected %s.", param, expectedType),
 	}
 }
 
-func (e ErrInvalidParameterValue) Error() string {
+func (e ErrInvalidParameterType) Error() string {
 	return e.msg
 }
 
@@ -111,12 +100,12 @@ func (e ErrUnexpectedJSONField) Error() string {
 	return e.msg
 }
 
-func newErrUnknownParameter(p string) error {
-	return ErrUnknownParameter{
-		msg: fmt.Sprintf("Unknown query parameter: %s.", p),
+func newErrUnexpectedParameter(param string) error {
+	return ErrUnexpectedParameter{
+		msg: fmt.Sprintf("Unexpected query parameter: %s.", param),
 	}
 }
 
-func (e ErrUnknownParameter) Error() string {
+func (e ErrUnexpectedParameter) Error() string {
 	return e.msg
 }

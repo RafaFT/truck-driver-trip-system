@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -49,7 +48,7 @@ func (c GetDriversController) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	for p := range params {
 		if _, ok := getDriversParameters[p]; !ok {
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(c.p.OutputError(newErrUnknownParameter(p)))
+			w.Write(c.p.OutputError(newErrUnexpectedParameter(p)))
 			return
 		}
 	}
@@ -68,9 +67,9 @@ func (c GetDriversController) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 		switch errors.Unwrap(err).(type) {
 		case entity.ErrInvalidCNH:
-			ucErr = newErrInvalidParameterValue("cnh", r.Form.Get("cnh"), reflect.TypeOf((*entity.CNH)(nil)).Elem())
+			ucErr = newErrInvalidParameterType("cnh", "CNH")
 		case entity.ErrInvalidGender:
-			ucErr = newErrInvalidParameterValue("gender", r.Form.Get("gender"), reflect.TypeOf((*entity.Gender)(nil)).Elem())
+			ucErr = newErrInvalidParameterType("gender", "Gender")
 		default:
 			code = http.StatusInternalServerError
 			ucErr = ErrInternalServerError
@@ -98,7 +97,7 @@ func getGetDriversQuery(v url.Values) (usecase.GetDriversQuery, error) {
 		if hasVehicle, err := strconv.ParseBool(rawHasVehicle); err == nil {
 			q.HasVehicle = &hasVehicle
 		} else {
-			return q, newErrInvalidParameterValue("has_vehicle", rawHasVehicle, reflect.TypeOf((*bool)(nil)).Elem())
+			return q, newErrInvalidParameterType("has_vehicle", "bool")
 		}
 	}
 
@@ -107,7 +106,7 @@ func getGetDriversQuery(v url.Values) (usecase.GetDriversQuery, error) {
 			ulimit := uint(limit)
 			q.Limit = &ulimit
 		} else {
-			return q, newErrInvalidParameterValue("limit", rawLimit, reflect.TypeOf((*uint)(nil)).Elem())
+			return q, newErrInvalidParameterType("limit", "uint")
 		}
 	}
 
