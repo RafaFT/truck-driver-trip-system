@@ -2,6 +2,7 @@ package rest
 
 import (
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
@@ -21,6 +22,10 @@ type GetDriverByCPFController struct {
 	uc usecase.GetDriverByCPF
 }
 
+var getDriverByCPFParameters = map[string]struct{}{
+	"fields": {},
+}
+
 func NewGetDriverByCPF(p GetDriverByCPFPresenter, uc usecase.GetDriverByCPF) GetDriverByCPFController {
 	return GetDriverByCPFController{
 		p:  p,
@@ -29,6 +34,21 @@ func NewGetDriverByCPF(p GetDriverByCPFPresenter, uc usecase.GetDriverByCPF) Get
 }
 
 func (c GetDriverByCPFController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	params, err := url.ParseQuery(r.URL.RawQuery)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(c.p.OutputError(ErrInvalidQueryString))
+		return
+	}
+
+	for p := range params {
+		if _, ok := getDriverByCPFParameters[p]; !ok {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write(c.p.OutputError(newErrUnexpectedParameter(p)))
+			return
+		}
+	}
+
 	cpf := r.Context().Value(CPFKey("cpf")).(string)
 
 	output, err := c.uc.Execute(r.Context(), cpf)
