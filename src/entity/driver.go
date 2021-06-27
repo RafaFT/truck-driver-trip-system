@@ -58,68 +58,68 @@ func NewDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bo
 }
 
 // getters
-func (td *Driver) Age() int {
-	return td.birthDate.CalculateAge()
+func (d *Driver) Age() int {
+	return d.birthDate.CalculateAge()
 }
 
-func (td *Driver) BirthDate() BirthDate {
-	return td.birthDate
+func (d *Driver) BirthDate() BirthDate {
+	return d.birthDate
 }
 
-func (td *Driver) CNH() CNH {
-	return td.cnh
+func (d *Driver) CNH() CNH {
+	return d.cnh
 }
 
-func (td *Driver) CPF() CPF {
-	return td.cpf
+func (d *Driver) CPF() CPF {
+	return d.cpf
 }
 
-func (td *Driver) Gender() Gender {
-	return td.gender
+func (d *Driver) Gender() Gender {
+	return d.gender
 }
 
-func (td *Driver) HasVehicle() bool {
-	return td.hasVehicle
+func (d *Driver) HasVehicle() bool {
+	return d.hasVehicle
 }
 
-func (td *Driver) Name() Name {
-	return td.name
+func (d *Driver) Name() Name {
+	return d.name
 }
 
 // setters
-func (td *Driver) SetCNH(cnh string) error {
+func (d *Driver) SetCNH(cnh string) error {
 	newCNH, err := NewCNH(cnh)
 	if err != nil {
 		return err
 	}
 
-	td.cnh = newCNH
+	d.cnh = newCNH
 
 	return nil
 }
 
-func (td *Driver) SetGender(gender string) error {
+func (d *Driver) SetGender(gender string) error {
 	newGender, err := NewGender(gender)
 	if err != nil {
 		return err
 	}
 
-	td.gender = newGender
+	d.gender = newGender
 
 	return nil
 }
 
-func (td *Driver) SetHasVehicle(hasVehicle bool) {
-	td.hasVehicle = hasVehicle
+func (d *Driver) SetHasVehicle(hasVehicle bool) {
+	d.hasVehicle = hasVehicle
 }
 
-func (td *Driver) SetName(name string) error {
+func (d *Driver) SetName(name string) error {
 	newName, err := NewName(name)
 	if err != nil {
 		return err
 	}
 
-	td.name = newName
+	d.name = newName
 
 	return nil
 }
