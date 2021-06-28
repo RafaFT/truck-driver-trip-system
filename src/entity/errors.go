@@ -37,6 +37,10 @@ type ErrInvalidName struct {
 	msg string
 }
 
+type ErrInvalidVehicleCode struct {
+	msg string
+}
+
 func NewErrDriverAlreadyExists(cpf CPF) ErrDriverAlreadyExists {
 	return ErrDriverAlreadyExists{
 		msg: fmt.Sprintf("Driver already exists. cpf=[%s]", cpf),
@@ -114,5 +118,15 @@ func newErrInvalidName(name string) ErrInvalidName {
 }
 
 func (e ErrInvalidName) Error() string {
+	return e.msg
+}
+
+func newErrInvalidVehicleCode(vehicleCode int) ErrInvalidVehicleCode {
+	return ErrInvalidVehicleCode{
+		msg: fmt.Sprintf("Vehicle code invalid. code=[%d]", vehicleCode),
+	}
+}
+
+func (e ErrInvalidVehicleCode) Error() string {
 	return e.msg
 }
