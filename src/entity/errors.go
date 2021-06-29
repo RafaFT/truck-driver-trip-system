@@ -37,6 +37,14 @@ type ErrInvalidName struct {
 	msg string
 }
 
+type ErrInvalidTripEndDate struct {
+	msg string
+}
+
+type ErrInvalidTripStartDate struct {
+	msg string
+}
+
 type ErrInvalidVehicleCode struct {
 	msg string
 }
@@ -128,5 +136,25 @@ func newErrInvalidVehicleCode(vehicleCode int) ErrInvalidVehicleCode {
 }
 
 func (e ErrInvalidVehicleCode) Error() string {
+	return e.msg
+}
+
+func newErrInvalidTripEndDate(endDate time.Time) ErrInvalidTripEndDate {
+	return ErrInvalidTripEndDate{
+		msg: fmt.Sprintf("Trip end date invalid. date=[%s]", endDate),
+	}
+}
+
+func (e ErrInvalidTripEndDate) Error() string {
+	return e.msg
+}
+
+func newErrInvalidTripStartDate(startDate time.Time) ErrInvalidTripStartDate {
+	return ErrInvalidTripStartDate{
+		msg: fmt.Sprintf("Trip start date invalid. date=[%s]", startDate),
+	}
+}
+
+func (e ErrInvalidTripStartDate) Error() string {
 	return e.msg
 }
