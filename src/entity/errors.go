@@ -33,6 +33,14 @@ type ErrInvalidGender struct {
 	msg string
 }
 
+type ErrInvalidLatitude struct {
+	msg string
+}
+
+type ErrInvalidLongitude struct {
+	msg string
+}
+
 type ErrInvalidName struct {
 	msg string
 }
@@ -116,6 +124,26 @@ func newErrInvalidGender(gender string) ErrInvalidGender {
 }
 
 func (e ErrInvalidGender) Error() string {
+	return e.msg
+}
+
+func newErrInvalidLatitude(lat float64) ErrInvalidLatitude {
+	return ErrInvalidLatitude{
+		msg: fmt.Sprintf("Latitude out of range. latitude=[%f]", lat),
+	}
+}
+
+func (e ErrInvalidLatitude) Error() string {
+	return e.msg
+}
+
+func newErrInvalidLongitude(lat float64) ErrInvalidLongitude {
+	return ErrInvalidLongitude{
+		msg: fmt.Sprintf("Longitude out of range. longitude=[%f]", lat),
+	}
+}
+
+func (e ErrInvalidLongitude) Error() string {
 	return e.msg
 }
 
