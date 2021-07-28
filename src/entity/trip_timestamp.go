@@ -6,24 +6,24 @@ import (
 
 var minTripStartDate = minBirthDate.AddDate(minimumDriverAge, 0, 0)
 
-type TripTimeStamp struct {
+type TripTS struct {
 	start   time.Time
 	end     time.Time
 	seconds int64
 }
 
-func NewTripTimeStamp(start, end time.Time) (TripTimeStamp, error) {
+func NewTripTS(start, end time.Time) (TripTS, error) {
 	if !start.After(minTripStartDate) {
-		return TripTimeStamp{}, newErrInvalidTripStartDate(start)
+		return TripTS{}, newErrInvalidTripStartDate(start)
 	}
 
 	if end.Before(start) {
-		return TripTimeStamp{}, newErrInvalidTripEndDate(end)
+		return TripTS{}, newErrInvalidTripEndDate(end)
 	}
 
 	seconds := int64(end.Sub(start).Seconds())
 
-	return TripTimeStamp{
+	return TripTS{
 		start:   start,
 		end:     end,
 		seconds: seconds,
