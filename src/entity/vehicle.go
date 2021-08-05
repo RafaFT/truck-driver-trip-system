@@ -3,15 +3,15 @@ package entity
 type Vehicle string
 
 const (
-	truck      Vehicle = "TRUCK"
-	_34Truck   Vehicle = "3/4Truck"
-	stumpTruck Vehicle = "STUMP_TRUCK"
+	Truck      Vehicle = "TRUCK"
+	Truck_34   Vehicle = "3/4Truck"
+	StumpTruck Vehicle = "STUMP_TRUCK"
 )
 
 var vehicleCodes = map[int]Vehicle{
-	0: truck,
-	1: _34Truck,
-	2: stumpTruck,
+	0: Truck,
+	1: Truck_34,
+	2: StumpTruck,
 }
 
 func NewVehicle(vehicleCode int) (Vehicle, error) {

@@ -3,25 +3,27 @@ package entity
 import (
 	"reflect"
 	"testing"
+
+	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
 func TestVehicle(t *testing.T) {
 	tests := []struct {
 		input int
-		want  Vehicle
+		want  entity.Vehicle
 		err   error
 	}{
 		// invalid input
-		{-1, "", ErrInvalidVehicleCode{}},
-		{300, "", ErrInvalidVehicleCode{}},
+		{-1, "", entity.ErrInvalidVehicleCode{}},
+		{300, "", entity.ErrInvalidVehicleCode{}},
 		// valid input
-		{0, truck, nil},
-		{1, _34Truck, nil},
-		{2, stumpTruck, nil},
+		{0, entity.Truck, nil},
+		{1, entity.Truck_34, nil},
+		{2, entity.StumpTruck, nil},
 	}
 
 	for _, test := range tests {
-		got, gotError := NewVehicle(test.input)
+		got, gotError := entity.NewVehicle(test.input)
 
 		if test.want != got || reflect.TypeOf(test.err) != reflect.TypeOf(gotError) {
 			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
