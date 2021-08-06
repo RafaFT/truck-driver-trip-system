@@ -5,11 +5,11 @@ import (
 )
 
 var (
-	maxLatitude = decimal.NewFromInt(90)
 	minLatitude = decimal.NewFromInt(-90)
+	maxLatitude = decimal.NewFromInt(90)
 
-	maxLongitude = decimal.NewFromInt(180)
 	minLongitude = decimal.NewFromInt(-180)
+	maxLongitude = decimal.NewFromInt(180)
 )
 
 type latitude struct {
@@ -26,9 +26,8 @@ type Location struct {
 }
 
 func newLatitude(rawLat float64) (latitude, error) {
-	lat := latitude{decimal.NewFromFloat(rawLat)}
+	lat := latitude{decimal.NewFromFloat(rawLat).Truncate(7)}
 
-	lat.Truncate(7)
 	if lat.GreaterThan(maxLatitude) || lat.LessThan(minLatitude) {
 		return lat, newErrInvalidLatitude(rawLat)
 	}
@@ -37,10 +36,9 @@ func newLatitude(rawLat float64) (latitude, error) {
 }
 
 func newLongitude(rawLong float64) (longitude, error) {
-	long := longitude{decimal.NewFromFloat(rawLong)}
+	long := longitude{decimal.NewFromFloat(rawLong).Truncate(7)}
 
-	long.Truncate(7)
-	if long.GreaterThan(maxLatitude) || long.LessThan(minLatitude) {
+	if long.GreaterThan(maxLongitude) || long.LessThan(minLongitude) {
 		return long, newErrInvalidLongitude(rawLong)
 	}
 
@@ -64,4 +62,14 @@ func NewLocation(rawLat, rawLong float64) (Location, error) {
 	loc.long = long
 
 	return loc, nil
+}
+
+func (l Location) Latitude() float64 {
+	f, _ := l.lat.Float64()
+	return f
+}
+
+func (l Location) Longitude() float64 {
+	f, _ := l.long.Float64()
+	return f
 }
