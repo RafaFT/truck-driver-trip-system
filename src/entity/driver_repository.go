@@ -5,9 +5,9 @@ import (
 )
 
 type DriverRepository interface {
-	DeleteDriverByCPF(context.Context, CPF) error
-	FindDriverByCPF(context.Context, CPF) (*Driver, error)
-	FindDrivers(context.Context, FindDriversQuery) ([]*Driver, error)
-	SaveDriver(context.Context, *Driver) error
-	UpdateDriver(context.Context, *Driver) error
+	DeleteByCPF(context.Context, CPF) error
+	FindByCPF(context.Context, CPF) (*Driver, error)
+	Find(context.Context, FindDriversQuery) ([]*Driver, error)
+	Save(context.Context, *Driver) error
+	Update(context.Context, *Driver) error
 }

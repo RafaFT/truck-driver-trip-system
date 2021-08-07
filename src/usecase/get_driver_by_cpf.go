@@ -43,7 +43,7 @@ func (di getDriverByCPF) Execute(ctx context.Context, cpf string) (*GetDriverByC
 		return nil, err
 	}
 
-	driver, err := di.repo.FindDriverByCPF(ctx, driverCPF)
+	driver, err := di.repo.FindByCPF(ctx, driverCPF)
 	if err != nil {
 		switch err.(type) {
 		case entity.ErrDriverNotFound:

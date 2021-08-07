@@ -62,7 +62,7 @@ func (di createDriver) Execute(ctx context.Context, input CreateDriverInput) (*C
 		return nil, err
 	}
 
-	err = di.repo.SaveDriver(ctx, driver)
+	err = di.repo.Save(ctx, driver)
 	if err != nil {
 		switch err.(type) {
 		case entity.ErrDriverAlreadyExists:

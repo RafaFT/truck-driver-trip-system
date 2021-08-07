@@ -32,7 +32,7 @@ func (di deleteDriver) Execute(ctx context.Context, cpf string) error {
 		return err
 	}
 
-	err = di.repo.DeleteDriverByCPF(ctx, driverCPF)
+	err = di.repo.DeleteByCPF(ctx, driverCPF)
 	if err != nil {
 		switch err.(type) {
 		case entity.ErrDriverNotFound:

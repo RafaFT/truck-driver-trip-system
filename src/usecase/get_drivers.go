@@ -55,7 +55,7 @@ func (di getDrivers) Execute(ctx context.Context, rawQ GetDriversQuery) ([]*GetD
 	logQ, _ := json.MarshalIndent(q, "", "\t")
 	di.logger.Debug(fmt.Sprintf("FindDriversQuery: %s", string(logQ)))
 
-	drivers, err := di.repo.FindDrivers(ctx, q)
+	drivers, err := di.repo.Find(ctx, q)
 	if err != nil {
 		di.logger.Error(err.Error())
 		return nil, err

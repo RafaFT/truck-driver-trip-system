@@ -36,7 +36,7 @@ func NewDriverFirestore(c *firestore.Client) entity.DriverRepository {
 	}
 }
 
-func (df driverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF) error {
+func (df driverFirestore) DeleteByCPF(ctx context.Context, cpf entity.CPF) error {
 	doc := df.client.Doc(fmt.Sprintf("%s/%s", df.coll, cpf))
 
 	if _, err := doc.Get(ctx); err != nil {
@@ -54,7 +54,7 @@ func (df driverFirestore) DeleteDriverByCPF(ctx context.Context, cpf entity.CPF)
 	return nil
 }
 
-func (df driverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
+func (df driverFirestore) FindByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
 	docSnap, err := df.client.Doc(fmt.Sprintf("%s/%s", df.coll, cpf)).Get(ctx)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
@@ -84,7 +84,7 @@ func (df driverFirestore) FindDriverByCPF(ctx context.Context, cpf entity.CPF) (
 	return driver, nil
 }
 
-func (df driverFirestore) FindDrivers(ctx context.Context, rawQ entity.FindDriversQuery) ([]*entity.Driver, error) {
+func (df driverFirestore) Find(ctx context.Context, rawQ entity.FindDriversQuery) ([]*entity.Driver, error) {
 	q := df.client.Collection(df.coll).Query
 
 	if rawQ.CNH != nil {
@@ -131,7 +131,7 @@ func (df driverFirestore) FindDrivers(ctx context.Context, rawQ entity.FindDrive
 	return drivers, nil
 }
 
-func (df driverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver) error {
+func (df driverFirestore) Save(ctx context.Context, driver *entity.Driver) error {
 	newDriverDoc := driverDoc{
 		BirthDate:  driver.BirthDate().Time,
 		CNH:        string(driver.CNH()),
@@ -153,7 +153,7 @@ func (df driverFirestore) SaveDriver(ctx context.Context, driver *entity.Driver)
 	return nil
 }
 
-func (df driverFirestore) UpdateDriver(ctx context.Context, driver *entity.Driver) error {
+func (df driverFirestore) Update(ctx context.Context, driver *entity.Driver) error {
 	driverDocument := driverDoc{
 		BirthDate:  driver.BirthDate().Time,
 		CNH:        string(driver.CNH()),

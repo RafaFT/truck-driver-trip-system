@@ -52,7 +52,7 @@ func (di updateDriver) Execute(ctx context.Context, cpf string, input UpdateDriv
 		return nil, err
 	}
 
-	driver, err := di.repo.FindDriverByCPF(ctx, driverCPF)
+	driver, err := di.repo.FindByCPF(ctx, driverCPF)
 	if err != nil {
 		switch err.(type) {
 		case entity.ErrDriverNotFound:
@@ -89,7 +89,7 @@ func (di updateDriver) Execute(ctx context.Context, cpf string, input UpdateDriv
 		}
 	}
 
-	err = di.repo.UpdateDriver(ctx, driver)
+	err = di.repo.Update(ctx, driver)
 	if err != nil {
 		di.logger.Error(err.Error())
 		return nil, err
