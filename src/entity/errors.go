@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+var ErrInvalidID = fmt.Errorf("Invalid Entity ID")
+
 type ErrDriverAlreadyExists struct {
 	msg string
 }

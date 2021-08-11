@@ -3,6 +3,7 @@ package entity
 import "time"
 
 type Trip struct {
+	id          string
 	driverCPF   CPF
 	hasLoad     bool
 	origin      Location
@@ -23,7 +24,11 @@ type TripInput struct {
 	VehicleCode     int
 }
 
-func NewTrip(input TripInput) (*Trip, error) {
+func NewTrip(id string, input TripInput) (*Trip, error) {
+	if len(id) == 0 {
+		return nil, ErrInvalidID
+	}
+
 	cpf, err := NewCPF(input.CPF)
 	if err != nil {
 		return &Trip{}, err
@@ -60,6 +65,10 @@ func NewTrip(input TripInput) (*Trip, error) {
 }
 
 // getters
+func (t *Trip) ID() string {
+	return t.id
+}
+
 func (t *Trip) CPF() CPF {
 	return t.driverCPF
 }
