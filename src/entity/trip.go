@@ -13,14 +13,14 @@ type Trip struct {
 
 type TripInput struct {
 	CPF             string
-	startDate       time.Time
-	endDate         time.Time
-	hasLoad         bool
-	originLat       float64
-	originLong      float64
-	destinationLat  float64
-	destinationLong float64
-	vehicleCode     int
+	StartDate       time.Time
+	EndDate         time.Time
+	HasLoad         bool
+	OriginLat       float64
+	OriginLong      float64
+	DestinationLat  float64
+	DestinationLong float64
+	VehicleCode     int
 }
 
 func NewTrip(input TripInput) (*Trip, error) {
@@ -29,29 +29,29 @@ func NewTrip(input TripInput) (*Trip, error) {
 		return &Trip{}, err
 	}
 
-	origin, err := NewLocation(input.originLat, input.originLong)
+	origin, err := NewLocation(input.OriginLat, input.OriginLong)
 	if err != nil {
 		return &Trip{}, err
 	}
 
-	destination, err := NewLocation(input.destinationLat, input.destinationLong)
+	destination, err := NewLocation(input.DestinationLat, input.DestinationLong)
 	if err != nil {
 		return &Trip{}, err
 	}
 
-	vehicle, err := NewVehicle(input.vehicleCode)
+	vehicle, err := NewVehicle(input.VehicleCode)
 	if err != nil {
 		return &Trip{}, err
 	}
 
-	tripTS, err := NewTripTS(input.startDate, input.endDate)
+	tripTS, err := NewTripTS(input.StartDate, input.EndDate)
 	if err != nil {
 		return &Trip{}, err
 	}
 
 	return &Trip{
 		driverCPF:   cpf,
-		hasLoad:     input.hasLoad,
+		hasLoad:     input.HasLoad,
 		origin:      origin,
 		destination: destination,
 		timeStamp:   tripTS,
