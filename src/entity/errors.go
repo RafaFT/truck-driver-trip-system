@@ -59,6 +59,10 @@ type ErrInvalidVehicleCode struct {
 	msg string
 }
 
+type ErrTripNotFound struct {
+	msg string
+}
+
 func NewErrDriverAlreadyExists(cpf CPF) ErrDriverAlreadyExists {
 	return ErrDriverAlreadyExists{
 		msg: fmt.Sprintf("Driver already exists. cpf=[%s]", cpf),
@@ -186,5 +190,15 @@ func newErrInvalidTripStartDate(startDate time.Time) ErrInvalidTripStartDate {
 }
 
 func (e ErrInvalidTripStartDate) Error() string {
+	return e.msg
+}
+
+func NewErrTripNotFound(id string) ErrTripNotFound {
+	return ErrTripNotFound{
+		msg: fmt.Sprintf("Trip not found. id=[%s]", id),
+	}
+}
+
+func (e ErrTripNotFound) Error() string {
 	return e.msg
 }
