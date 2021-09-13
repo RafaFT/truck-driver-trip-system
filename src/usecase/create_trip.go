@@ -12,7 +12,7 @@ import (
 
 // input port
 type CreateTrip interface {
-	Execute(context.Context, string, CreateTripInput) (*CreateTripOutput, error)
+	Execute(context.Context, CreateTripInput) (*CreateTripOutput, error)
 }
 
 // input port implementation - interactor
@@ -23,6 +23,7 @@ type createTrip struct {
 }
 
 type CreateTripInput struct {
+	CPF             string
 	StartDate       time.Time
 	EndDate         time.Time
 	HasLoad         bool
@@ -54,7 +55,7 @@ func NewCreateTrip(logger Logger, tripRepo entity.TripRepository, driverRepo ent
 	}
 }
 
-func (ti createTrip) Execute(ctx context.Context, cpf string, input CreateTripInput) (*CreateTripOutput, error) {
+func (ti createTrip) Execute(ctx context.Context, input CreateTripInput) (*CreateTripOutput, error) {
 	var output CreateTripOutput
 
 	tripUUID, err := uuid.NewRandom()
@@ -64,7 +65,7 @@ func (ti createTrip) Execute(ctx context.Context, cpf string, input CreateTripIn
 	}
 
 	tripInput := entity.TripInput{
-		CPF:             cpf,
+		CPF:             input.CPF,
 		StartDate:       input.StartDate,
 		EndDate:         input.EndDate,
 		HasLoad:         input.HasLoad,
