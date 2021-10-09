@@ -7,9 +7,9 @@ import (
 var minTripStartDate = minBirthDate.AddDate(minimumDriverAge, 0, 0)
 
 type TripTS struct {
-	start   time.Time
-	end     time.Time
-	seconds int
+	start    time.Time
+	end      time.Time
+	duration time.Duration
 }
 
 func NewTripTS(start, end time.Time) (TripTS, error) {
@@ -21,12 +21,10 @@ func NewTripTS(start, end time.Time) (TripTS, error) {
 		return TripTS{}, newErrInvalidTripEndDate(end)
 	}
 
-	seconds := int(end.Sub(start).Seconds())
-
 	return TripTS{
-		start:   start,
-		end:     end,
-		seconds: seconds,
+		start:    start,
+		end:      end,
+		duration: end.Sub(start),
 	}, nil
 }
 
@@ -38,6 +36,6 @@ func (t TripTS) End() time.Time {
 	return t.end
 }
 
-func (t TripTS) Seconds() int {
-	return t.seconds
+func (t TripTS) Duration() time.Duration {
+	return t.duration
 }
