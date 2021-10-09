@@ -38,6 +38,7 @@ type CreateTripOutput struct {
 	ID              string
 	StartDate       time.Time
 	EndDate         time.Time
+	Duration        time.Duration
 	HasLoad         bool
 	OriginLat       float64
 	OriginLong      float64
@@ -107,6 +108,7 @@ func (ti createTrip) Execute(ctx context.Context, input CreateTripInput) (*Creat
 		ID:              trip.ID(),
 		StartDate:       trip.StartDate(),
 		EndDate:         trip.EndDate(),
+		Duration:        trip.Duration(),
 		HasLoad:         trip.HasLoad(),
 		OriginLat:       trip.Origin().Latitude(),
 		OriginLong:      trip.Origin().Longitude(),
