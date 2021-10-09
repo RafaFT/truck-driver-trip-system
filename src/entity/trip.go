@@ -8,7 +8,7 @@ type Trip struct {
 	hasLoad     bool
 	origin      Location
 	destination Location
-	timeStamp   TripTS
+	timeStamp   tripTS
 	vehicle     Vehicle
 }
 
@@ -49,7 +49,7 @@ func NewTrip(id string, input TripInput) (*Trip, error) {
 		return &Trip{}, err
 	}
 
-	tripTS, err := NewTripTS(input.StartDate, input.EndDate)
+	tripTS, err := newTripTS(input.StartDate, input.EndDate)
 	if err != nil {
 		return &Trip{}, err
 	}
@@ -136,7 +136,7 @@ func (t *Trip) SetDestination(lat, long float64) error {
 }
 
 func (t *Trip) SetTS(start, end time.Time) error {
-	tripTS, err := NewTripTS(start, end)
+	tripTS, err := newTripTS(start, end)
 	if err != nil {
 		return err
 	}
