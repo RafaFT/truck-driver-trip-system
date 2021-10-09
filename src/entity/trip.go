@@ -98,6 +98,10 @@ func (t *Trip) Vehicle() Vehicle {
 	return t.vehicle
 }
 
+func (t *Trip) Duration() time.Duration {
+	return t.timeStamp.duration
+}
+
 // setters
 func (t *Trip) SetHasLoad(hasLoad bool) {
 	t.hasLoad = hasLoad
