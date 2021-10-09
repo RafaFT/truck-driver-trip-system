@@ -59,6 +59,10 @@ type ErrInvalidVehicleCode struct {
 	msg string
 }
 
+type ErrTripAlreadyExists struct {
+	msg string
+}
+
 type ErrTripNotFound struct {
 	msg string
 }
@@ -190,6 +194,16 @@ func newErrInvalidTripStartDate(startDate time.Time) ErrInvalidTripStartDate {
 }
 
 func (e ErrInvalidTripStartDate) Error() string {
+	return e.msg
+}
+
+func NewErrTripAlreadyExists(id string) ErrTripAlreadyExists {
+	return ErrTripAlreadyExists{
+		msg: fmt.Sprintf("Trip already exists. id=[%s]", id),
+	}
+}
+
+func (e ErrTripAlreadyExists) Error() string {
 	return e.msg
 }
 
