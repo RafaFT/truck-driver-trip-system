@@ -55,6 +55,7 @@ func NewTrip(id string, input TripInput) (*Trip, error) {
 	}
 
 	return &Trip{
+		id:          id,
 		driverCPF:   cpf,
 		hasLoad:     input.HasLoad,
 		origin:      origin,
