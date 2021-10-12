@@ -5,6 +5,7 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+	"time"
 
 	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
@@ -143,4 +144,12 @@ func getUintPointer(ui uint) *uint {
 
 func getIntPointer(i int) *int {
 	return &i
+}
+
+func getFloatPointer(f float64) *float64 {
+	return &f
+}
+
+func getDatePointer(t time.Time) *time.Time {
+	return &t
 }
