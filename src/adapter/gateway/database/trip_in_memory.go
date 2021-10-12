@@ -36,9 +36,9 @@ func (t *InMemoryTrips) Delete(ctx context.Context, id string) error {
 
 func (t *InMemoryTrips) Find(ctx context.Context, q entity.FindTripsQuery) ([]*entity.Trip, error) {
 	limit := len(t.Trips)
-	if q.Limit() != nil {
+	if q.Limit != nil {
 		// TODO: since limit is uint, it's possible limit value may be overflowed
-		if inputLimit := int(*q.Limit()); inputLimit < limit {
+		if inputLimit := int(*q.Limit); inputLimit < limit {
 			limit = inputLimit
 		}
 	}
@@ -49,13 +49,13 @@ func (t *InMemoryTrips) Find(ctx context.Context, q entity.FindTripsQuery) ([]*e
 			break
 		}
 
-		if q.CPF() != nil && trip.CPF() != *q.CPF() {
+		if q.CPF != nil && trip.CPF() != *q.CPF {
 			continue
 		}
-		if q.HasLoad() != nil && trip.HasLoad() != *q.HasLoad() {
+		if q.HasLoad != nil && trip.HasLoad() != *q.HasLoad {
 			continue
 		}
-		if q.Vehicle() != nil && trip.Vehicle() != *q.Vehicle() {
+		if q.Vehicle != nil && trip.Vehicle() != *q.Vehicle {
 			continue
 		}
 

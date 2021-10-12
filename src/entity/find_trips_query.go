@@ -1,58 +1,35 @@
 package entity
 
-type FindTripsQuery interface {
-	CPF() *CPF
-	HasLoad() *bool
-	Limit() *uint
-	Vehicle() *Vehicle
-}
-
-type findTripsQuery struct {
-	cpf     *CPF
-	hasLoad *bool
-	limit   *uint
-	vehicle *Vehicle
+type FindTripsQuery struct {
+	CPF     *CPF
+	HasLoad *bool
+	Limit   *uint
+	Vehicle *Vehicle
 }
 
 func NewFindTripsQuery(cpf *string, hasLoad *bool, limit *uint, vehicleCode *int) (FindTripsQuery, error) {
-	var q findTripsQuery
+	var q FindTripsQuery
 
 	if cpf != nil {
 		CPF, err := NewCPF(*cpf)
 		if err != nil {
-			return nil, err
+			return q, err
 		}
 
-		q.cpf = &CPF
+		q.CPF = &CPF
 	}
 
 	if vehicleCode != nil {
 		Vehicle, err := NewVehicle(*vehicleCode)
 		if err != nil {
-			return nil, err
+			return q, err
 		}
 
-		q.vehicle = &Vehicle
+		q.Vehicle = &Vehicle
 	}
 
-	q.hasLoad = hasLoad
-	q.limit = limit
+	q.HasLoad = hasLoad
+	q.Limit = limit
 
 	return q, nil
-}
-
-func (q findTripsQuery) CPF() *CPF {
-	return q.cpf
-}
-
-func (q findTripsQuery) HasLoad() *bool {
-	return q.hasLoad
-}
-
-func (q findTripsQuery) Limit() *uint {
-	return q.limit
-}
-
-func (q findTripsQuery) Vehicle() *Vehicle {
-	return q.vehicle
 }
