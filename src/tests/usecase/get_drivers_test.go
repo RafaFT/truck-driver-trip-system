@@ -140,3 +140,7 @@ func getStrPointer(s string) *string {
 func getUintPointer(ui uint) *uint {
 	return &ui
 }
+
+func getIntPointer(i int) *int {
+	return &i
+}
