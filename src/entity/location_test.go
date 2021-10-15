@@ -1,4 +1,4 @@
-package entity
+package entity_test
 
 import (
 	"reflect"
