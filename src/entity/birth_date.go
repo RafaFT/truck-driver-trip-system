@@ -18,7 +18,7 @@ func NewBirthDate(birthDate time.Time) (BirthDate, error) {
 		return BirthDate{}, newErrInvalidBirthDate(birthDate)
 	}
 
-	return BirthDate{birthDate}, nil
+	return BirthDate{birthDate.UTC()}, nil
 }
 
 func (bd BirthDate) CalculateAge() int {
