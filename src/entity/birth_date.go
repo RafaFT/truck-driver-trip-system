@@ -22,7 +22,7 @@ func NewBirthDate(birthDate time.Time) (BirthDate, error) {
 }
 
 func (bd BirthDate) age() int {
-	now := time.Now()
+	now := time.Now().UTC()
 
 	years := now.Year() - bd.Year()
 	if years < 0 {
