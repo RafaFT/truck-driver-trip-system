@@ -1,41 +1,42 @@
-package entity_test
+package entity
 
 import (
-	"reflect"
+	"errors"
 	"testing"
-
-	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
 func TestCNHType(t *testing.T) {
 	tests := []struct {
-		input string
-		want  entity.CNH
-		err   error
+		input   string
+		want    CNH
+		wantErr error
 	}{
 		// invalid input
-		{"", "", entity.ErrInvalidCNH{}},
-		{"not even trying", "", entity.ErrInvalidCNH{}},
-		{"f", "", entity.ErrInvalidCNH{}},
-		{"0", "", entity.ErrInvalidCNH{}},
-		{"é", "", entity.ErrInvalidCNH{}},
-		{"ẽ", "", entity.ErrInvalidCNH{}},
-		{"ç", "", entity.ErrInvalidCNH{}},
+		{"", "", newErrInvalidCNH("")},
+		{"not even trying", "", newErrInvalidCNH("not even trying")},
+		{"f", "", newErrInvalidCNH("f")},
+		{"0", "", newErrInvalidCNH("0")},
+		{"é", "", newErrInvalidCNH("é")},
+		{"ẽ", "", newErrInvalidCNH("ẽ")},
+		{"ç", "", newErrInvalidCNH("ç")},
 		// valid input
-		{"A", "A", nil},
-		{"B", "B", nil},
-		{"C", "C", nil},
-		{"d", "D", nil},
-		{"e", "E", nil},
+		{"A", CNH("A"), nil},
+		{"B", CNH("B"), nil},
+		{"C", CNH("C"), nil},
+		{"d", CNH("D"), nil},
+		{"e", CNH("E"), nil},
 	}
 
-	for _, test := range tests {
-		got, gotError := entity.NewCNH(test.input)
+	for i, test := range tests {
+		got, gotErr := NewCNH(test.input)
 
-		if test.want != got || reflect.TypeOf(test.err) != reflect.TypeOf(gotError) {
-			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
-				test.input, test.want, test.err, got, gotError,
-			)
+		if !errors.Is(test.wantErr, gotErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
+			continue
+		}
+
+		if test.want != got {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
 		}
 	}
 }

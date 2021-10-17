@@ -38,7 +38,3 @@ func (bd BirthDate) age() int {
 
 	return years
 }
-
-func MinBirthDate() time.Time {
-	return minBirthDate
-}

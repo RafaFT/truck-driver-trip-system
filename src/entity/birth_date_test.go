@@ -1,54 +1,70 @@
-package entity_test
+package entity
 
 import (
-	"reflect"
+	"errors"
 	"testing"
 	"time"
-
-	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
 func TestNewBirthDate(t *testing.T) {
+	moscowLocation, _ := time.LoadLocation("Europe/Moscow")
+	torontoLocation, _ := time.LoadLocation("America/Toronto")
+
 	tests := []struct {
-		input time.Time
-		want  entity.BirthDate
-		err   error
+		input   time.Time
+		want    BirthDate
+		wantErr error
 	}{
-		{
-			entity.MinBirthDate().AddDate(0, 0, -1),
-			entity.BirthDate{time.Time{}},
-			entity.ErrInvalidBirthDate{},
-		},
+		// invalid input
 		{
 			time.Time{},
-			entity.BirthDate{time.Time{}},
-			entity.ErrInvalidBirthDate{},
+			BirthDate{},
+			newErrInvalidBirthDate(time.Time{}),
 		},
 		{
-			entity.MinBirthDate(),
-			entity.BirthDate{entity.MinBirthDate()},
+			minBirthDate.AddDate(0, 0, -1),
+			BirthDate{},
+			newErrInvalidBirthDate(minBirthDate.AddDate(0, 0, -1)),
+		},
+		{ // +3 UTC offset
+			time.Date(1950, 1, 1, 2, 59, 59, 0, moscowLocation),
+			BirthDate{},
+			newErrInvalidBirthDate(time.Date(1950, 1, 1, 2, 59, 59, 0, moscowLocation)),
+		},
+		// valid input
+		{
+			minBirthDate,
+			BirthDate{minBirthDate},
 			nil,
 		},
 		{
 			time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC),
-			entity.BirthDate{time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC)},
+			BirthDate{time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC)},
+			nil,
+		},
+		{ // -5 UTC offset
+			time.Date(1949, 12, 31, 19, 0, 0, 0, torontoLocation),
+			BirthDate{time.Date(1950, 1, 1, 0, 0, 0, 0, time.UTC)},
 			nil,
 		},
 	}
 
-	for _, test := range tests {
-		got, gotErr := entity.NewBirthDate(test.input)
+	for i, test := range tests {
+		got, gotErr := NewBirthDate(test.input)
 
-		if !got.Time.Equal(test.want.Time) || reflect.TypeOf(test.err) != reflect.TypeOf(gotErr) {
-			t.Errorf("[input: %v] [want: %v] [err: %v] [got: %v] [gotErr: %v]",
-				test.input, test.want, test.err, got, gotErr,
-			)
+		if !errors.Is(test.wantErr, gotErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
+			continue
+		}
+
+		if !got.Time.Equal(test.want.Time) {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
 		}
 	}
 }
 
 func TestCalculateAge(t *testing.T) {
-	now := time.Now()
+	now := time.Now().UTC()
 
 	tests := []struct {
 		input time.Time
@@ -64,13 +80,11 @@ func TestCalculateAge(t *testing.T) {
 		{now.AddDate(-20, -12, 1), 20},
 	}
 
-	for _, test := range tests {
-		bd, _ := entity.NewBirthDate(test.input)
+	for i, test := range tests {
+		bd, _ := NewBirthDate(test.input)
 
-		if got := bd.CalculateAge(); got != test.want {
-			t.Errorf("[input: %v] [want: %v] [got: %v]",
-				test.input, test.want, got,
-			)
+		if got := bd.age(); got != test.want {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
 		}
 	}
 }

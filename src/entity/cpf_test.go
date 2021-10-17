@@ -1,41 +1,42 @@
-package entity_test
+package entity
 
 import (
-	"reflect"
+	"errors"
 	"testing"
-
-	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
 func TestNewCPF(t *testing.T) {
 	tests := []struct {
-		input string
-		want  entity.CPF
-		err   error
+		input   string
+		want    CPF
+		wantErr error
 	}{
-		// invalid CPF values
-		{"", "", entity.ErrInvalidCPF{}},
-		{"not even trying", "", entity.ErrInvalidCPF{}},
-		{"12345678901", "", entity.ErrInvalidCPF{}},
-		{"00000000000", "", entity.ErrInvalidCPF{}},
-		{"10804773069", "", entity.ErrInvalidCPF{}},
-		{"643.512.830-84", "", entity.ErrInvalidCPF{}},
-		{"64351283084a", "", entity.ErrInvalidCPF{}},
-		{"64351f283084", "", entity.ErrInvalidCPF{}},
-		// valid cases
-		{"64351283084", entity.CPF("64351283084"), nil},
-		{"10804773068", entity.CPF("10804773068"), nil},
-		{"14316382004", entity.CPF("14316382004"), nil},
-		{"54692539020", entity.CPF("54692539020"), nil},
+		// invalid input
+		{"", "", newErrInvalidCPF("")},
+		{"not even trying", "", newErrInvalidCPF("not even trying")},
+		{"12345678901", "", newErrInvalidCPF("12345678901")},
+		{"00000000000", "", newErrInvalidCPF("00000000000")},
+		{"10804773069", "", newErrInvalidCPF("10804773069")},
+		{"643.512.830-84", "", newErrInvalidCPF("643.512.830-84")},
+		{"64351283084a", "", newErrInvalidCPF("64351283084a")},
+		{"64351f283084", "", newErrInvalidCPF("64351f283084")},
+		// valid input
+		{"64351283084", CPF("64351283084"), nil},
+		{"10804773068", CPF("10804773068"), nil},
+		{"14316382004", CPF("14316382004"), nil},
+		{"54692539020", CPF("54692539020"), nil},
 	}
 
-	for _, test := range tests {
-		got, gotErr := entity.NewCPF(test.input)
+	for i, test := range tests {
+		got, gotErr := NewCPF(test.input)
 
-		if test.want != got || reflect.TypeOf(gotErr) != reflect.TypeOf(test.err) {
-			t.Errorf("[input: %v] [want: %v] [err: %v] [got: %v] [gotErr: %v]",
-				test.input, test.want, test.err, got, gotErr,
-			)
+		if !errors.Is(test.wantErr, gotErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
+			continue
+		}
+
+		if test.want != got {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
 		}
 	}
 }

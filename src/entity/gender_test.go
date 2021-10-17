@@ -1,41 +1,42 @@
-package entity_test
+package entity
 
 import (
-	"reflect"
+	"errors"
 	"testing"
-
-	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
 func TestGender(t *testing.T) {
 	tests := []struct {
-		input string
-		want  entity.Gender
-		err   error
+		input   string
+		want    Gender
+		wantErr error
 	}{
 		// invalid input
-		{"", "", entity.ErrInvalidGender{}},
-		{"not even trying", "", entity.ErrInvalidGender{}},
-		{"a", "", entity.ErrInvalidGender{}},
-		{"5", "", entity.ErrInvalidGender{}},
-		{"Ó", "", entity.ErrInvalidGender{}},
-		{"ô", "", entity.ErrInvalidGender{}},
+		{"", "", newErrInvalidGender("")},
+		{"not even trying", "", newErrInvalidGender("not even trying")},
+		{"a", "", newErrInvalidGender("a")},
+		{"5", "", newErrInvalidGender("5")},
+		{"Ó", "", newErrInvalidGender("Ó")},
+		{"ô", "", newErrInvalidGender("ô")},
 		// valid input
-		{"M", entity.Gender("M"), nil},
-		{"F", entity.Gender("F"), nil},
-		{"O", entity.Gender("O"), nil},
-		{"m", entity.Gender("M"), nil},
-		{"f", entity.Gender("F"), nil},
-		{"o", entity.Gender("O"), nil},
+		{"M", Gender("M"), nil},
+		{"F", Gender("F"), nil},
+		{"O", Gender("O"), nil},
+		{"m", Gender("M"), nil},
+		{"f", Gender("F"), nil},
+		{"o", Gender("O"), nil},
 	}
 
-	for _, test := range tests {
-		got, gotError := entity.NewGender(test.input)
+	for i, test := range tests {
+		got, gotErr := NewGender(test.input)
 
-		if test.want != got || reflect.TypeOf(test.err) != reflect.TypeOf(gotError) {
-			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
-				test.input, test.want, test.err, got, gotError,
-			)
+		if !errors.Is(test.wantErr, gotErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
+			continue
+		}
+
+		if test.want != got {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
 		}
 	}
 }

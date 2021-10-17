@@ -1,34 +1,35 @@
-package entity_test
+package entity
 
 import (
-	"reflect"
+	"errors"
 	"testing"
-
-	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
 func TestVehicle(t *testing.T) {
 	tests := []struct {
-		input int
-		want  entity.Vehicle
-		err   error
+		input   int
+		want    Vehicle
+		wantErr error
 	}{
 		// invalid input
-		{-1, "", entity.ErrInvalidVehicleCode{}},
-		{300, "", entity.ErrInvalidVehicleCode{}},
+		{-1, "", newErrInvalidVehicleCode(-1)},
+		{300, "", newErrInvalidVehicleCode(300)},
 		// valid input
-		{0, entity.Truck, nil},
-		{1, entity.Truck_34, nil},
-		{2, entity.StumpTruck, nil},
+		{0, Truck, nil},
+		{1, Truck_34, nil},
+		{2, StumpTruck, nil},
 	}
 
-	for _, test := range tests {
-		got, gotError := entity.NewVehicle(test.input)
+	for i, test := range tests {
+		got, gotErr := NewVehicle(test.input)
 
-		if test.want != got || reflect.TypeOf(test.err) != reflect.TypeOf(gotError) {
-			t.Errorf("[input: %v] [want: %v] [error: %v] [got: %v] [gotError: %v]",
-				test.input, test.want, test.err, got, gotError,
-			)
+		if !errors.Is(test.wantErr, gotErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
+			continue
+		}
+
+		if test.want != got {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
 		}
 	}
 }
