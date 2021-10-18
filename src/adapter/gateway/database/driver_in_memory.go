@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
+	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
 // driver repository mock implementation
@@ -11,7 +12,7 @@ type InMemoryDrivers struct {
 	Drivers []*entity.Driver
 }
 
-func NewDriverInMemory(drivers []*entity.Driver) entity.DriverRepository {
+func NewDriverInMemory(drivers []*entity.Driver) usecase.DriverRepository {
 	return &InMemoryDrivers{
 		Drivers: drivers,
 	}
@@ -40,7 +41,7 @@ func (d *InMemoryDrivers) FindByCPF(ctx context.Context, cpf entity.CPF) (*entit
 	return nil, entity.NewErrDriverNotFound(cpf)
 }
 
-func (d *InMemoryDrivers) Find(ctx context.Context, q entity.FindDriversQuery) ([]*entity.Driver, error) {
+func (d *InMemoryDrivers) Find(ctx context.Context, q usecase.FindDriversQuery) ([]*entity.Driver, error) {
 	limit := len(d.Drivers)
 	if q.Limit != nil {
 		limit = int(*q.Limit)

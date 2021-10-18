@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
+	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
 // trip repository in memory implementation
@@ -11,7 +12,7 @@ type InMemoryTrips struct {
 	Trips map[string]entity.Trip
 }
 
-func NewTripInMemory(trips []*entity.Trip) entity.TripRepository {
+func NewTripInMemory(trips []*entity.Trip) usecase.TripRepository {
 	internalTrips := make(map[string]entity.Trip, len(trips))
 
 	for _, trip := range trips {
@@ -34,7 +35,7 @@ func (t *InMemoryTrips) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (t *InMemoryTrips) Find(ctx context.Context, q entity.FindTripsQuery) ([]*entity.Trip, error) {
+func (t *InMemoryTrips) Find(ctx context.Context, q usecase.FindTripsQuery) ([]*entity.Trip, error) {
 	limit := len(t.Trips)
 	if q.Limit != nil {
 		// TODO: since limit is uint, it's possible limit value may be overflowed

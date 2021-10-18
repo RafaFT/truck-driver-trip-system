@@ -9,36 +9,43 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port
-type UpdateDriver interface {
-	Execute(context.Context, string, UpdateDriverInput) (*UpdateDriverOutput, error)
-}
+type (
+	// input port
+	UpdateDriver interface {
+		Execute(context.Context, string, UpdateDriverInput) (*UpdateDriverOutput, error)
+	}
 
-// input port implementation - Interactor
-type updateDriver struct {
-	logger Logger
-	repo   entity.DriverRepository
-}
+	UpdateDriverRepo interface {
+		FindByCPF(context.Context, entity.CPF) (*entity.Driver, error)
+		Update(context.Context, *entity.Driver) error
+	}
 
-type UpdateDriverInput struct {
-	CNH        *string
-	Gender     *string
-	HasVehicle *bool
-	Name       *string
-}
+	// input port implementation - Interactor
+	updateDriver struct {
+		logger Logger
+		repo   UpdateDriverRepo
+	}
 
-type UpdateDriverOutput struct {
-	Age        int
-	BirthDate  time.Time
-	CNH        string
-	CPF        string
-	Gender     string
-	HasVehicle bool
-	Name       string
-	UpdatedAt  time.Time
-}
+	UpdateDriverInput struct {
+		CNH        *string
+		Gender     *string
+		HasVehicle *bool
+		Name       *string
+	}
 
-func NewUpdateDriver(logger Logger, repo entity.DriverRepository) UpdateDriver {
+	UpdateDriverOutput struct {
+		Age        int
+		BirthDate  time.Time
+		CNH        string
+		CPF        string
+		Gender     string
+		HasVehicle bool
+		Name       string
+		UpdatedAt  time.Time
+	}
+)
+
+func NewUpdateDriver(logger Logger, repo UpdateDriverRepo) UpdateDriver {
 	return updateDriver{
 		logger: logger,
 		repo:   repo,

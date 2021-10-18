@@ -7,32 +7,38 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port
-type GetTrip interface {
-	Execute(context.Context, string) (*GetTripOutput, error)
-}
+type (
+	// input port
+	GetTrip interface {
+		Execute(context.Context, string) (*GetTripOutput, error)
+	}
 
-// input port implementation - interactor
-type getTrip struct {
-	logger Logger
-	repo   entity.TripRepository
-}
+	GetTripRepo interface {
+		FindByID(context.Context, string) (*entity.Trip, error)
+	}
 
-type GetTripOutput struct {
-	ID              string
-	StartDate       time.Time
-	EndDate         time.Time
-	Duration        time.Duration
-	HasLoad         bool
-	OriginLat       float64
-	OriginLong      float64
-	DestinationLat  float64
-	DestinationLong float64
-	Vehicle         string
-}
+	// input port implementation - interactor
+	getTrip struct {
+		logger Logger
+		repo   GetTripRepo
+	}
+
+	GetTripOutput struct {
+		ID              string
+		StartDate       time.Time
+		EndDate         time.Time
+		Duration        time.Duration
+		HasLoad         bool
+		OriginLat       float64
+		OriginLong      float64
+		DestinationLat  float64
+		DestinationLong float64
+		Vehicle         string
+	}
+)
 
 // NewGetTrip returns input port implementation for getting Trip by ID
-func NewGetTrip(logger Logger, repo entity.TripRepository) GetTrip {
+func NewGetTrip(logger Logger, repo GetTripRepo) GetTrip {
 	return getTrip{
 		logger: logger,
 		repo:   repo,
