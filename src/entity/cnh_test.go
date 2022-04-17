@@ -12,13 +12,13 @@ func TestCNHType(t *testing.T) {
 		wantErr error
 	}{
 		// invalid input
-		{"", "", newErrInvalidCNH("")},
-		{"not even trying", "", newErrInvalidCNH("not even trying")},
-		{"f", "", newErrInvalidCNH("f")},
-		{"0", "", newErrInvalidCNH("0")},
-		{"é", "", newErrInvalidCNH("é")},
-		{"ẽ", "", newErrInvalidCNH("ẽ")},
-		{"ç", "", newErrInvalidCNH("ç")},
+		{"", "", NewErrInvalidCNH("")},
+		{"not even trying", "", NewErrInvalidCNH("not even trying")},
+		{"f", "", NewErrInvalidCNH("f")},
+		{"0", "", NewErrInvalidCNH("0")},
+		{"é", "", NewErrInvalidCNH("é")},
+		{"ẽ", "", NewErrInvalidCNH("ẽ")},
+		{"ç", "", NewErrInvalidCNH("ç")},
 		// valid input
 		{"A", CNH("A"), nil},
 		{"B", CNH("B"), nil},

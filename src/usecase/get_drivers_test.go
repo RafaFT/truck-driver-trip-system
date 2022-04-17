@@ -1,4 +1,4 @@
-package usecase_test
+package usecase
 
 import (
 	"context"
@@ -7,125 +7,140 @@ import (
 	"testing"
 	"time"
 
-	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
-	"github.com/rafaft/truck-driver-trip-system/tests/samples"
-	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
+type mockGetDriverRepo struct {
+	drivers []*entity.Driver
+	err     error
+}
+
+func (repo mockGetDriverRepo) Find(ctx context.Context, query FindDriversQuery) ([]*entity.Driver, error) {
+	return repo.drivers, repo.err
+}
+
 func TestGetDrivers(t *testing.T) {
-	l := log.NewFakeLogger()
-	r := repository.NewDriverInMemory(samples.GetDrivers(t))
-	uc := usecase.NewGetDrivers(l, r)
+	now := time.Now()
+	driver1, _ := entity.NewDriver(
+		"75839001074",
+		"name",
+		"F",
+		"a",
+		now.AddDate(-20, 0, 0),
+		true,
+	)
+	driver2, _ := entity.NewDriver(
+		"29321569006",
+		"Joaquim",
+		"O",
+		"b",
+		now.AddDate(-25, 0, 0),
+		false,
+	)
 
 	tests := []struct {
-		input usecase.GetDriversQuery
-		// want    []*usecase.GetDriversOutput
-		wantLen int
-		err     error
+		input GetDriversQuery
+		repo  GetDriverRepo
+		want  []*GetDriversOutput
 	}{
-		// invalid
 		{
-			input: usecase.GetDriversQuery{
-				CNH: getStrPointer("f"), // invalid CNH
+			GetDriversQuery{},
+			mockGetDriverRepo{},
+			[]*GetDriversOutput{},
+		},
+		{
+			GetDriversQuery{},
+			mockGetDriverRepo{
+				drivers: []*entity.Driver{
+					driver1,
+					driver2,
+				},
 			},
-			// want:    nil,
-			wantLen: -1,
-			err:     entity.ErrInvalidCNH{},
-		},
-		{
-			input: usecase.GetDriversQuery{
-				Gender: getStrPointer("a"), // invalid Gender
+			[]*GetDriversOutput{
+				{
+					Age:        20,
+					BirthDate:  now.AddDate(-20, 0, 0).UTC(),
+					CNH:        "A",
+					CPF:        "75839001074",
+					Gender:     "F",
+					HasVehicle: true,
+					Name:       "name",
+				},
+				{
+					Age:        25,
+					BirthDate:  now.AddDate(-25, 0, 0).UTC(),
+					CNH:        "B",
+					CPF:        "29321569006",
+					Gender:     "O",
+					HasVehicle: false,
+					Name:       "joaquim",
+				},
 			},
-			// want:    nil,
-			wantLen: -1,
-			err:     entity.ErrInvalidGender{},
-		},
-		// valid
-		{
-			input: usecase.GetDriversQuery{},
-			// want:    nil,
-			wantLen: 20,
-			err:     nil,
 		},
 		{
-			input: usecase.GetDriversQuery{
-				Limit: getUintPointer(0),
-			},
-			// want:    nil,
-			wantLen: 0,
-			err:     nil,
-		},
-		{
-			input: usecase.GetDriversQuery{
-				CNH: getStrPointer("a"),
-			},
-			// want:    nil,
-			wantLen: 4,
-			err:     nil,
-		},
-		{
-			input: usecase.GetDriversQuery{
-				CNH:    getStrPointer("a"),
-				Gender: getStrPointer("M"),
-			},
-			// want:    nil,
-			wantLen: 2,
-			err:     nil,
-		},
-		{
-			input: usecase.GetDriversQuery{
-				CNH:    getStrPointer("A"),
-				Gender: getStrPointer("m"),
-				Limit:  getUintPointer(1),
-			},
-			// want:    nil,
-			wantLen: 1,
-			err:     nil,
-		},
-		{
-			input: usecase.GetDriversQuery{
-				HasVehicle: getBoolPointer(true),
-			},
-			// want:    nil,
-			wantLen: 10,
-			err:     nil,
-		},
-		{
-			input: usecase.GetDriversQuery{
-				CNH:        getStrPointer("e"),
-				Gender:     getStrPointer("F"),
+			GetDriversQuery{
+				CNH:        getStrPointer("B"),
+				Gender:     getStrPointer("M"),
 				HasVehicle: getBoolPointer(false),
+				Limit:      getUintPointer(1),
 			},
-			// want: []*usecase.GetDriversOutput{
-			// 	&usecase.GetDriversOutput{
-			// 		Age:        30,
-			// 		BirthDate:  time.Now().AddDate(-30, 0, 0),
-			// 		CNH:        "E",
-			// 		CPF:        "45464490388",
-			// 		Gender:     "F",
-			// 		HasVehicle: false,
-			// 		Name:       "bárbara valentina ana barros",
-			// 	},
-			// },
-			wantLen: 1,
-			err:     nil,
+			mockGetDriverRepo{},
+			[]*GetDriversOutput{},
 		},
 	}
 
 	for i, test := range tests {
+		uc := NewGetDrivers(fakeLogger{}, test.repo)
 		got, gotErr := uc.Execute(context.Background(), test.input)
 
-		if err := errors.Unwrap(gotErr); reflect.TypeOf(test.err) != reflect.TypeOf(err) {
-			t.Errorf("%d: [wantErr: %v] [gotErr: %v]", i, test.err, err)
+		if got == nil || gotErr != nil {
+			t.Errorf("%d: [input: %v] [wantErr: <nil>] [gotErr: %v]", i, test.input, gotErr)
 			continue
 		}
 
-		// test.want == -1 signals that the result length check should be ignored
-		if test.wantLen != -1 && test.wantLen != len(got) {
-			t.Errorf("%d: [wantLen: %v] [gotLen: %v]", i, test.wantLen, len(got))
-			continue
+		if !reflect.DeepEqual(test.want, got) {
+			t.Errorf("%d:  [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
+		}
+	}
+}
+
+func TestGetDriversErr(t *testing.T) {
+	networkErr := errors.New("some network err")
+
+	tests := []struct {
+		input   GetDriversQuery
+		repo    GetDriverRepo
+		wantErr error
+	}{
+		{
+			GetDriversQuery{
+				CNH: getStrPointer("f"),
+			},
+			mockGetDriverRepo{},
+			entity.NewErrInvalidCNH("f"),
+		},
+		{
+			GetDriversQuery{
+				Gender: getStrPointer(""),
+			},
+			mockGetDriverRepo{},
+			entity.NewErrInvalidGender(""),
+		},
+		{
+			GetDriversQuery{},
+			mockGetDriverRepo{
+				err: networkErr,
+			},
+			networkErr,
+		},
+	}
+
+	for i, test := range tests {
+		uc := NewGetDrivers(fakeLogger{}, test.repo)
+		_, gotErr := uc.Execute(context.Background(), test.input)
+
+		if !errors.Is(gotErr, test.wantErr) {
+			t.Errorf("%d: [wantErr: %v] [gotErr: %v]", i, test.wantErr, gotErr)
 		}
 	}
 }

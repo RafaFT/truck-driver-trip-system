@@ -12,8 +12,8 @@ func TestVehicle(t *testing.T) {
 		wantErr error
 	}{
 		// invalid input
-		{-1, "", newErrInvalidVehicleCode(-1)},
-		{300, "", newErrInvalidVehicleCode(300)},
+		{-1, "", NewErrInvalidVehicleCode(-1)},
+		{300, "", NewErrInvalidVehicleCode(300)},
 		// valid input
 		{0, Truck, nil},
 		{1, Truck_34, nil},

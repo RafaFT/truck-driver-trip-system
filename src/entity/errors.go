@@ -87,7 +87,7 @@ func (e ErrDriverNotFound) Error() string {
 	return e.msg
 }
 
-func newErrInvalidAge(age int) ErrInvalidAge {
+func NewErrInvalidAge(age int) ErrInvalidAge {
 	return ErrInvalidAge{
 		msg: fmt.Sprintf("Age invalid. age=[%d]", age),
 	}
@@ -107,7 +107,7 @@ func (e ErrInvalidBirthDate) Error() string {
 	return e.msg
 }
 
-func newErrInvalidCNH(cnh string) ErrInvalidCNH {
+func NewErrInvalidCNH(cnh string) ErrInvalidCNH {
 	return ErrInvalidCNH{
 		msg: fmt.Sprintf("CNH invalid. cnh=[%s]", cnh),
 	}
@@ -117,7 +117,7 @@ func (e ErrInvalidCNH) Error() string {
 	return e.msg
 }
 
-func newErrInvalidCPF(cpf string) ErrInvalidCPF {
+func NewErrInvalidCPF(cpf string) ErrInvalidCPF {
 	return ErrInvalidCPF{
 		msg: fmt.Sprintf("CPF invalid. cpf=[%s]", cpf),
 	}
@@ -127,7 +127,7 @@ func (e ErrInvalidCPF) Error() string {
 	return e.msg
 }
 
-func newErrInvalidGender(gender string) ErrInvalidGender {
+func NewErrInvalidGender(gender string) ErrInvalidGender {
 	return ErrInvalidGender{
 		msg: fmt.Sprintf("Gender invalid. gender=[%s]", gender),
 	}
@@ -137,7 +137,7 @@ func (e ErrInvalidGender) Error() string {
 	return e.msg
 }
 
-func newErrInvalidLatitude(lat float64) ErrInvalidLatitude {
+func NewErrInvalidLatitude(lat float64) ErrInvalidLatitude {
 	return ErrInvalidLatitude{
 		msg: fmt.Sprintf("Latitude out of range. latitude=[%f]", lat),
 	}
@@ -147,7 +147,7 @@ func (e ErrInvalidLatitude) Error() string {
 	return e.msg
 }
 
-func newErrInvalidLongitude(lat float64) ErrInvalidLongitude {
+func NewErrInvalidLongitude(lat float64) ErrInvalidLongitude {
 	return ErrInvalidLongitude{
 		msg: fmt.Sprintf("Longitude out of range. longitude=[%f]", lat),
 	}
@@ -157,7 +157,7 @@ func (e ErrInvalidLongitude) Error() string {
 	return e.msg
 }
 
-func newErrInvalidName(name string) ErrInvalidName {
+func NewErrInvalidName(name string) ErrInvalidName {
 	return ErrInvalidName{
 		msg: fmt.Sprintf("Name invalid. name=[%s]", name),
 	}
@@ -167,7 +167,7 @@ func (e ErrInvalidName) Error() string {
 	return e.msg
 }
 
-func newErrInvalidVehicleCode(vehicleCode int) ErrInvalidVehicleCode {
+func NewErrInvalidVehicleCode(vehicleCode int) ErrInvalidVehicleCode {
 	return ErrInvalidVehicleCode{
 		msg: fmt.Sprintf("Vehicle code invalid. code=[%d]", vehicleCode),
 	}
@@ -177,7 +177,7 @@ func (e ErrInvalidVehicleCode) Error() string {
 	return e.msg
 }
 
-func newErrInvalidTripEndDate(endDate time.Time) ErrInvalidTripEndDate {
+func NewErrInvalidTripEndDate(endDate time.Time) ErrInvalidTripEndDate {
 	return ErrInvalidTripEndDate{
 		msg: fmt.Sprintf("Trip end date invalid. date=[%s]", endDate),
 	}
@@ -187,7 +187,7 @@ func (e ErrInvalidTripEndDate) Error() string {
 	return e.msg
 }
 
-func newErrInvalidTripStartDate(startDate time.Time) ErrInvalidTripStartDate {
+func NewErrInvalidTripStartDate(startDate time.Time) ErrInvalidTripStartDate {
 	return ErrInvalidTripStartDate{
 		msg: fmt.Sprintf("Trip start date invalid. date=[%s]", startDate),
 	}

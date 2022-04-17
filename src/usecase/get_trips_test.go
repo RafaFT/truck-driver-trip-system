@@ -1,114 +1,156 @@
-package usecase_test
+package usecase
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"testing"
+	"time"
 
-	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
-	"github.com/rafaft/truck-driver-trip-system/tests/samples"
-	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
-func TestGetTripsErrors(t *testing.T) {
-	logger := log.NewFakeLogger()
-	tripRepo := repository.NewTripInMemory(nil)
-	uc := usecase.NewGetTrips(logger, tripRepo)
+type mockGetTripsRepo struct {
+	trips []*entity.Trip
+	err   error
+}
+
+func (r mockGetTripsRepo) Find(ctx context.Context, query FindTripsQuery) ([]*entity.Trip, error) {
+	return r.trips, r.err
+}
+
+func TestGetTrips(t *testing.T) {
+	now := time.Now().UTC()
+	trip1, _ := entity.NewTrip(
+		"ID1",
+		entity.TripInput{
+			CPF:             "31519028040",
+			StartDate:       now.AddDate(-1, 0, -1),
+			EndDate:         now.AddDate(-1, 0, 0),
+			HasLoad:         true,
+			OriginLat:       -23.5,
+			OriginLong:      -46.6,
+			DestinationLat:  10,
+			DestinationLong: 11,
+			VehicleCode:     0,
+		},
+	)
+	trip2, _ := entity.NewTrip(
+		"ID2",
+		entity.TripInput{
+			CPF:             "95580146051",
+			StartDate:       now.AddDate(-2, -1, -1),
+			EndDate:         now.AddDate(-2, -1, 0),
+			HasLoad:         false,
+			OriginLat:       1,
+			OriginLong:      2,
+			DestinationLat:  3,
+			DestinationLong: 4,
+			VehicleCode:     1,
+		},
+	)
 
 	tests := []struct {
-		input usecase.GetTripsInput
-		err   error
+		query GetTripsInput
+		repo  GetTripsRepo
+		want  []*GetTripsOutput
 	}{
 		{
-			input: usecase.GetTripsInput{
-				CPF:         getStrPointer("123"), // invalid CPF
-				HasLoad:     getBoolPointer(true),
-				Limit:       getUintPointer(5),
-				VehicleCode: getIntPointer(0),
-			},
-			err: entity.ErrInvalidCPF{},
+			GetTripsInput{},
+			mockGetTripsRepo{},
+			[]*GetTripsOutput{},
 		},
 		{
-			input: usecase.GetTripsInput{
-				CPF:         getStrPointer("48027285062"),
-				HasLoad:     getBoolPointer(true),
-				Limit:       getUintPointer(5),
-				VehicleCode: getIntPointer(-1), // invalid code
+			GetTripsInput{
+				Limit: getUintPointer(10),
 			},
-			err: entity.ErrInvalidVehicleCode{},
+			mockGetTripsRepo{
+				trips: []*entity.Trip{
+					trip1,
+					trip2,
+				},
+			},
+			[]*GetTripsOutput{
+				{
+					ID:              "ID1",
+					StartDate:       now.AddDate(-1, 0, -1),
+					EndDate:         now.AddDate(-1, 0, 0),
+					Duration:        now.AddDate(-1, 0, 0).Sub(now.AddDate(-1, 0, -1)),
+					HasLoad:         true,
+					OriginLat:       -23.5,
+					OriginLong:      -46.6,
+					DestinationLat:  10,
+					DestinationLong: 11,
+					Vehicle:         "TRUCK",
+				},
+				{
+					ID:              "ID2",
+					StartDate:       now.AddDate(-2, -1, -1),
+					EndDate:         now.AddDate(-2, -1, 0),
+					Duration:        now.AddDate(-2, -1, 0).Sub(now.AddDate(-2, -1, -1)),
+					HasLoad:         false,
+					OriginLat:       1,
+					OriginLong:      2,
+					DestinationLat:  3,
+					DestinationLong: 4,
+					Vehicle:         "3/4Truck",
+				},
+			},
 		},
 	}
 
 	for i, test := range tests {
-		_, gotErr := uc.Execute(context.Background(), test.input)
+		uc := NewGetTrips(fakeLogger{}, test.repo)
+		got, gotErr := uc.Execute(context.Background(), test.query)
 
-		if reflect.TypeOf(test.err) != reflect.TypeOf(gotErr) {
-			t.Errorf("%d: [wantErr: %v] [gotErr: %v]", i, test.err, gotErr)
+		if got == nil || gotErr != nil {
+			t.Errorf("%d: [input: %v] [wantErr: <nil>] [gotErr: %v]", i, test.query, gotErr)
+			continue
+		}
+
+		if !reflect.DeepEqual(test.want, got) {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.query, test.want, got)
 		}
 	}
 }
 
-func TestGetTrips(t *testing.T) {
-	logger := log.NewFakeLogger()
-	tripRepo := repository.NewTripInMemory(samples.GetTrips(t))
-	uc := usecase.NewGetTrips(logger, tripRepo)
+func TestGetTripsErr(t *testing.T) {
+	networkError := errors.New("some repo network error")
 
 	tests := []struct {
-		input   usecase.GetTripsInput
-		wantLen int
-		err     error
+		query   GetTripsInput
+		repo    GetTripsRepo
+		wantErr error
 	}{
 		{
-			input: usecase.GetTripsInput{
-				CPF: getStrPointer("51598390031"),
+			GetTripsInput{
+				CPF: getStrPointer("12345678901"),
 			},
-			wantLen: 3,
-			err:     nil,
+			mockGetTripsRepo{},
+			entity.NewErrInvalidCPF("12345678901"),
 		},
 		{
-			input: usecase.GetTripsInput{
-				HasLoad: getBoolPointer(false),
+			GetTripsInput{
+				VehicleCode: getIntPointer(-3),
 			},
-			wantLen: 1,
-			err:     nil,
+			mockGetTripsRepo{},
+			entity.NewErrInvalidVehicleCode(-3),
 		},
 		{
-			input: usecase.GetTripsInput{
-				CPF:     getStrPointer("51598390031"),
-				HasLoad: getBoolPointer(false),
+			GetTripsInput{},
+			mockGetTripsRepo{
+				err: networkError,
 			},
-			wantLen: 0,
-			err:     nil,
-		},
-		{
-			input: usecase.GetTripsInput{
-				CPF:         getStrPointer("51598390031"),
-				VehicleCode: getIntPointer(0),
-			},
-			wantLen: 1,
-			err:     nil,
-		},
-		{
-			input: usecase.GetTripsInput{
-				Limit: getUintPointer(2),
-			},
-			wantLen: 2,
-			err:     nil,
+			networkError,
 		},
 	}
 
 	for i, test := range tests {
-		got, gotErr := uc.Execute(context.Background(), test.input)
+		uc := NewGetTrips(fakeLogger{}, test.repo)
+		_, gotErr := uc.Execute(context.Background(), test.query)
 
-		if gotErr != nil {
-			t.Errorf("%d: unexpected error -> [gotErr: %v]", i, gotErr)
-			continue
-		}
-
-		if len(got) != test.wantLen {
-			t.Errorf("%d: [wantLen: %v] != [gotLen: %v]", i, test.wantLen, len(got))
+		if !errors.Is(gotErr, test.wantErr) {
+			t.Errorf("%d: [wantErr: %v] [gotErr: %v]", i, test.wantErr, gotErr)
 		}
 	}
 }

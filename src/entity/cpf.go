@@ -26,7 +26,7 @@ type CPF string
 
 func NewCPF(cpf string) (CPF, error) {
 	if !isCPFValid(cpf) {
-		return "", newErrInvalidCPF(cpf)
+		return "", NewErrInvalidCPF(cpf)
 	}
 
 	return CPF(cpf), nil

@@ -1,35 +1,89 @@
-package usecase_test
+package usecase
 
 import (
 	"context"
-	"reflect"
+	"errors"
 	"testing"
 	"time"
 
-	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
-	"github.com/rafaft/truck-driver-trip-system/tests/samples"
-	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
-func TestCreateTripErrors(t *testing.T) {
-	now := time.Now()
-	logger := log.NewFakeLogger()
-	tripRepo := repository.NewTripInMemory(nil)
-	driverRepo := repository.NewDriverInMemory(nil)
-	uc := usecase.NewCreateTrip(logger, tripRepo, driverRepo)
+type mockCreateTripRepo struct {
+	err error
+}
 
+func (m mockCreateTripRepo) Save(context.Context, *entity.Trip) error {
+	return m.err
+}
+
+type mockCreateTripDriverRepo struct {
+	err error
+}
+
+func (m mockCreateTripDriverRepo) FindByCPF(context.Context, entity.CPF) (*entity.Driver, error) {
+	return nil, m.err
+}
+
+func TestCreateTrip(t *testing.T) {
 	tests := []struct {
-		input usecase.CreateTripInput
-		want  *usecase.CreateTripOutput
-		err   error
+		input CreateTripInput
+		want  CreateTripOutput
 	}{
 		{
-			input: usecase.CreateTripInput{
-				CPF:             "42265277040", // invalid
-				StartDate:       now.AddDate(0, 0, -1),
-				EndDate:         now,
+			CreateTripInput{
+				CPF:             "33510345398",
+				StartDate:       time.Date(1997, 6, 23, 5, 5, 0, 0, time.UTC),
+				EndDate:         time.Date(1997, 6, 23, 14, 37, 0, 0, time.UTC),
+				HasLoad:         false,
+				OriginLat:       -32.3736,
+				OriginLong:      31.0709193,
+				DestinationLat:  -44.51865,
+				DestinationLong: 26.61581,
+				VehicleCode:     0,
+			},
+			CreateTripOutput{
+				ID:              "", // random UUID
+				StartDate:       time.Date(1997, 6, 23, 5, 5, 0, 0, time.UTC),
+				EndDate:         time.Date(1997, 6, 23, 14, 37, 0, 0, time.UTC),
+				Duration:        time.Date(1997, 6, 23, 14, 37, 0, 0, time.UTC).Sub(time.Date(1997, 6, 23, 5, 5, 0, 0, time.UTC)),
+				HasLoad:         false,
+				OriginLat:       -32.3736,
+				OriginLong:      31.0709193,
+				DestinationLat:  -44.51865,
+				DestinationLong: 26.61581,
+				Vehicle:         string(entity.Truck),
+			},
+		},
+	}
+
+	for i, test := range tests {
+		uc := NewCreateTrip(fakeLogger{}, mockCreateTripRepo{}, mockCreateTripDriverRepo{})
+		got, gotErr := uc.Execute(context.Background(), test.input)
+
+		if got == nil || gotErr != nil {
+			t.Errorf("%d: [input: %v] [wantErr: <nil>] [gotErr: %v]", i, test.input, gotErr)
+			continue
+		}
+
+		got.ID = ""
+		if test.want != *got {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
+		}
+	}
+}
+
+func TestCreateTripErr(t *testing.T) {
+	tests := []struct {
+		input      CreateTripInput
+		driverRepo mockCreateTripDriverRepo
+		wantErr    error
+	}{
+		{
+			CreateTripInput{
+				CPF:             "12345678901", // invalid CPF
+				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
+				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
 				HasLoad:         true,
 				OriginLat:       0,
 				OriginLong:      0,
@@ -37,119 +91,89 @@ func TestCreateTripErrors(t *testing.T) {
 				DestinationLong: 0,
 				VehicleCode:     1,
 			},
-			want: nil,
-			err:  entity.ErrInvalidCPF{},
+			mockCreateTripDriverRepo{},
+			entity.NewErrInvalidCPF("12345678901"),
 		},
 		{
-			input: usecase.CreateTripInput{
-				CPF:             "78066022085",
-				StartDate:       time.Date(1968, 1, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 0, -1), // invalid
-				EndDate:         now,
+			CreateTripInput{
+				CPF:             "74658482029",
+				StartDate:       time.Date(1950, 1, 1, 18, 25, 0, 0, time.UTC), // invalid
+				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
 				HasLoad:         true,
-				OriginLat:       0,
+				OriginLat:       90,
 				OriginLong:      0,
 				DestinationLat:  0,
 				DestinationLong: 0,
 				VehicleCode:     1,
 			},
-			want: nil,
-			err:  entity.ErrInvalidTripStartDate{},
+			mockCreateTripDriverRepo{},
+			entity.NewErrInvalidTripStartDate(time.Date(1950, 1, 1, 18, 25, 0, 0, time.UTC)),
 		},
 		{
-			input: usecase.CreateTripInput{
-				CPF:             "10259412090",
-				StartDate:       now,
-				EndDate:         now, // invalid
+			CreateTripInput{
+				CPF:             "74658482029",
+				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
+				EndDate:         time.Date(1999, 1, 1, 22, 55, 0, 0, time.UTC), // invalid
 				HasLoad:         true,
-				OriginLat:       0,
+				OriginLat:       90,
 				OriginLong:      0,
 				DestinationLat:  0,
 				DestinationLong: 0,
 				VehicleCode:     1,
 			},
-			want: nil,
-			err:  entity.ErrInvalidTripEndDate{},
+			mockCreateTripDriverRepo{},
+			entity.NewErrInvalidTripEndDate(time.Date(1999, 1, 1, 22, 55, 0, 0, time.UTC)),
 		},
 		{
-			input: usecase.CreateTripInput{
-				CPF:             "90106226061",
-				StartDate:       now.AddDate(0, 0, -1),
-				EndDate:         now,
+			CreateTripInput{
+				CPF:             "74658482029",
+				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
+				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
 				HasLoad:         true,
-				OriginLat:       -91, // invalid
+				OriginLat:       91, // invalid
 				OriginLong:      0,
 				DestinationLat:  0,
 				DestinationLong: 0,
 				VehicleCode:     1,
 			},
-			want: nil,
-			err:  entity.ErrInvalidLatitude{},
+			mockCreateTripDriverRepo{},
+			entity.NewErrInvalidLatitude(91),
 		},
 		{
-			input: usecase.CreateTripInput{
-				CPF:             "82905682078",
-				StartDate:       now.AddDate(0, 0, -1),
-				EndDate:         now,
+			CreateTripInput{
+				CPF:             "74658482029",
+				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
+				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
 				HasLoad:         true,
-				OriginLat:       0,
-				OriginLong:      -181, // invalid
-				DestinationLat:  0,
-				DestinationLong: 0,
-				VehicleCode:     1,
-			},
-			want: nil,
-			err:  entity.ErrInvalidLongitude{},
-		},
-		{
-			input: usecase.CreateTripInput{
-				CPF:             "51362416088",
-				StartDate:       now.AddDate(0, 0, -1),
-				EndDate:         now,
-				HasLoad:         true,
-				OriginLat:       0,
-				OriginLong:      0,
-				DestinationLat:  91, // invalid
-				DestinationLong: 0,
-				VehicleCode:     1,
-			},
-			want: nil,
-			err:  entity.ErrInvalidLatitude{},
-		},
-		{
-			input: usecase.CreateTripInput{
-				CPF:             "77297976075",
-				StartDate:       now.AddDate(0, 0, -1),
-				EndDate:         now,
-				HasLoad:         true,
-				OriginLat:       0,
+				OriginLat:       90,
 				OriginLong:      0,
 				DestinationLat:  0,
 				DestinationLong: -181, // invalid
 				VehicleCode:     1,
 			},
-			want: nil,
-			err:  entity.ErrInvalidLongitude{},
+			mockCreateTripDriverRepo{},
+			entity.NewErrInvalidLongitude(-181),
 		},
 		{
-			input: usecase.CreateTripInput{
-				CPF:             "64947151099",
-				StartDate:       now.AddDate(0, 0, -1),
-				EndDate:         now,
+			CreateTripInput{
+				CPF:             "74658482029",
+				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
+				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
 				HasLoad:         true,
-				OriginLat:       0,
+				OriginLat:       90,
 				OriginLong:      0,
 				DestinationLat:  0,
 				DestinationLong: 0,
-				VehicleCode:     35,
+				VehicleCode:     -5, // invalid
 			},
-			want: nil,
-			err:  entity.ErrInvalidVehicleCode{},
+			mockCreateTripDriverRepo{},
+			entity.NewErrInvalidVehicleCode(-5),
 		},
 		{
-			input: usecase.CreateTripInput{
-				CPF:             "32041794003", // there is no driver with this CPF
-				StartDate:       now.AddDate(0, 0, -1),
-				EndDate:         now,
+			CreateTripInput{
+				CPF:             "74658482029",
+				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
+				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
 				HasLoad:         true,
 				OriginLat:       0,
 				OriginLong:      0,
@@ -157,104 +181,19 @@ func TestCreateTripErrors(t *testing.T) {
 				DestinationLong: 0,
 				VehicleCode:     1,
 			},
-			want: nil,
-			err:  entity.ErrDriverNotFound{},
+			mockCreateTripDriverRepo{
+				err: entity.NewErrDriverNotFound("74658482029"),
+			},
+			entity.NewErrDriverNotFound("74658482029"),
 		},
 	}
 
 	for i, test := range tests {
+		uc := NewCreateTrip(fakeLogger{}, mockCreateTripRepo{}, test.driverRepo)
 		_, gotErr := uc.Execute(context.Background(), test.input)
 
-		if reflect.TypeOf(test.err) != reflect.TypeOf(gotErr) {
-			t.Errorf("%d: [err: %v] [gotErr: %v]", i, test.err, gotErr)
-			continue
-		}
-	}
-}
-
-func TestCreateTrip(t *testing.T) {
-	logger := log.NewFakeLogger()
-	tripRepo := repository.NewTripInMemory(nil)
-	driverRepo := repository.NewDriverInMemory(samples.GetDrivers(t))
-	uc := usecase.NewCreateTrip(logger, tripRepo, driverRepo)
-
-	tests := []struct {
-		input usecase.CreateTripInput
-		want  *usecase.CreateTripOutput
-		err   error
-	}{
-		{
-			input: usecase.CreateTripInput{
-				CPF:             "33510345398",
-				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
-				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
-				HasLoad:         true,
-				OriginLat:       0,
-				OriginLong:      0,
-				DestinationLat:  0,
-				DestinationLong: 0,
-				VehicleCode:     1,
-			},
-			want: &usecase.CreateTripOutput{
-				ID:              "", // random UUID
-				StartDate:       time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC),
-				EndDate:         time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC),
-				Duration:        time.Date(2000, 1, 1, 22, 55, 0, 0, time.UTC).Sub(time.Date(2000, 1, 1, 18, 25, 0, 0, time.UTC)),
-				HasLoad:         true,
-				OriginLat:       0,
-				OriginLong:      0,
-				DestinationLat:  0,
-				DestinationLong: 0,
-				Vehicle:         string(entity.Truck_34),
-			},
-			err: nil,
-		},
-		{
-			input: usecase.CreateTripInput{
-				CPF:             "52742089403",
-				StartDate:       time.Date(2000, 12, 25, 04, 57, 0, 0, time.UTC),
-				EndDate:         time.Date(2021, 10, 1, 22, 55, 0, 0, time.UTC),
-				HasLoad:         false,
-				OriginLat:       87.1234567,
-				OriginLong:      -4.9876543,
-				DestinationLat:  14.564738,
-				DestinationLong: -179.98765,
-				VehicleCode:     2,
-			},
-			want: &usecase.CreateTripOutput{
-				ID:              "", // random UUID
-				StartDate:       time.Date(2000, 12, 25, 04, 57, 0, 0, time.UTC),
-				EndDate:         time.Date(2021, 10, 1, 22, 55, 0, 0, time.UTC),
-				Duration:        time.Date(2021, 10, 1, 22, 55, 0, 0, time.UTC).Sub(time.Date(2000, 12, 25, 04, 57, 0, 0, time.UTC)),
-				HasLoad:         false,
-				OriginLat:       87.1234567,
-				OriginLong:      -4.9876543,
-				DestinationLat:  14.564738,
-				DestinationLong: -179.98765,
-				Vehicle:         string(entity.StumpTruck),
-			},
-			err: nil,
-		},
-	}
-
-	for i, test := range tests {
-		got, gotErr := uc.Execute(context.Background(), test.input)
-
-		if gotErr != nil {
-			t.Errorf("%d: unexpected error -> [gotErr: %v]", i, gotErr)
-			continue
-		}
-
-		if test.want.HasLoad != got.HasLoad ||
-			test.want.OriginLat != got.OriginLat ||
-			test.want.OriginLong != got.OriginLong ||
-			test.want.DestinationLat != got.DestinationLat ||
-			test.want.DestinationLong != got.DestinationLong ||
-			test.want.Vehicle != got.Vehicle ||
-			!test.want.StartDate.Equal(got.StartDate) ||
-			!test.want.EndDate.Equal(got.EndDate) ||
-			test.want.Duration != got.Duration {
-			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
+		if !errors.Is(gotErr, test.wantErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
 		}
 	}
 }

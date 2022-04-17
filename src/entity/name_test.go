@@ -12,15 +12,15 @@ func TestName(t *testing.T) {
 		wantErr error
 	}{
 		// invalid input
-		{"", "", newErrInvalidName("")},
-		{"12345", "", newErrInvalidName("12345")},
-		{"Húgo Diego Barros ", "", newErrInvalidName("Húgo Diego Barros ")},   // trailing space
-		{" Húgo Diego Barros", "", newErrInvalidName(" Húgo Diego Barros")},   // leading space
-		{"Húgo  Diego  Barros", "", newErrInvalidName("Húgo  Diego  Barros")}, // double spacing
-		{"Húgo Diego Barros 1", "", newErrInvalidName("Húgo Diego Barros 1")}, // digit
-		{"Húgo Diego Barros!", "", newErrInvalidName("Húgo Diego Barros!")},   // use of symbol
-		{"Húgo\tDiego\vBarros", "", newErrInvalidName("Húgo\tDiego\vBarros")}, // use of tab/v space
-		{"张伟 ", "", newErrInvalidName("张伟 ")},                                 // chinese name with trailing space
+		{"", "", NewErrInvalidName("")},
+		{"12345", "", NewErrInvalidName("12345")},
+		{"Húgo Diego Barros ", "", NewErrInvalidName("Húgo Diego Barros ")},   // trailing space
+		{" Húgo Diego Barros", "", NewErrInvalidName(" Húgo Diego Barros")},   // leading space
+		{"Húgo  Diego  Barros", "", NewErrInvalidName("Húgo  Diego  Barros")}, // double spacing
+		{"Húgo Diego Barros 1", "", NewErrInvalidName("Húgo Diego Barros 1")}, // digit
+		{"Húgo Diego Barros!", "", NewErrInvalidName("Húgo Diego Barros!")},   // use of symbol
+		{"Húgo\tDiego\vBarros", "", NewErrInvalidName("Húgo\tDiego\vBarros")}, // use of tab/v space
+		{"张伟 ", "", NewErrInvalidName("张伟 ")},                                 // chinese name with trailing space
 		// valid input
 		{"Húgo Diego Barros", Name("húgo diego barros"), nil},
 		{"张伟", Name("张伟"), nil},

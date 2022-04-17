@@ -14,11 +14,11 @@ type tripTS struct {
 
 func newTripTS(start, end time.Time) (tripTS, error) {
 	if start.Before(minTripStartDate) {
-		return tripTS{}, newErrInvalidTripStartDate(start)
+		return tripTS{}, NewErrInvalidTripStartDate(start)
 	}
 
 	if !end.After(start) {
-		return tripTS{}, newErrInvalidTripEndDate(end)
+		return tripTS{}, NewErrInvalidTripEndDate(end)
 	}
 
 	return tripTS{

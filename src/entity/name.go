@@ -11,7 +11,7 @@ var spacePattern = regexp.MustCompile(`[^\S\t\v\r]`)
 type Name string
 
 func NewName(name string) (Name, error) {
-	err := newErrInvalidName(name)
+	err := NewErrInvalidName(name)
 
 	// check min and (arbitrary) max runes limit
 	if length := len([]rune(name)); length == 0 || length > 127 {

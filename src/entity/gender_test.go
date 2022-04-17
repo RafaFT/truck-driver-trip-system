@@ -12,12 +12,12 @@ func TestGender(t *testing.T) {
 		wantErr error
 	}{
 		// invalid input
-		{"", "", newErrInvalidGender("")},
-		{"not even trying", "", newErrInvalidGender("not even trying")},
-		{"a", "", newErrInvalidGender("a")},
-		{"5", "", newErrInvalidGender("5")},
-		{"Ó", "", newErrInvalidGender("Ó")},
-		{"ô", "", newErrInvalidGender("ô")},
+		{"", "", NewErrInvalidGender("")},
+		{"not even trying", "", NewErrInvalidGender("not even trying")},
+		{"a", "", NewErrInvalidGender("a")},
+		{"5", "", NewErrInvalidGender("5")},
+		{"Ó", "", NewErrInvalidGender("Ó")},
+		{"ô", "", NewErrInvalidGender("ô")},
 		// valid input
 		{"M", Gender("M"), nil},
 		{"F", Gender("F"), nil},

@@ -35,7 +35,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: false,
 			},
 			Driver{},
-			newErrInvalidCPF("369063555110"),
+			NewErrInvalidCPF("369063555110"),
 		},
 		{
 			DriverInput{
@@ -47,7 +47,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: true,
 			},
 			Driver{},
-			newErrInvalidName(""),
+			NewErrInvalidName(""),
 		},
 		{
 			DriverInput{
@@ -59,7 +59,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: false,
 			},
 			Driver{},
-			newErrInvalidGender("H"),
+			NewErrInvalidGender("H"),
 		},
 		{
 			DriverInput{
@@ -71,7 +71,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: true,
 			},
 			Driver{},
-			newErrInvalidCNH("G"),
+			NewErrInvalidCNH("G"),
 		},
 		{
 			DriverInput{
@@ -83,7 +83,7 @@ func TestNewTruckDriver(t *testing.T) {
 				hasVehicle: false,
 			},
 			Driver{},
-			newErrInvalidAge(17),
+			NewErrInvalidAge(17),
 		},
 		// valid input
 		{ // +3 UTC offset

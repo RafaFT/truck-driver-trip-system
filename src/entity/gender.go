@@ -14,7 +14,7 @@ func NewGender(gender string) (Gender, error) {
 	genderUpper := strings.ToUpper(gender)
 
 	if _, ok := genderValues[genderUpper]; !ok {
-		return "", newErrInvalidGender(gender)
+		return "", NewErrInvalidGender(gender)
 	}
 
 	return Gender(genderUpper), nil

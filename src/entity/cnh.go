@@ -16,7 +16,7 @@ func NewCNH(cnh string) (CNH, error) {
 	cnhUpper := strings.ToUpper(cnh)
 
 	if _, ok := cnhValues[cnhUpper]; !ok {
-		return "", newErrInvalidCNH(cnh)
+		return "", NewErrInvalidCNH(cnh)
 	}
 
 	return CNH(cnhUpper), nil

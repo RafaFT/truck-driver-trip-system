@@ -1,69 +1,54 @@
-package usecase_test
+package usecase
 
 import (
 	"context"
-	"reflect"
+	"errors"
 	"testing"
 
-	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
-	"github.com/rafaft/truck-driver-trip-system/tests/samples"
-	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
-func TestDeleteTripErrors(t *testing.T) {
-	logger := log.NewFakeLogger()
-	tripRepo := repository.NewTripInMemory(nil)
-	uc := usecase.NewDeleteTrip(logger, tripRepo)
+type mockDeleteTripRepo struct {
+	err error
+}
 
-	tests := []struct {
-		input string
-		err   error
-	}{
-		{
-			input: "",
-			err:   entity.ErrInvalidID,
-		},
-		{
-			input: "a676b5ad-5ffa-4917-a62e-d0933e53c1bb",
-			err:   entity.ErrTripNotFound{},
-		},
-	}
-
-	for i, test := range tests {
-		gotErr := uc.Execute(context.Background(), test.input)
-
-		if reflect.TypeOf(test.err) != reflect.TypeOf(gotErr) {
-			t.Errorf("%d: [err: %v] [gotErr: %v]", i, test.err, gotErr)
-		}
-	}
+func (d mockDeleteTripRepo) Delete(ctx context.Context, id string) error {
+	return d.err
 }
 
 func TestDeleteTrip(t *testing.T) {
-	logger := log.NewFakeLogger()
-	tripRepo := repository.NewTripInMemory(samples.GetTrips(t))
-	uc := usecase.NewDeleteTrip(logger, tripRepo)
-
 	tests := []struct {
-		input string
-		err   error
+		tripID  string
+		repo    mockDeleteTripRepo
+		wantErr error
 	}{
+		// invalid input
 		{
-			input: "47bc0c57-adb7-47da-8886-6ff92d484d06",
-			err:   nil,
+			"",
+			mockDeleteTripRepo{},
+			entity.ErrInvalidID,
 		},
 		{
-			input: "794b9937-7afa-449e-9662-92271d44cb81",
-			err:   nil,
+			"a676b5ad-5ffa-4917-a62e-d0933e53c1bb",
+			mockDeleteTripRepo{
+				err: entity.NewErrTripNotFound("a676b5ad-5ffa-4917-a62e-d0933e53c1bb"),
+			},
+			entity.NewErrTripNotFound("a676b5ad-5ffa-4917-a62e-d0933e53c1bb"),
+		},
+		// valid input
+		{
+			"794b9937-7afa-449e-9662-92271d44cb81",
+			mockDeleteTripRepo{},
+			nil,
 		},
 	}
 
 	for i, test := range tests {
-		gotErr := uc.Execute(context.Background(), test.input)
+		uc := NewDeleteTrip(fakeLogger{}, test.repo)
+		gotErr := uc.Execute(context.Background(), test.tripID)
 
-		if gotErr != nil {
-			t.Errorf("%d: unexpected error -> [gotErr: %v]", i, gotErr)
+		if !errors.Is(gotErr, test.wantErr) {
+			t.Errorf("%d: [wantErr: %v] [gotErr: %v]", i, test.wantErr, gotErr)
 		}
 	}
 }

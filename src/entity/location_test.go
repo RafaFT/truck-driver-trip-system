@@ -26,7 +26,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			newErrInvalidLatitude(-90.0000001),
+			NewErrInvalidLatitude(-90.0000001),
 		},
 		{
 			locationInput{
@@ -35,7 +35,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			newErrInvalidLatitude(90.0000001),
+			NewErrInvalidLatitude(90.0000001),
 		},
 		// invalid longitude values
 		{
@@ -45,7 +45,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			newErrInvalidLongitude(-180.0000001),
+			NewErrInvalidLongitude(-180.0000001),
 		},
 		{
 			locationInput{
@@ -54,7 +54,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			newErrInvalidLongitude(180.0000001),
+			NewErrInvalidLongitude(180.0000001),
 		},
 		// valid values
 		{

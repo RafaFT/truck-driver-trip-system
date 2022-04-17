@@ -12,14 +12,14 @@ func TestNewCPF(t *testing.T) {
 		wantErr error
 	}{
 		// invalid input
-		{"", "", newErrInvalidCPF("")},
-		{"not even trying", "", newErrInvalidCPF("not even trying")},
-		{"12345678901", "", newErrInvalidCPF("12345678901")},
-		{"00000000000", "", newErrInvalidCPF("00000000000")},
-		{"10804773069", "", newErrInvalidCPF("10804773069")},
-		{"643.512.830-84", "", newErrInvalidCPF("643.512.830-84")},
-		{"64351283084a", "", newErrInvalidCPF("64351283084a")},
-		{"64351f283084", "", newErrInvalidCPF("64351f283084")},
+		{"", "", NewErrInvalidCPF("")},
+		{"not even trying", "", NewErrInvalidCPF("not even trying")},
+		{"12345678901", "", NewErrInvalidCPF("12345678901")},
+		{"00000000000", "", NewErrInvalidCPF("00000000000")},
+		{"10804773069", "", NewErrInvalidCPF("10804773069")},
+		{"643.512.830-84", "", NewErrInvalidCPF("643.512.830-84")},
+		{"64351283084a", "", NewErrInvalidCPF("64351283084a")},
+		{"64351f283084", "", NewErrInvalidCPF("64351f283084")},
 		// valid input
 		{"64351283084", CPF("64351283084"), nil},
 		{"10804773068", CPF("10804773068"), nil},

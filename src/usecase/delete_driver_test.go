@@ -1,49 +1,54 @@
-package usecase_test
+package usecase
 
 import (
 	"context"
-	"reflect"
+	"errors"
 	"testing"
 
-	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
-	"github.com/rafaft/truck-driver-trip-system/tests/samples"
-	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
-func TestDeleteDriver(t *testing.T) {
-	l := log.NewFakeLogger()
-	r := repository.NewDriverInMemory(samples.GetDrivers(t))
-	uc := usecase.NewDeleteDriver(l, r)
+type mockDeleteDriverRepo struct {
+	err error
+}
 
+func (d mockDeleteDriverRepo) DeleteByCPF(ctx context.Context, cpf entity.CPF) error {
+	return d.err
+}
+
+func TestDeleteDriver(t *testing.T) {
 	tests := []struct {
-		input string
-		want  error
+		cpf     string
+		repo    mockDeleteDriverRepo
+		wantErr error
 	}{
+		// invalid input
 		{
-			input: "49628536021", // invalid CPF
-			want:  entity.ErrInvalidCPF{},
+			"49628536021",
+			mockDeleteDriverRepo{},
+			entity.NewErrInvalidCPF("49628536021"),
 		},
 		{
-			input: "47128632000", // CPF never existed
-			want:  entity.ErrDriverNotFound{},
+			"47128632000",
+			mockDeleteDriverRepo{
+				err: entity.NewErrDriverNotFound(entity.CPF("47128632000")),
+			},
+			entity.NewErrDriverNotFound(entity.CPF("47128632000")),
 		},
+		// valid input
 		{
-			input: "63503201238", // driver exists and should be deleted
-			want:  nil,
-		},
-		{
-			input: "63503201238", // once deleted, it should be not found!
-			want:  entity.ErrDriverNotFound{},
+			"63503201238",
+			mockDeleteDriverRepo{},
+			nil,
 		},
 	}
 
 	for i, test := range tests {
-		got := uc.Execute(context.Background(), test.input)
+		uc := NewDeleteDriver(fakeLogger{}, test.repo)
+		gotErr := uc.Execute(context.Background(), test.cpf)
 
-		if reflect.TypeOf(test.want) != reflect.TypeOf(got) {
-			t.Errorf("%d: [want: %v] [got: %v]", i, test.want, got)
+		if !errors.Is(gotErr, test.wantErr) {
+			t.Errorf("%d: [wantErr: %v] [gotErr: %v]", i, test.wantErr, gotErr)
 		}
 	}
 }

@@ -42,7 +42,7 @@ func NewDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bo
 	}
 
 	if age := newBirthDate.age(); age < minimumDriverAge {
-		return nil, newErrInvalidAge(age)
+		return nil, NewErrInvalidAge(age)
 	}
 
 	driver := Driver{

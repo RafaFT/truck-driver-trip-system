@@ -1,190 +1,147 @@
-package usecase_test
+package usecase
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"testing"
 	"time"
 
-	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/entity"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
-	"github.com/rafaft/truck-driver-trip-system/tests/samples"
-	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
+
+type mockUpdateDriverRepo struct {
+	driver    *entity.Driver
+	findErr   error
+	updateErr error
+}
+
+func (r mockUpdateDriverRepo) FindByCPF(ctx context.Context, cpf entity.CPF) (*entity.Driver, error) {
+	return r.driver, r.findErr
+}
+
+func (r mockUpdateDriverRepo) Update(ctx context.Context, driver *entity.Driver) error {
+	return r.updateErr
+}
 
 func TestUpdateDriver(t *testing.T) {
 	now := time.Now()
-
-	l := log.NewFakeLogger()
-	r := repository.NewDriverInMemory(samples.GetDrivers(t))
-	uc := usecase.NewUpdateDriver(l, r)
+	driver, _ := entity.NewDriver("31803413603", "name", "M", "b", now.AddDate(-46, 0, 0), true)
 
 	tests := []struct {
 		cpf   string
-		input usecase.UpdateDriverInput
-		want  *usecase.UpdateDriverOutput
-		err   error
+		input UpdateDriverInput
+		repo  UpdateDriverRepo
+		want  *UpdateDriverOutput
 	}{
-		// invalid
 		{
-			cpf:   "52742089401", // invalid CPF
-			input: usecase.UpdateDriverInput{},
-			want:  nil,
-			err:   entity.ErrInvalidCPF{},
-		},
-		{
-			cpf: "52742089403",
-			input: usecase.UpdateDriverInput{
-				CNH: getStrPointer("8"), // invalid CNH
+			"31803413603",
+			UpdateDriverInput{
+				CNH:        getStrPointer("A"),
+				Gender:     getStrPointer("o"),
+				HasVehicle: getBoolPointer(false),
+				Name:       getStrPointer("new name"),
 			},
-			want: nil,
-			err:  entity.ErrInvalidCNH{},
-		},
-		{
-			cpf: "94982599769",
-			input: usecase.UpdateDriverInput{
-				Gender: getStrPointer("l"), // invalid Gender
+			mockUpdateDriverRepo{
+				driver: driver,
 			},
-			want: nil,
-			err:  entity.ErrInvalidGender{},
-		},
-		{
-			cpf: "08931283849",
-			input: usecase.UpdateDriverInput{
-				Name: getStrPointer("invalid  name because  of  extra  space"), // invalid name
-			},
-			want: nil,
-			err:  entity.ErrInvalidName{},
-		},
-		{
-			cpf:   "08298213092", // CPF not registered
-			input: usecase.UpdateDriverInput{},
-			want:  nil,
-			err:   entity.ErrDriverNotFound{},
-		},
-		// valid
-		{
-			cpf: "31803413603",
-			input: usecase.UpdateDriverInput{
-				CNH: getStrPointer("b"),
-			},
-			want: &usecase.UpdateDriverOutput{
+			&UpdateDriverOutput{
 				Age:        46,
-				BirthDate:  now.AddDate(-46, 0, 0),
-				CNH:        "B",
+				BirthDate:  now.AddDate(-46, 0, 0).UTC(),
+				CNH:        "A",
 				CPF:        "31803413603",
 				Gender:     "O",
 				HasVehicle: false,
-				Name:       "rayssa emanuelly andrea viana",
+				Name:       "new name",
 			},
-			err: nil,
-		},
-		{
-			cpf: "72595478710",
-			input: usecase.UpdateDriverInput{
-				Gender: getStrPointer("f"),
-			},
-			want: &usecase.UpdateDriverOutput{
-				Age:        41,
-				BirthDate:  now.AddDate(-41, 0, 0),
-				CNH:        "B",
-				CPF:        "72595478710",
-				Gender:     "F",
-				HasVehicle: true,
-				Name:       "raimundo erick nicolas souza",
-			},
-			err: nil,
-		},
-		{
-			cpf: "27188079463",
-			input: usecase.UpdateDriverInput{
-				HasVehicle: getBoolPointer(false),
-			},
-			want: &usecase.UpdateDriverOutput{
-				Age:        33,
-				BirthDate:  now.AddDate(-33, 0, 0),
-				CNH:        "D",
-				CPF:        "27188079463",
-				Gender:     "O",
-				HasVehicle: false,
-				Name:       "thales marcos fogaça",
-			},
-			err: nil,
-		},
-		{
-			cpf: "56820381930",
-			input: usecase.UpdateDriverInput{
-				Name: getStrPointer("Jessica Torres"),
-			},
-			want: &usecase.UpdateDriverOutput{
-				Age:        28,
-				BirthDate:  now.AddDate(-28, 0, 0),
-				CNH:        "A",
-				CPF:        "56820381930",
-				Gender:     "F",
-				HasVehicle: true,
-				Name:       "jessica torres",
-			},
-			err: nil,
-		},
-		{
-			cpf: "56820381930",
-			input: usecase.UpdateDriverInput{
-				Name: getStrPointer("Jessica Torres"),
-			},
-			want: &usecase.UpdateDriverOutput{
-				Age:        28,
-				BirthDate:  now.AddDate(-28, 0, 0),
-				CNH:        "A",
-				CPF:        "56820381930",
-				Gender:     "F",
-				HasVehicle: true,
-				Name:       "jessica torres",
-			},
-			err: nil,
-		},
-		{
-			cpf: "17844926805",
-			input: usecase.UpdateDriverInput{
-				CNH:        getStrPointer("D"),
-				Gender:     getStrPointer("O"),
-				HasVehicle: getBoolPointer(true),
-				Name:       getStrPointer("allana louise bianca"),
-			},
-			want: &usecase.UpdateDriverOutput{
-				Age:        20,
-				BirthDate:  now.AddDate(-20, 0, 0),
-				CNH:        "D",
-				CPF:        "17844926805",
-				Gender:     "O",
-				HasVehicle: true,
-				Name:       "allana louise bianca",
-			},
-			err: nil,
 		},
 	}
 
 	for i, test := range tests {
+		uc := NewUpdateDriver(fakeLogger{}, test.repo)
 		got, gotErr := uc.Execute(context.Background(), test.cpf, test.input)
 
-		if reflect.TypeOf(test.err) != reflect.TypeOf(gotErr) {
-			t.Errorf("%d: [wantErr: %v] [gotErr: %v]", i, test.err, gotErr)
+		if got == nil || gotErr != nil {
+			t.Errorf("%d: [input: %v] [wantErr: <nil>] [gotErr: %v]", i, test.input, gotErr)
 			continue
 		}
 
-		if test.want != nil {
-			if test.want.Age != got.Age ||
-				test.want.BirthDate.Year() != got.BirthDate.Year() ||
-				test.want.BirthDate.Month() != got.BirthDate.Month() ||
-				test.want.BirthDate.Day() != got.BirthDate.Day() ||
-				test.want.CNH != got.CNH ||
-				test.want.CPF != got.CPF ||
-				test.want.Gender != got.Gender ||
-				test.want.HasVehicle != got.HasVehicle ||
-				test.want.Name != got.Name {
-				t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
-			}
+		got.UpdatedAt = time.Time{}
+		test.want.UpdatedAt = time.Time{}
+		if !reflect.DeepEqual(test.want, got) {
+			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
+		}
+	}
+}
+
+func TestUpdateDriverErr(t *testing.T) {
+	now := time.Now()
+	networkErr := errors.New("some network error")
+	driver, _ := entity.NewDriver("81183605048", "name", "M", "b", now.AddDate(-46, 0, 0), true)
+
+	tests := []struct {
+		cpf     string
+		input   UpdateDriverInput
+		repo    UpdateDriverRepo
+		wantErr error
+	}{
+		{
+			"52742089401",
+			UpdateDriverInput{},
+			mockUpdateDriverRepo{},
+			entity.NewErrInvalidCPF("52742089401"),
+		},
+		{
+			"00645063045",
+			UpdateDriverInput{},
+			mockUpdateDriverRepo{
+				findErr: entity.NewErrDriverNotFound("00645063045"),
+			},
+			entity.NewErrDriverNotFound("00645063045"),
+		},
+		{
+			"52742089403",
+			UpdateDriverInput{
+				CNH: getStrPointer("8"),
+			},
+			mockUpdateDriverRepo{},
+			entity.NewErrInvalidCNH("8"),
+		},
+		{
+			"94982599769",
+			UpdateDriverInput{
+				Gender: getStrPointer("l"),
+			},
+			mockUpdateDriverRepo{},
+			entity.NewErrInvalidGender("l"),
+		},
+		{
+			"08931283849",
+			UpdateDriverInput{
+				Name: getStrPointer("invalid  name because  of  extra  space"),
+			},
+			mockUpdateDriverRepo{},
+			entity.NewErrInvalidName("invalid  name because  of  extra  space"),
+		},
+		{
+			"81183605048",
+			UpdateDriverInput{
+				Name: getStrPointer("new name"),
+			},
+			mockUpdateDriverRepo{
+				driver:    driver,
+				updateErr: networkErr,
+			},
+			networkErr,
+		},
+	}
+
+	for i, test := range tests {
+		uc := NewUpdateDriver(fakeLogger{}, test.repo)
+		_, gotErr := uc.Execute(context.Background(), test.cpf, test.input)
+
+		if !errors.Is(gotErr, test.wantErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
 		}
 	}
 }
