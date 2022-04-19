@@ -25,6 +25,7 @@ func TestNewCPF(t *testing.T) {
 		{"10804773068", CPF("10804773068"), nil},
 		{"14316382004", CPF("14316382004"), nil},
 		{"54692539020", CPF("54692539020"), nil},
+		{"54692539020", CPF("54692539020"), nil},
 	}
 
 	for i, test := range tests {
@@ -38,5 +39,11 @@ func TestNewCPF(t *testing.T) {
 		if test.want != got {
 			t.Errorf("%d: [input: %v] [want: %v] [got: %v]", i, test.input, test.want, got)
 		}
+	}
+}
+
+func BenchmarkCPF(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewCPF("54692539020")
 	}
 }
