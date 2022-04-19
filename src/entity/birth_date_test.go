@@ -70,7 +70,6 @@ func TestCalculateAge(t *testing.T) {
 		input time.Time
 		want  int
 	}{
-		{now.AddDate(-2020, 0, 0), 2020},
 		{now, 0},
 		{now.AddDate(0, -1, 0), 0},
 		{now.AddDate(-1, 0, 1), 0},
