@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -29,10 +27,7 @@ func (bd BirthDate) age() int {
 		return 0
 	}
 
-	birthMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(bd.Month()), bd.Day()))
-	baseDateMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(now.Month()), now.Day()))
-
-	if birthMonthNDay > baseDateMonthNDay {
+	if bd.Month() >= now.Month() && bd.Day() > now.Day() {
 		years--
 	}
 

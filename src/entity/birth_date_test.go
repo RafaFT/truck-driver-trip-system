@@ -87,3 +87,16 @@ func TestCalculateAge(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkBirthDate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewBirthDate(time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC))
+	}
+}
+
+func BenchmarkCalculateAge(b *testing.B) {
+	bd, _ := NewBirthDate(time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC))
+	for i := 0; i < b.N; i++ {
+		bd.age()
+	}
+}
