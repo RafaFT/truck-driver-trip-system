@@ -58,7 +58,7 @@ func TestCreateTrip(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewCreateTrip(fakeLogger{}, mockCreateTripRepo{}, mockCreateTripDriverRepo{})
+		uc := NewCreateTrip(FakeLogger{}, mockCreateTripRepo{}, mockCreateTripDriverRepo{})
 		got, gotErr := uc.Execute(context.Background(), test.input)
 
 		if got == nil || gotErr != nil {
@@ -189,7 +189,7 @@ func TestCreateTripErr(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewCreateTrip(fakeLogger{}, mockCreateTripRepo{}, test.driverRepo)
+		uc := NewCreateTrip(FakeLogger{}, mockCreateTripRepo{}, test.driverRepo)
 		_, gotErr := uc.Execute(context.Background(), test.input)
 
 		if !errors.Is(gotErr, test.wantErr) {

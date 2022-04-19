@@ -181,7 +181,7 @@ func TestUpdateTrip(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewUpdateTrip(fakeLogger{}, test.repo)
+		uc := NewUpdateTrip(FakeLogger{}, test.repo)
 		got, gotErr := uc.Execute(context.Background(), test.tripID, test.input)
 
 		if !errors.Is(gotErr, test.wantErr) {

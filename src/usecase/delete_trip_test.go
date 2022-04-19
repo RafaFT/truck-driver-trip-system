@@ -44,7 +44,7 @@ func TestDeleteTrip(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewDeleteTrip(fakeLogger{}, test.repo)
+		uc := NewDeleteTrip(FakeLogger{}, test.repo)
 		gotErr := uc.Execute(context.Background(), test.tripID)
 
 		if !errors.Is(gotErr, test.wantErr) {

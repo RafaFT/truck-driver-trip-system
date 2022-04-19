@@ -7,16 +7,16 @@ type Logger interface {
 	Error(string)
 }
 
-type fakeLogger struct{}
+type FakeLogger struct{}
 
-func (l fakeLogger) Debug(msg string) {
+func (l FakeLogger) Debug(msg string) {
 }
 
-func (l fakeLogger) Info(msg string) {
+func (l FakeLogger) Info(msg string) {
 }
 
-func (l fakeLogger) Warning(msg string) {
+func (l FakeLogger) Warning(msg string) {
 }
 
-func (l fakeLogger) Error(msg string) {
+func (l FakeLogger) Error(msg string) {
 }

@@ -58,7 +58,7 @@ func TestUpdateDriver(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewUpdateDriver(fakeLogger{}, test.repo)
+		uc := NewUpdateDriver(FakeLogger{}, test.repo)
 		got, gotErr := uc.Execute(context.Background(), test.cpf, test.input)
 
 		if got == nil || gotErr != nil {
@@ -137,7 +137,7 @@ func TestUpdateDriverErr(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewUpdateDriver(fakeLogger{}, test.repo)
+		uc := NewUpdateDriver(FakeLogger{}, test.repo)
 		_, gotErr := uc.Execute(context.Background(), test.cpf, test.input)
 
 		if !errors.Is(gotErr, test.wantErr) {

@@ -100,7 +100,7 @@ func TestGetTrips(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewGetTrips(fakeLogger{}, test.repo)
+		uc := NewGetTrips(FakeLogger{}, test.repo)
 		got, gotErr := uc.Execute(context.Background(), test.query)
 
 		if got == nil || gotErr != nil {
@@ -146,7 +146,7 @@ func TestGetTripsErr(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewGetTrips(fakeLogger{}, test.repo)
+		uc := NewGetTrips(FakeLogger{}, test.repo)
 		_, gotErr := uc.Execute(context.Background(), test.query)
 
 		if !errors.Is(gotErr, test.wantErr) {

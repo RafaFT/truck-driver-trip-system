@@ -44,7 +44,7 @@ func TestDeleteDriver(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewDeleteDriver(fakeLogger{}, test.repo)
+		uc := NewDeleteDriver(FakeLogger{}, test.repo)
 		gotErr := uc.Execute(context.Background(), test.cpf)
 
 		if !errors.Is(gotErr, test.wantErr) {

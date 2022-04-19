@@ -90,7 +90,7 @@ func TestGetDrivers(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewGetDrivers(fakeLogger{}, test.repo)
+		uc := NewGetDrivers(FakeLogger{}, test.repo)
 		got, gotErr := uc.Execute(context.Background(), test.input)
 
 		if got == nil || gotErr != nil {
@@ -136,7 +136,7 @@ func TestGetDriversErr(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewGetDrivers(fakeLogger{}, test.repo)
+		uc := NewGetDrivers(FakeLogger{}, test.repo)
 		_, gotErr := uc.Execute(context.Background(), test.input)
 
 		if !errors.Is(gotErr, test.wantErr) {

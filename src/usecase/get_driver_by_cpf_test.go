@@ -52,7 +52,7 @@ func TestGetDriverByCPF(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewGetDriverByCPF(fakeLogger{}, test.repo)
+		uc := NewGetDriverByCPF(FakeLogger{}, test.repo)
 		got, gotErr := uc.Execute(context.Background(), test.cpf)
 
 		if got == nil || gotErr != nil {
@@ -87,7 +87,7 @@ func TestGetDriverByCPFErr(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		uc := NewGetDriverByCPF(fakeLogger{}, test.repo)
+		uc := NewGetDriverByCPF(FakeLogger{}, test.repo)
 		_, gotErr := uc.Execute(context.Background(), test.cpf)
 
 		if !errors.Is(gotErr, test.wantErr) {
