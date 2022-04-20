@@ -1,21 +1,28 @@
 package entity
 
-import "strings"
-
-var genderValues = map[string]string{
-	"F": "female",
-	"M": "male",
-	"O": "other",
-}
-
 type Gender string
 
-func NewGender(gender string) (Gender, error) {
-	genderUpper := strings.ToUpper(gender)
+var genderValues = []byte{
+	'F', // Female
+	'M', // Male
+	'O', // Other
+}
 
-	if _, ok := genderValues[genderUpper]; !ok {
+func NewGender(gender string) (Gender, error) {
+	if len(gender) != 1 {
 		return "", NewErrInvalidGender(gender)
 	}
 
-	return Gender(genderUpper), nil
+	genderByte := gender[0]
+	if genderByte >= 'Z' {
+		genderByte -= 32 // convert to uppercase
+	}
+
+	for _, b := range genderValues {
+		if b == genderByte {
+			return Gender(genderByte), nil
+		}
+	}
+
+	return "", NewErrInvalidGender(gender)
 }

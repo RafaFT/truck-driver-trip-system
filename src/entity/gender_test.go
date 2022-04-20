@@ -40,3 +40,9 @@ func TestGender(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkGender(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewGender("female")
+	}
+}
