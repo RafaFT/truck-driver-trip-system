@@ -40,3 +40,9 @@ func TestCNHType(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkCNH(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewCNH("c")
+	}
+}

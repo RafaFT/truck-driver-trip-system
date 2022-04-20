@@ -1,23 +1,28 @@
 package entity
 
-import "strings"
-
-var cnhValues = map[string]bool{
-	"A": true,
-	"B": true,
-	"C": true,
-	"D": true,
-	"E": true,
-}
-
 type CNH string
 
-func NewCNH(cnh string) (CNH, error) {
-	cnhUpper := strings.ToUpper(cnh)
+const (
+	cnhA byte = 65 + iota // "A"
+	cnhB                  // "B"
+	cnhC                  // "C"
+	cnhD                  // "D"
+	cnhE                  // "E"
+	cnhMax
+)
 
-	if _, ok := cnhValues[cnhUpper]; !ok {
+func NewCNH(cnh string) (CNH, error) {
+	if len(cnh) != 1 {
 		return "", NewErrInvalidCNH(cnh)
 	}
 
-	return CNH(cnhUpper), nil
+	cnhByte := cnh[0]
+	if cnhByte >= 'Z' {
+		cnhByte -= 32 // convert to uppercase
+	}
+	if cnhByte < cnhA || cnhByte >= cnhMax {
+		return "", NewErrInvalidCNH(cnh)
+	}
+
+	return CNH(cnhByte), nil
 }
