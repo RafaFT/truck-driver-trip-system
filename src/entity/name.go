@@ -10,10 +10,17 @@ var spacePattern = regexp.MustCompile(`[^\S\t\v\r]`)
 
 type Name string
 
+const maxNameChars = 127
+
 func NewName(name string) (Name, error) {
-	// check min and (arbitrary) max runes limit
-	if length := len([]rune(name)); length == 0 || length > 127 {
+	if len(name) == 0 {
 		return "", NewErrInvalidName(name)
+	}
+
+	for i := range name {
+		if i+1 > maxNameChars {
+			return "", NewErrInvalidName(name)
+		}
 	}
 
 	tokens := spacePattern.Split(name, -1)
