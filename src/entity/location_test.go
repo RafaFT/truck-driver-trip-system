@@ -1,10 +1,8 @@
 package entity
 
 import (
-	"reflect"
+	"errors"
 	"testing"
-
-	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
 func TestLocation(t *testing.T) {
@@ -17,7 +15,7 @@ func TestLocation(t *testing.T) {
 		input    locationInput
 		wantLat  float64
 		wantLong float64
-		err      error
+		wantErr  error
 	}{
 		// invalid input
 		// invalid latitude values
@@ -28,7 +26,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			entity.ErrInvalidLatitude{},
+			NewErrInvalidLatitude(-90.0000001),
 		},
 		{
 			locationInput{
@@ -37,7 +35,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			entity.ErrInvalidLatitude{},
+			NewErrInvalidLatitude(90.0000001),
 		},
 		// invalid longitude values
 		{
@@ -47,7 +45,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			entity.ErrInvalidLongitude{},
+			NewErrInvalidLongitude(-180.0000001),
 		},
 		{
 			locationInput{
@@ -56,7 +54,7 @@ func TestLocation(t *testing.T) {
 			},
 			0,
 			0,
-			entity.ErrInvalidLongitude{},
+			NewErrInvalidLongitude(180.0000001),
 		},
 		// valid values
 		{
@@ -107,18 +105,16 @@ func TestLocation(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		got, gotError := entity.NewLocation(test.input.lat, test.input.long)
+		got, gotErr := NewLocation(test.input.lat, test.input.long)
 
-		if reflect.TypeOf(test.err) != reflect.TypeOf(gotError) {
-			t.Errorf("%d: [input: %v] [wantError: %T] [gotError: %v]",
-				i, test.input, test.err, gotError,
-			)
+		if !errors.Is(test.wantErr, gotErr) {
+			t.Errorf("%d: [input: %v] [wantErr: %v] [gotErr: %v]", i, test.input, test.wantErr, gotErr)
 			continue
 		}
 
 		if got.Latitude() != test.wantLat || got.Longitude() != test.wantLong {
-			t.Errorf("%d: [input: %v] [wantLat: %v] [wantLong: %v] [gotLat: %v] [gotLong: %v]",
-				i, test.input, test.wantLat, test.wantLong, got.Latitude(), got.Longitude(),
+			t.Errorf("%d: [input: %v] [wantLat: %v] [gotLat: %v] [wantLong: %v] [gotLong: %v]",
+				i, test.input, test.wantLat, got.Latitude(), test.wantLong, got.Longitude(),
 			)
 		}
 	}

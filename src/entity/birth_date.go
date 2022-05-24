@@ -1,8 +1,6 @@
 package entity
 
 import (
-	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -18,27 +16,20 @@ func NewBirthDate(birthDate time.Time) (BirthDate, error) {
 		return BirthDate{}, newErrInvalidBirthDate(birthDate)
 	}
 
-	return BirthDate{birthDate}, nil
+	return BirthDate{birthDate.UTC()}, nil
 }
 
-func (bd BirthDate) CalculateAge() int {
-	now := time.Now()
+func (bd BirthDate) age() int {
+	now := time.Now().UTC()
 
 	years := now.Year() - bd.Year()
 	if years < 0 {
 		return 0
 	}
 
-	birthMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(bd.Month()), bd.Day()))
-	baseDateMonthNDay, _ := strconv.Atoi(fmt.Sprintf("%d%d", int(now.Month()), now.Day()))
-
-	if birthMonthNDay > baseDateMonthNDay {
+	if bd.Month() >= now.Month() && bd.Day() > now.Day() {
 		years--
 	}
 
 	return years
-}
-
-func MinBirthDate() time.Time {
-	return minBirthDate
 }

@@ -29,7 +29,7 @@ func newLatitude(rawLat float64) (latitude, error) {
 	lat := latitude{decimal.NewFromFloat(rawLat).Truncate(7)}
 
 	if lat.GreaterThan(maxLatitude) || lat.LessThan(minLatitude) {
-		return lat, newErrInvalidLatitude(rawLat)
+		return lat, NewErrInvalidLatitude(rawLat)
 	}
 
 	return lat, nil
@@ -39,7 +39,7 @@ func newLongitude(rawLong float64) (longitude, error) {
 	long := longitude{decimal.NewFromFloat(rawLong).Truncate(7)}
 
 	if long.GreaterThan(maxLongitude) || long.LessThan(minLongitude) {
-		return long, newErrInvalidLongitude(rawLong)
+		return long, NewErrInvalidLongitude(rawLong)
 	}
 
 	return long, nil

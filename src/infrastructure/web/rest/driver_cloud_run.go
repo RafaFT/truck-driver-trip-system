@@ -10,7 +10,6 @@ import (
 
 	"github.com/rafaft/truck-driver-trip-system/adapter/controller/rest"
 	"github.com/rafaft/truck-driver-trip-system/adapter/presenter"
-	"github.com/rafaft/truck-driver-trip-system/entity"
 	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
@@ -18,11 +17,11 @@ import (
 type cloudRunRouter struct {
 	port      string
 	projectID string
-	repo      entity.DriverRepository
+	repo      usecase.DriverRepository
 	router    *mux.Router
 }
 
-func NewDriverCloudRun(port, projectID string, repo entity.DriverRepository) DriversRouter {
+func NewDriverCloudRun(port, projectID string, repo usecase.DriverRepository) DriversRouter {
 	return &cloudRunRouter{
 		port:      port,
 		projectID: projectID,

@@ -9,38 +9,44 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port
-type CreateDriver interface {
-	Execute(context.Context, CreateDriverInput) (*CreateDriverOutput, error)
-}
+type (
+	// input port
+	CreateDriver interface {
+		Execute(context.Context, CreateDriverInput) (*CreateDriverOutput, error)
+	}
 
-// input port implementation - Interactor
-type createDriver struct {
-	logger Logger
-	repo   entity.DriverRepository
-}
+	CreateDriverRepo interface {
+		Save(context.Context, *entity.Driver) error
+	}
 
-type CreateDriverInput struct {
-	BirthDate  time.Time
-	CNH        string
-	CPF        string
-	Gender     string
-	HasVehicle bool
-	Name       string
-}
+	// input port implementation - Interactor
+	createDriver struct {
+		logger Logger
+		repo   CreateDriverRepo
+	}
 
-type CreateDriverOutput struct {
-	Age        int
-	BirthDate  time.Time
-	CNH        string
-	CPF        string
-	CreatedAt  time.Time
-	Gender     string
-	HasVehicle bool
-	Name       string
-}
+	CreateDriverInput struct {
+		BirthDate  time.Time
+		CNH        string
+		CPF        string
+		Gender     string
+		HasVehicle bool
+		Name       string
+	}
 
-func NewCreateDriver(logger Logger, repo entity.DriverRepository) CreateDriver {
+	CreateDriverOutput struct {
+		Age        int
+		BirthDate  time.Time
+		CNH        string
+		CPF        string
+		CreatedAt  time.Time
+		Gender     string
+		HasVehicle bool
+		Name       string
+	}
+)
+
+func NewCreateDriver(logger Logger, repo CreateDriverRepo) CreateDriver {
 	return createDriver{
 		logger: logger,
 		repo:   repo,

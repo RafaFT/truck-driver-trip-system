@@ -9,42 +9,49 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port
-type UpdateTrip interface {
-	Execute(context.Context, string, UpdateTripInput) (*UpdateTripOutput, error)
-}
+type (
+	// input port
+	UpdateTrip interface {
+		Execute(context.Context, string, UpdateTripInput) (*UpdateTripOutput, error)
+	}
 
-// input port implementation - Interactor
-type updateTrip struct {
-	logger Logger
-	repo   entity.TripRepository
-}
+	UpdateTripRepo interface {
+		FindByID(context.Context, string) (*entity.Trip, error)
+		Update(context.Context, *entity.Trip) error
+	}
 
-type UpdateTripInput struct {
-	StartDate       *time.Time
-	EndDate         *time.Time
-	HasLoad         *bool
-	OriginLat       *float64
-	OriginLong      *float64
-	DestinationLat  *float64
-	DestinationLong *float64
-	VehicleCode     *int
-}
+	// input port implementation - Interactor
+	updateTrip struct {
+		logger Logger
+		repo   UpdateTripRepo
+	}
 
-type UpdateTripOutput struct {
-	ID              string
-	StartDate       time.Time
-	EndDate         time.Time
-	Duration        time.Duration
-	HasLoad         bool
-	OriginLat       float64
-	OriginLong      float64
-	DestinationLat  float64
-	DestinationLong float64
-	Vehicle         string
-}
+	UpdateTripInput struct {
+		StartDate       *time.Time
+		EndDate         *time.Time
+		HasLoad         *bool
+		OriginLat       *float64
+		OriginLong      *float64
+		DestinationLat  *float64
+		DestinationLong *float64
+		VehicleCode     *int
+	}
 
-func NewUpdateTrip(logger Logger, repo entity.TripRepository) UpdateTrip {
+	UpdateTripOutput struct {
+		ID              string
+		StartDate       time.Time
+		EndDate         time.Time
+		Duration        time.Duration
+		HasLoad         bool
+		OriginLat       float64
+		OriginLong      float64
+		DestinationLat  float64
+		DestinationLong float64
+		Vehicle         string
+	}
+)
+
+func NewUpdateTrip(logger Logger, repo UpdateTripRepo) UpdateTrip {
 	return updateTrip{
 		logger: logger,
 		repo:   repo,

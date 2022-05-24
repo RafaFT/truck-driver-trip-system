@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/rafaft/truck-driver-trip-system/entity"
+	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
 type driverDoc struct {
@@ -29,7 +30,7 @@ type driverFirestore struct {
 	coll   string
 }
 
-func NewDriverFirestore(c *firestore.Client) entity.DriverRepository {
+func NewDriverFirestore(c *firestore.Client) usecase.DriverRepository {
 	return &driverFirestore{
 		client: c,
 		coll:   "drivers",
@@ -84,7 +85,7 @@ func (df driverFirestore) FindByCPF(ctx context.Context, cpf entity.CPF) (*entit
 	return driver, nil
 }
 
-func (df driverFirestore) Find(ctx context.Context, rawQ entity.FindDriversQuery) ([]*entity.Driver, error) {
+func (df driverFirestore) Find(ctx context.Context, rawQ usecase.FindDriversQuery) ([]*entity.Driver, error) {
 	q := df.client.Collection(df.coll).Query
 
 	if rawQ.CNH != nil {

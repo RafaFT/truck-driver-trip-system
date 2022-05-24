@@ -17,7 +17,7 @@ var vehicleCodes = map[int]Vehicle{
 func NewVehicle(vehicleCode int) (Vehicle, error) {
 	vehicle, ok := vehicleCodes[vehicleCode]
 	if !ok {
-		return "", newErrInvalidVehicleCode(vehicleCode)
+		return "", NewErrInvalidVehicleCode(vehicleCode)
 	}
 
 	return vehicle, nil

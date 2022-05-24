@@ -9,7 +9,6 @@ import (
 
 	"github.com/rafaft/truck-driver-trip-system/adapter/controller/rest"
 	"github.com/rafaft/truck-driver-trip-system/adapter/presenter"
-	"github.com/rafaft/truck-driver-trip-system/entity"
 	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
@@ -17,11 +16,11 @@ import (
 type localHostRouter struct {
 	baseURL string
 	port    string
-	repo    entity.DriverRepository
+	repo    usecase.DriverRepository
 	router  *mux.Router
 }
 
-func NewDriverLocalHost(port string, repo entity.DriverRepository) DriversRouter {
+func NewDriverLocalHost(port string, repo usecase.DriverRepository) DriversRouter {
 	return &localHostRouter{
 		baseURL: "http://localhost",
 		port:    port,

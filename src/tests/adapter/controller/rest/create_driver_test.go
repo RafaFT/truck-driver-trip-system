@@ -13,7 +13,6 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/adapter/controller/rest"
 	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/adapter/presenter"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
 	"github.com/rafaft/truck-driver-trip-system/tests/samples"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
@@ -21,7 +20,7 @@ import (
 func TestCreateDriver(t *testing.T) {
 	const target = "https://127.0.0.1"
 
-	l := log.NewFakeLogger()
+	l := usecase.FakeLogger{}
 	repo := repository.NewDriverInMemory(nil)
 	uc := usecase.NewCreateDriver(l, repo)
 	p := presenter.NewCreateDriver()
@@ -83,7 +82,7 @@ func TestCreateDriver(t *testing.T) {
 }
 
 func TestCreateDriverErrors(t *testing.T) {
-	l := log.NewFakeLogger()
+	l := usecase.FakeLogger{}
 	repo := repository.NewDriverInMemory(samples.GetDrivers(t))
 	uc := usecase.NewCreateDriver(l, repo)
 	p := presenter.NewCreateDriver()

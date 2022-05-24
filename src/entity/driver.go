@@ -41,8 +41,8 @@ func NewDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bo
 		return nil, err
 	}
 
-	if age := newBirthDate.CalculateAge(); age < minimumDriverAge {
-		return nil, newErrInvalidAge(age)
+	if age := newBirthDate.age(); age < minimumDriverAge {
+		return nil, NewErrInvalidAge(age)
 	}
 
 	driver := Driver{
@@ -59,7 +59,7 @@ func NewDriver(cpf, name, gender, cnh string, birthDate time.Time, hasVehicle bo
 
 // getters
 func (d *Driver) Age() int {
-	return d.birthDate.CalculateAge()
+	return d.birthDate.age()
 }
 
 func (d *Driver) BirthDate() BirthDate {

@@ -7,29 +7,35 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port
-type GetDriverByCPF interface {
-	Execute(context.Context, string) (*GetDriverByCPFOutput, error)
-}
+type (
+	// input port
+	GetDriverByCPF interface {
+		Execute(context.Context, string) (*GetDriverByCPFOutput, error)
+	}
 
-// input port implementation - Interactor
-type getDriverByCPF struct {
-	logger Logger
-	repo   entity.DriverRepository
-}
+	GetDriverByCPFRepo interface {
+		FindByCPF(context.Context, entity.CPF) (*entity.Driver, error)
+	}
 
-// output data - type
-type GetDriverByCPFOutput struct {
-	Age        int
-	BirthDate  time.Time
-	CNH        string
-	CPF        string
-	Gender     string
-	HasVehicle bool
-	Name       string
-}
+	// input port implementation - Interactor
+	getDriverByCPF struct {
+		logger Logger
+		repo   GetDriverByCPFRepo
+	}
 
-func NewGetDriverByCPF(logger Logger, repo entity.DriverRepository) GetDriverByCPF {
+	// output data - type
+	GetDriverByCPFOutput struct {
+		Age        int
+		BirthDate  time.Time
+		CNH        string
+		CPF        string
+		Gender     string
+		HasVehicle bool
+		Name       string
+	}
+)
+
+func NewGetDriverByCPF(logger Logger, repo GetDriverByCPFRepo) GetDriverByCPF {
 	return getDriverByCPF{
 		logger: logger,
 		repo:   repo,

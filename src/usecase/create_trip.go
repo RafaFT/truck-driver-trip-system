@@ -10,45 +10,55 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/entity"
 )
 
-// input port
-type CreateTrip interface {
-	Execute(context.Context, CreateTripInput) (*CreateTripOutput, error)
-}
+type (
+	// input port
+	CreateTrip interface {
+		Execute(context.Context, CreateTripInput) (*CreateTripOutput, error)
+	}
 
-// input port implementation - interactor
-type createTrip struct {
-	logger     Logger
-	tripRepo   entity.TripRepository
-	driverRepo entity.DriverRepository
-}
+	CreateTripRepo interface {
+		Save(context.Context, *entity.Trip) error
+	}
 
-type CreateTripInput struct {
-	CPF             string
-	StartDate       time.Time
-	EndDate         time.Time
-	HasLoad         bool
-	OriginLat       float64
-	OriginLong      float64
-	DestinationLat  float64
-	DestinationLong float64
-	VehicleCode     int
-}
+	CreateTripDriverRepo interface {
+		FindByCPF(context.Context, entity.CPF) (*entity.Driver, error)
+	}
 
-type CreateTripOutput struct {
-	ID              string
-	StartDate       time.Time
-	EndDate         time.Time
-	Duration        time.Duration
-	HasLoad         bool
-	OriginLat       float64
-	OriginLong      float64
-	DestinationLat  float64
-	DestinationLong float64
-	Vehicle         string
-}
+	// input port implementation - interactor
+	createTrip struct {
+		logger     Logger
+		tripRepo   CreateTripRepo
+		driverRepo CreateTripDriverRepo
+	}
+
+	CreateTripInput struct {
+		CPF             string
+		StartDate       time.Time
+		EndDate         time.Time
+		HasLoad         bool
+		OriginLat       float64
+		OriginLong      float64
+		DestinationLat  float64
+		DestinationLong float64
+		VehicleCode     int
+	}
+
+	CreateTripOutput struct {
+		ID              string
+		StartDate       time.Time
+		EndDate         time.Time
+		Duration        time.Duration
+		HasLoad         bool
+		OriginLat       float64
+		OriginLong      float64
+		DestinationLat  float64
+		DestinationLong float64
+		Vehicle         string
+	}
+)
 
 // NewCreateTrip returns input port implementation for creating new Trips
-func NewCreateTrip(logger Logger, tripRepo entity.TripRepository, driverRepo entity.DriverRepository) CreateTrip {
+func NewCreateTrip(logger Logger, tripRepo CreateTripRepo, driverRepo CreateTripDriverRepo) CreateTrip {
 	return createTrip{
 		logger:     logger,
 		tripRepo:   tripRepo,

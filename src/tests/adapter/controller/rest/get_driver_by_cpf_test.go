@@ -10,13 +10,12 @@ import (
 	"github.com/rafaft/truck-driver-trip-system/adapter/controller/rest"
 	repository "github.com/rafaft/truck-driver-trip-system/adapter/gateway/database"
 	"github.com/rafaft/truck-driver-trip-system/adapter/presenter"
-	"github.com/rafaft/truck-driver-trip-system/infrastructure/log"
 	"github.com/rafaft/truck-driver-trip-system/tests/samples"
 	"github.com/rafaft/truck-driver-trip-system/usecase"
 )
 
 func TestGetDriverByCPF(t *testing.T) {
-	l := log.NewFakeLogger()
+	l := usecase.FakeLogger{}
 	repo := repository.NewDriverInMemory(samples.GetDrivers(t))
 	uc := usecase.NewGetDriverByCPF(l, repo)
 	p := presenter.NewGetDriverByCPF()
@@ -93,7 +92,7 @@ func TestGetDriverByCPF(t *testing.T) {
 }
 
 func TestGetDriverByCPFErrors(t *testing.T) {
-	l := log.NewFakeLogger()
+	l := usecase.FakeLogger{}
 	repo := repository.NewDriverInMemory(nil)
 	uc := usecase.NewGetDriverByCPF(l, repo)
 	p := presenter.NewGetDriverByCPF()
